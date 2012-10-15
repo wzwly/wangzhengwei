@@ -43,9 +43,10 @@ void QSerial::InitSerial(int nId_)
     struct termios _opt;
     int _fd = 1;
 #if PC_BEBUG
-    //_fd = 0;
+    _fd = 0;
+    return;
 #else
-   // _fd = 0;
+    _fd = 1;
 #endif
     _fd = m_nFdCom = open(g_szSerialName[_fd], O_RDWR | O_NONBLOCK);    //默认为阻塞读方式
    if(_fd == -1)

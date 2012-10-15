@@ -49,4 +49,4 @@ HEADERS  += \
     core/drawthread.h \
     ui/addrdef.h
 
-//DEFINES += PC_BEBUG
+DEFINES += PC_BEBUG

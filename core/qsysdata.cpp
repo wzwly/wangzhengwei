@@ -106,7 +106,7 @@ QSysData::QSysData()
          QString _name(m_szName);
           LoadFile(_path, _name);
     }
-
+    m_cGlbData.bReDrawRule = true;
     InitParamData();
 }
 
