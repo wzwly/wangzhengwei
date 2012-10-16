@@ -374,13 +374,13 @@ void QDrawArea::DrawRightRuler(const double fMin_, const double fMax_, QString s
                       if (_bFirst)
                       {
                               if (DB_EZ(_dbCurPos) )
-                                      m_pPaint->drawText(1, 14, QString::number(_dbCurPos));
+                                      m_pPaint->drawText(7, 20, QString::number(_dbCurPos));
 
-                             m_pPaint->drawText(7, 14, strUnit_);
+                             m_pPaint->drawText(14, 20, strUnit_);
                            _bFirst = false;
                       }
                       else
-                            m_pPaint->drawText(1, 14, QString::number(_dbCurPos));
+                            m_pPaint->drawText(7, 20, QString::number(_dbCurPos));
 
                       m_pPaint->resetTransform();
                }
@@ -410,7 +410,7 @@ void QDrawArea::DrawRightRuler(const double fMin_, const double fMax_, QString s
       {
               m_pPaint->translate(_nX, _k);
               m_pPaint->rotate(270);
-              m_pPaint->drawText(7, 14, strUnit_);
+              m_pPaint->drawText(14, 20, strUnit_);
               m_pPaint->resetTransform();
       }
 }
@@ -457,20 +457,20 @@ void QDrawArea::DrawBottomRuler(const double fMin_, const double fMax_, QString 
                     if (_bFirst)
                     {
                             if (DB_EZ(_dbCurPos) )
-                                    m_pPaint->drawText(_k + 1, _nY + 14, QString::number(_dbCurPos));
+                                    m_pPaint->drawText(_k + 1, _nY + 20, QString::number(_dbCurPos));
 
-                           m_pPaint->drawText(_k + 5, _nY + 14, strUnit_);
+                           m_pPaint->drawText(_k + 10, _nY + 20, strUnit_);
                          _bFirst = false;
                     }
                     else
-                            m_pPaint->drawText(_k + 1, _nY + 14, QString::number(_dbCurPos));
+                            m_pPaint->drawText(_k + 1, _nY + 20, QString::number(_dbCurPos));
              }
              else if (_nPos % 5 == 0)
              {
                     m_pPaint->drawLine(_k, _nY, _k, _nY + 8);
                     if (_bFirst)
                     {
-                             m_pPaint->drawText(_k - 2, _nY + 14, strUnit_);
+                             m_pPaint->drawText(_k - 2, _nY + 20, strUnit_);
                              _bFirst = false;
                     }
              }
