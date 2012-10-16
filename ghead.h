@@ -68,7 +68,7 @@ enum LANG
        LANG_NUM,
 };
 
-#define COLOR_F  250
+#define COLOR_F  50
 
 #define DISABLE_BK_COLOR  QColor(212, 207, 178, COLOR_F)
 #define DISABLE_FG_COLOR  QColor(152, 151, 148, COLOR_F)
