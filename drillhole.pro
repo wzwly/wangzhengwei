@@ -50,3 +50,6 @@ HEADERS  += \
     ui/addrdef.h
 
 DEFINES += PC_BEBUG
+
+OTHER_FILES += \
+    备注.txt
