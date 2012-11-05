@@ -5,6 +5,8 @@
 #include <QLabel>
 #include <QDoubleSpinBox>
 
+struct  DataMap;
+
 class QItem
 {
 public:
@@ -30,13 +32,15 @@ protected:
     int        m_nFontSize;
     int        m_nBdWidth;
     unsigned int m_nFlag;
-
+    DataMap* m_pDataMap;
 public:
     inline void SetFgColor(QColor cColor_,  WIND_STATE State_ = INVALID_STATE){State_ == INVALID_STATE ? m_cFgColor[m_eSate] = cColor_ : m_cFgColor[State_] = cColor_;}
     inline void SetBkColor(QColor cColor_,  WIND_STATE State_ = INVALID_STATE){State_ == INVALID_STATE ? m_cBkColor[m_eSate] = cColor_ : m_cBkColor[State_] = cColor_;}
     inline void SetBdColor(QColor cColor_,  WIND_STATE State_ = INVALID_STATE){State_ == INVALID_STATE ? m_cBdColor[m_eSate] = cColor_ : m_cBdColor[State_] = cColor_;}
     inline void SetColor(QColor cFg_, QColor cBk_, QColor cBd_, WIND_STATE State_ = INVALID_STATE);
     inline void SetBdWide(int nW_) {m_nBdWidth = nW_;}
+    void SetDataMap(DataMap* pMap_) {m_pDataMap = pMap_;}
+    DataMap* GetDataMap() {return m_pDataMap;}
     virtual void SetFontSize(int nF_) {m_nFontSize = nF_;}
 
     virtual void SetStatus(WIND_STATE State_) = 0;
