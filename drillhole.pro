@@ -1,14 +1,11 @@
-#-------------------------------------------------
-#
+# -------------------------------------------------
 # Project created by QtCreator 2012-06-30T20:16:46
-#
-#-------------------------------------------------
-QT       += core gui
-
+# -------------------------------------------------
+QT += core \
+    gui
 TARGET = drillhole
 TEMPLATE = app
-
-SOURCES += main.cpp\   
+SOURCES += main.cpp \
     label/item.cpp \
     label/button.cpp \
     ui/mainframe.cpp \
@@ -25,10 +22,9 @@ SOURCES += main.cpp\
     core/dxfreader.cpp \
     core/serial.cpp \
     core/drawthread.cpp \
-    core/cmddef.cpp
-
-HEADERS  += \
-    ghead.h \
+    core/cmddef.cpp \
+    core/parseconfig.cpp
+HEADERS += ghead.h \
     label/item.h \
     label/button.h \
     ui/mainframe.h \
@@ -47,8 +43,8 @@ HEADERS  += \
     core/serial.h \
     core/cmddef.h \
     core/drawthread.h \
-    ui/addrdef.h
-
+    ui/addrdef.h \
+    core/parseconfig.h
 DEFINES += PC_BEBUG
 
 OTHER_FILES += \

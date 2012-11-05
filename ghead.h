@@ -11,9 +11,12 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <string>
+#include <strings.h>
+#include <vector>
 #include <QDebug>
 
-
+using namespace std;
 #define MAIN_MENU_COUNT      5
 #define SECOND_MENU_COUNT    6
 
@@ -68,7 +71,9 @@ enum LANG
        LANG_NUM,
 };
 
-#define COLOR_F  250
+
+#define COLOR_F  30
+
 
 #define DISABLE_BK_COLOR  QColor(212, 207, 178, COLOR_F)
 #define DISABLE_FG_COLOR  QColor(152, 151, 148, COLOR_F)
@@ -84,5 +89,7 @@ enum LANG
 extern QList<QObject*> g_pListObject;
 
 #define  AXIS_NUM  6
+#define  PAGE_PARAM_COUNT  50
+#define  MAX_LINE_READ  256
 
 #endif

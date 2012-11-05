@@ -5,6 +5,7 @@
 #include "typedef.h"
 #include "./../ghead.h"
 
+
 struct PARAM_DEF
 {
     enum DATA_CLASS{   //属性
@@ -48,6 +49,7 @@ struct PARAM_DEF
     void SetData(float f);
 };
 
+
 struct GlbConfig
 {
     //显示类参数
@@ -79,10 +81,12 @@ struct GlbConfig
     unsigned short wBackOrg;  //回原点， -1 ，全部回， 1-6 分别每个轴回
     unsigned short wManulStep; // 1步进， 2连续开始， 3连续停止
     GlbConfig();
-    void ReSet();
+    void ReSet(); 
 };
 
-#define MAX_FILE_NAME_SIZE  64
+
+
+#define MAX_FILE_NAME_SIZE  128
 class QSysData
 {
    friend class QAutoPage;

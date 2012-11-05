@@ -40,6 +40,7 @@ QItem::QItem(COLOR_GROUP nColor_)
 {
         InitColor(nColor_);
         m_nBdWidth = 1;
+        m_pDataMap = NULL;
 }
 
 QItem::~QItem()
