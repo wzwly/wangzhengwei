@@ -1,0 +1,21 @@
+// "//"号作为程序注释
+// 一个有效的数据段包含在DATABEGIN 和 DATAEND之间
+// GROUP 代表在参数页属于那个页面下，从0开始，0 、1、 2、 3
+//一个向下发送的参数表示如下：
+//   #地址 = 初始值    FRAC = 小数点个数（不写默认是整数） MUL = 放大倍数 UNIT = "单位"    TEXT = "参数说明"
+//   #11 = 56.78  FRAC = 2  UNIT = m/min   DIS = Y  TEXT = "速度"
+//   其中地址和初始值必须，小数点默认为0， 显示默认为显示（Y显示，N不显示），参数说明必须（长度小于32字符）
+//              
+
+DATABEGIN
+
+GROUP  1
+BASEADDR 111
+
+#1=23.12  ADDR = 222 FRAC = 2 MUL = 1.0 UNIT = "mm/s" TEXT = "测试参数 速度"
+
+#3=3.12  ADDR = 32 FRAC = 2 MUL = 1.0 UNIT = "mm" TEXT = "测试参数 距离"
+
+
+DATAEND
+
