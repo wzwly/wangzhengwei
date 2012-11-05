@@ -239,6 +239,12 @@ void QAutoPage::OnUpDate(int nFlag_)
         //Cmd06WriteKeepReg(1, 0x55);
         const  char * _p = "1234567890\n00";
         //CmdWriteKeepReg(1, 11, (const unsigned char*)_p);
+        //for(int _i = 0; _i < 100)
+        static int _iCont = 0;
+        _iCont++;
+        if (_iCont > 100)
+            _iCont = 0;
+        CmdWriteKeepReg(_iCont, 4, (const unsigned char*)&_iCont);
     }
 }
 
