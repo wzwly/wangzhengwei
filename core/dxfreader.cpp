@@ -1,5 +1,5 @@
 #include "dxfreader.h"
-#define MAX_LINE  256
+#include "../ghead.h"
 
 QDxfReader::QDxfReader()
 {
@@ -17,6 +17,9 @@ QDxfReader::~QDxfReader()
 
 bool QDxfReader::Open(const QString& szFileName_)
 {
+    if (m_pFile != NULL)
+        Close();
+
     m_pFile = new QFile(szFileName_);
     if (m_pFile->open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -48,7 +51,7 @@ bool QDxfReader::ReadNextNode(int nToken_)
 {
         m_cNodeVal.Reset();
 
-        char _aRead[MAX_LINE + 1];
+        char _aRead[MAX_LINE_READ + 1];
         QString _strLine;
         int _nToken = -1;
         int _nTemp = 0;
@@ -56,7 +59,7 @@ bool QDxfReader::ReadNextNode(int nToken_)
 
         for (; ;) //读到一个标记为0 或者为2的值
         {
-                int _nRet = m_pFile->readLine(_aRead,MAX_LINE);
+                int _nRet = m_pFile->readLine(_aRead, MAX_LINE_READ);
                 if (_nRet > 0)
                 {
                         _strLine = QString(_aRead);
@@ -81,7 +84,7 @@ bool QDxfReader::ReadNextNode(int nToken_)
         //读取标记的具体名字
         if (m_cNodeVal.nToken >= 0)
         {
-                m_pFile->readLine(_aRead,MAX_LINE);
+                m_pFile->readLine(_aRead, MAX_LINE_READ);
                 _strLine = QString(_aRead);
                 m_cNodeVal.strCurLine = _strLine.trimmed();
                 //qDebug() <<m_cNodeVal.strCurLine;

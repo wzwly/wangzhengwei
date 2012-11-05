@@ -1,6 +1,7 @@
 #ifndef  __PARSECONFIG_H__
 #define __PARSECONFIG_H__
-
+ #include <stack>
+#include <QFile>
 #include  "./../ghead.h"
 
 //参数结构体
@@ -33,15 +34,83 @@ struct ConfigData
     vector<DataMap*> m_pArrayData;
 };
 
+
+//过程如下：
+//1.读取一个有效行
+//2.跳过空行
+//3.段开始，压栈，进入段
+//4.段结束，弹栈，进入段
+//5.数据，解释数据，数据插入队列
 class CParseConfig
 {
 public:
+    enum Token
+    {
+        INVALID_T = -1,
+        PARA_LINE,
+        DATA_BEGIN,
+        DATA_END,
+        BASE_ADDR,
+        GROUP_INFO,
+        TOKEN_NUM,
+    };
     CParseConfig();
+    ~ CParseConfig();
     bool OpenConfigFile(const char* szPath_);
+    void CloseFile();
+    bool StartLoadConfig(ConfigData* pData_);
 
+private:
+    bool LoadLine(); //读取一行。注释行跳过
+    bool ReadToken(const string& strToken_);  //读取对应标记
+    Token GetLineToken();
 
+    void EnterDataBegin();
+    void LeaveDataEnd();
+    void GetParam();
+    void GetGroupInfo();
+    void GetBaseAddr();
 
+    bool GetDouble(double& dRet_);
+    bool GetInt(int& nRet_);
 
+private:
+    int m_nBaseAddr;
+    int m_nGroup;
+    stack<int> m_stkSeg;
+
+    string m_strCurLine;
+    long m_nFileSize;
+    int m_nLinePos;
+    QFile* m_pFile;
+    ConfigData* m_pConfigData;
 };
 
+/*
+DATABEGIN  //数据开始
+
+GROUP       1
+BASEADDR   111
+
+#1=23.12  ADDR = 222 FRAC = 2 MUL = 1.0 UNIT = "mm/s" TEXT = "测试参数 速度"
+H
+#3=3.12  ADDR = 32 FRAC = 2 MUL = 1.0 UNIT = "mm" TEXT = "测试参数 距离"
+
+DATAEND
+*/
 #endif // PARSECONFIG_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
