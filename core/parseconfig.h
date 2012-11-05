@@ -73,6 +73,7 @@ private:
 
     bool GetDouble(double& dRet_);
     bool GetInt(int& nRet_);
+    bool GetText(string& str_);
 
 private:
     int m_nBaseAddr;

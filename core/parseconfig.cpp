@@ -115,7 +115,7 @@ void CParseConfig::CloseFile()
             switch(GetLineToken())
             {
                     case PARA_LINE:
-                       //GetParam();
+                       GetParam();
                         break;
                      case DATA_BEGIN:
                          EnterDataBegin();
@@ -127,7 +127,7 @@ void CParseConfig::CloseFile()
                         GetBaseAddr();
                         break;
                      case GROUP_INFO:
-                       // GetGroupInfo();
+                        GetGroupInfo();
                         break;
                      default:
                         assert(false);
@@ -178,13 +178,70 @@ CParseConfig::Token CParseConfig::GetLineToken()
 
  void CParseConfig::GetBaseAddr()
  {
-        m_nLinePos += 8;
-
+        m_nLinePos += 8;  //"BASEADDR"
         int _addr;
         if (GetInt(_addr))
-            qDebug() << "addr" << _addr;
+            m_nBaseAddr =_addr;
+        qDebug() << "addr" << _addr;
  }
 
+ void CParseConfig::GetGroupInfo()
+ {
+     m_nLinePos += 5; //"GROUP"
+     int _grp;
+     if (GetInt(_grp))
+         m_nGroup = _grp;
+     qDebug() << "group" << _grp;
+ }
+static const char* g_szItem[5] = {"ADDR", "FRAC", "MUL", "UNIT", "TEXT"};
+ void CParseConfig::GetParam()
+ {
+    m_nLinePos += 1;
+    int _nNo;
+    double _dVal;
+    if (GetInt(_nNo) && GetDouble(_dVal))
+    {
+        int _addr, _frac = 0;
+        double _dMul = 1.0;
+        int _i = 0;
+        string _strUnit, _strText;
+        string::size_type  _tPos;
+        _tPos = m_strCurLine.find(g_szItem[_i++]);
+        if (_tPos != string::npos)
+        {
+          m_nLinePos =  _tPos + 4;
+          GetInt(_addr);
+        }
+        _tPos = m_strCurLine.find(g_szItem[_i++]);
+        if (_tPos != string::npos)
+        {
+          m_nLinePos =  _tPos + 4;
+          GetInt(_frac);
+        }
+        _tPos = m_strCurLine.find(g_szItem[_i++]);
+        if (_tPos != string::npos)
+        {
+          m_nLinePos =  _tPos + 3;
+          GetDouble(_dMul);
+        }
+
+        _tPos = m_strCurLine.find(g_szItem[_i++]);
+        if (_tPos != string::npos)
+        {
+          m_nLinePos =  _tPos + 4;
+          GetText(_strUnit);
+        }
+
+        _tPos = m_strCurLine.find(g_szItem[_i++]);
+        if (_tPos != string::npos)
+        {
+          m_nLinePos =  _tPos + 4;
+          GetText(_strText);
+        }
+
+        qDebug() <<"#" <<_nNo << "="<<_dVal << _addr << _frac << _dMul<< QString(_strUnit.data())<<QString(_strText.data());
+    }
+ }
 
  bool CParseConfig::GetDouble(double& dRet_)
  {
@@ -196,7 +253,7 @@ CParseConfig::Token CParseConfig::GetLineToken()
         {
             _ch = m_strCurLine.at(m_nLinePos++);
 
-            if (_ch == '\o' || _ch ==  '\t')
+            if (_ch == ' ' || _ch ==  '\t')
             {
                     if (_bFind)
                         break;
@@ -250,7 +307,6 @@ bool CParseConfig::GetInt(int& nRet_)
                 return false;
         }
     }
-
     if (_i <= 0)
         return false;
     _cArray[_i] = '\0';
@@ -259,7 +315,34 @@ bool CParseConfig::GetInt(int& nRet_)
 }
 
 
+bool CParseConfig::GetText(string& str_)
+{
+    char _ch;
+    bool _bFind = false;
+    char _cArray[64];
+    int _i = 0;
+    while(_i < 63)
+    {
+        _ch = m_strCurLine.at(m_nLinePos++);
 
+        if (_ch == '\n' || _ch == '\r')
+            return false;
+        if (_bFind) // find out the first '\"'
+        {
+            if (_ch == '\"')
+                break;
+            _cArray[_i++] = _ch;
+        }
+        else if (_ch == '\"')
+            _bFind = true;
+    }
+    if (_i <= 0)
+        return false;
+    _cArray[_i] = '\0';
+    str_.append(_cArray);
+    return true;
+
+}
 
 
 
