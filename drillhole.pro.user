@@ -76,7 +76,7 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-n6onxJm1Wx,guid=d541cf8943d06131a527747f507f4ca9</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-ziosfRvoAj,guid=6aa02f4c07c1b075b5a289df50970464</value>
     <value type="QString">DEFAULTS_PATH=/usr/share/gconf/gnome.default.path</value>
     <value type="QString">DESKTOP_SESSION=gnome</value>
     <value type="QString">DISPLAY=:0.0</value>
@@ -84,8 +84,8 @@
     <value type="QString">GDM_KEYBOARD_LAYOUT=us</value>
     <value type="QString">GDM_LANG=zh_CN.utf8</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-htp1Jd</value>
-    <value type="QString">GNOME_KEYRING_PID=1454</value>
+    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-KKqREk</value>
+    <value type="QString">GNOME_KEYRING_PID=1481</value>
     <value type="QString">GTK_IM_MODULE=ibus</value>
     <value type="QString">GTK_MODULES=canberra-gtk-module</value>
     <value type="QString">HOME=/home/tt</value>
@@ -99,18 +99,18 @@
     <value type="QString">PWD=/home/tt</value>
     <value type="QString">QTDIR=/usr/share/qt4</value>
     <value type="QString">QT_IM_MODULE=xim</value>
-    <value type="QString">SESSION_MANAGER=local/tt-desktop:@/tmp/.ICE-unix/1472,unix/tt-desktop:/tmp/.ICE-unix/1472</value>
+    <value type="QString">SESSION_MANAGER=local/tt-desktop:@/tmp/.ICE-unix/1499,unix/tt-desktop:/tmp/.ICE-unix/1499</value>
     <value type="QString">SHELL=/bin/bash</value>
     <value type="QString">SHLVL=0</value>
     <value type="QString">SPEECHD_PORT=7560</value>
-    <value type="QString">SSH_AGENT_PID=1510</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-htp1Jd/ssh</value>
+    <value type="QString">SSH_AGENT_PID=1537</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-KKqREk/ssh</value>
     <value type="QString">USER=tt</value>
     <value type="QString">USERNAME=tt</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-tt-DYJmHz/database</value>
+    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-tt-mmgOia/database</value>
     <value type="QString">XDG_CONFIG_DIRS=/etc/xdg/xdg-gnome:/etc/xdg</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=dad9035a8d48a27baf43bdbe4dd0ed2a-1350519977.60045-173782362</value>
+    <value type="QString">XDG_SESSION_COOKIE=dad9035a8d48a27baf43bdbe4dd0ed2a-1352074340.36081-1204180026</value>
     <value type="QString">XMODIFIERS=@im=ibus</value>
    </valuelist>
    <valuelist key="abstractProcess.arguments" type="QVariantList">
@@ -130,7 +130,7 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-n6onxJm1Wx,guid=d541cf8943d06131a527747f507f4ca9</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-ziosfRvoAj,guid=6aa02f4c07c1b075b5a289df50970464</value>
     <value type="QString">DEFAULTS_PATH=/usr/share/gconf/gnome.default.path</value>
     <value type="QString">DESKTOP_SESSION=gnome</value>
     <value type="QString">DISPLAY=:0.0</value>
@@ -138,8 +138,8 @@
     <value type="QString">GDM_KEYBOARD_LAYOUT=us</value>
     <value type="QString">GDM_LANG=zh_CN.utf8</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-htp1Jd</value>
-    <value type="QString">GNOME_KEYRING_PID=1454</value>
+    <value type="QString">GNOME_KEYRING_CONTROL=/tmp/keyring-KKqREk</value>
+    <value type="QString">GNOME_KEYRING_PID=1481</value>
     <value type="QString">GTK_IM_MODULE=ibus</value>
     <value type="QString">GTK_MODULES=canberra-gtk-module</value>
     <value type="QString">HOME=/home/tt</value>
@@ -153,18 +153,18 @@
     <value type="QString">PWD=/home/tt</value>
     <value type="QString">QTDIR=/usr/share/qt4</value>
     <value type="QString">QT_IM_MODULE=xim</value>
-    <value type="QString">SESSION_MANAGER=local/tt-desktop:@/tmp/.ICE-unix/1472,unix/tt-desktop:/tmp/.ICE-unix/1472</value>
+    <value type="QString">SESSION_MANAGER=local/tt-desktop:@/tmp/.ICE-unix/1499,unix/tt-desktop:/tmp/.ICE-unix/1499</value>
     <value type="QString">SHELL=/bin/bash</value>
     <value type="QString">SHLVL=0</value>
     <value type="QString">SPEECHD_PORT=7560</value>
-    <value type="QString">SSH_AGENT_PID=1510</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-htp1Jd/ssh</value>
+    <value type="QString">SSH_AGENT_PID=1537</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-KKqREk/ssh</value>
     <value type="QString">USER=tt</value>
     <value type="QString">USERNAME=tt</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-tt-DYJmHz/database</value>
+    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-tt-mmgOia/database</value>
     <value type="QString">XDG_CONFIG_DIRS=/etc/xdg/xdg-gnome:/etc/xdg</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=dad9035a8d48a27baf43bdbe4dd0ed2a-1350519977.60045-173782362</value>
+    <value type="QString">XDG_SESSION_COOKIE=dad9035a8d48a27baf43bdbe4dd0ed2a-1352074340.36081-1204180026</value>
     <value type="QString">XMODIFIERS=@im=ibus</value>
    </valuelist>
    <value key="abstractProcess.IgnoreReturnValue" type="bool">false</value>
@@ -234,250 +234,8 @@
  <data>
   <variable>cleanstep0</variable>
   <valuemap type="QVariantMap">
-<<<<<<< HEAD
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString"></value>
    <value key="clean" type="bool">true</value>
-=======
-   <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">桌面</value>
-   <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-   <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Target.DesktopTarget</value>
-   <value key="ProjectExplorer.Target.ActiveBuildConfiguration" type="int">1</value>
-   <value key="ProjectExplorer.Target.ActiveDeployConfiguration" type="int">0</value>
-   <value key="ProjectExplorer.Target.ActiveRunConfiguration" type="int">0</value>
-   <valuemap key="ProjectExplorer.Target.BuildConfiguration.0" type="QVariantMap">
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.0" type="QVariantMap">
-     <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">qmake</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">QtProjectManager.QMakeBuildStep</value>
-      <valuelist key="QtProjectManager.QMakeBuildStep.QMakeArguments" type="QVariantList"/>
-      <value key="QtProjectManager.QMakeBuildStep.QMakeForced" type="bool">false</value>
-     </valuemap>
-     <valuemap key="ProjectExplorer.BuildStepList.Step.1" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-      <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">false</value>
-      <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList"/>
-      <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-     </valuemap>
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">2</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">构建</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Build</value>
-    </valuemap>
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.1" type="QVariantMap">
-     <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-      <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">true</value>
-      <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList">
-       <value type="QString">clean</value>
-      </valuelist>
-      <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-     </valuemap>
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">1</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">清理</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Clean</value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.BuildStepListCount" type="int">2</value>
-    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
-    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList"/>
-    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">PATH中的 Qt Release</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/home/wzwly/work_file/xinte/xinte_0904/drillhole-build-desktop</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
-   </valuemap>
-   <valuemap key="ProjectExplorer.Target.BuildConfiguration.1" type="QVariantMap">
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.0" type="QVariantMap">
-     <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">qmake</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">QtProjectManager.QMakeBuildStep</value>
-      <valuelist key="QtProjectManager.QMakeBuildStep.QMakeArguments" type="QVariantList"/>
-      <value key="QtProjectManager.QMakeBuildStep.QMakeForced" type="bool">false</value>
-     </valuemap>
-     <valuemap key="ProjectExplorer.BuildStepList.Step.1" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-      <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">false</value>
-      <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList"/>
-      <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-     </valuemap>
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">2</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">构建</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Build</value>
-    </valuemap>
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.1" type="QVariantMap">
-     <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-      <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">true</value>
-      <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList">
-       <value type="QString">clean</value>
-      </valuelist>
-      <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-     </valuemap>
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">1</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">清理</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Clean</value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.BuildStepListCount" type="int">2</value>
-    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
-    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList">
-     <value type="QString">PC_BEBUG=1</value>
-    </valuelist>
-    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">PATH中的 Qt Debug</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/home/wzwly/work_file/xinte/drillhole_pc</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
-   </valuemap>
-   <valuemap key="ProjectExplorer.Target.BuildConfiguration.2" type="QVariantMap">
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.0" type="QVariantMap">
-     <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">qmake</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">QtProjectManager.QMakeBuildStep</value>
-      <valuelist key="QtProjectManager.QMakeBuildStep.QMakeArguments" type="QVariantList"/>
-      <value key="QtProjectManager.QMakeBuildStep.QMakeForced" type="bool">false</value>
-     </valuemap>
-     <valuemap key="ProjectExplorer.BuildStepList.Step.1" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-      <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">false</value>
-      <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList"/>
-      <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-     </valuemap>
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">2</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">构建</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Build</value>
-    </valuemap>
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.1" type="QVariantMap">
-     <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-      <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">true</value>
-      <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList">
-       <value type="QString">clean</value>
-      </valuelist>
-      <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-     </valuemap>
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">1</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">清理</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Clean</value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.BuildStepListCount" type="int">2</value>
-    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
-    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList"/>
-    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">arm-4.7.0 Release</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/home/wzwly/work_file/xinte/xinte_0904/drillhole</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">4</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">false</value>
-   </valuemap>
-   <valuemap key="ProjectExplorer.Target.BuildConfiguration.3" type="QVariantMap">
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.0" type="QVariantMap">
-     <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">qmake</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">QtProjectManager.QMakeBuildStep</value>
-      <valuelist key="QtProjectManager.QMakeBuildStep.QMakeArguments" type="QVariantList"/>
-      <value key="QtProjectManager.QMakeBuildStep.QMakeForced" type="bool">false</value>
-     </valuemap>
-     <valuemap key="ProjectExplorer.BuildStepList.Step.1" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-      <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">false</value>
-      <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList"/>
-      <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-     </valuemap>
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">2</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">构建</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Build</value>
-    </valuemap>
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.1" type="QVariantMap">
-     <valuemap key="ProjectExplorer.BuildStepList.Step.0" type="QVariantMap">
-      <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Make</value>
-      <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-      <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">true</value>
-      <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList">
-       <value type="QString">clean</value>
-      </valuelist>
-      <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-     </valuemap>
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">1</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">清理</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Clean</value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.BuildStepListCount" type="int">2</value>
-    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
-    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList"/>
-    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">arm-4.7.0 Debug</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/home/wzwly/work_file/xinte/drillhole</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">4</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
-   </valuemap>
-   <value key="ProjectExplorer.Target.BuildConfigurationCount" type="int">4</value>
-   <valuemap key="ProjectExplorer.Target.DeployConfiguration.0" type="QVariantMap">
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStepList.0" type="QVariantMap">
-     <value key="ProjectExplorer.BuildStepList.StepsCount" type="int">0</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">部署</value>
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Deploy</value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.BuildStepListCount" type="int">1</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">当前无部署</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.DefaultDeployConfiguration</value>
-   </valuemap>
-   <value key="ProjectExplorer.Target.DeployConfigurationCount" type="int">1</value>
-   <valuemap key="ProjectExplorer.Target.RunConfiguration.0" type="QVariantMap">
-    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">drillhole</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4RunConfiguration</value>
-    <value key="Qt4ProjectManager.Qt4RunConfiguration.BaseEnvironmentBase" type="int">2</value>
-    <valuelist key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments" type="QVariantList"/>
-    <value key="Qt4ProjectManager.Qt4RunConfiguration.ProFile" type="QString">drillhole.pro</value>
-    <value key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix" type="bool">false</value>
-    <value key="Qt4ProjectManager.Qt4RunConfiguration.UseTerminal" type="bool">false</value>
-    <valuelist key="Qt4ProjectManager.Qt4RunConfiguration.UserEnvironmentChanges" type="QVariantList"/>
-    <value key="Qt4ProjectManager.Qt4RunConfiguration.UserSetWorkingDirectory" type="bool">false</value>
-    <value key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory" type="QString"></value>
-    <value key="RunConfiguration.QmlDebugServerPort" type="uint">3768</value>
-    <value key="RunConfiguration.UseCppDebugger" type="bool">true</value>
-    <value key="RunConfiguration.UseQmlDebugger" type="bool">false</value>
-   </valuemap>
-   <value key="ProjectExplorer.Target.RunConfigurationCount" type="int">1</value>
->>>>>>> 320c5f98eac0c33a4ec082179ca66fe9c23479e8
   </valuemap>
  </data>
  <data>
