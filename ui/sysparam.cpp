@@ -95,19 +95,21 @@ void QSysParamPage::InitParam()
 
 void QSysParamPage::Show()
 {
-    /*int _nLen = m_vParamData.size() - m_nShowIndex;
+    int _nLen = m_pSysParam->size() - m_nShowIndex;
     int _nMax = (_nLen > PARAM_COLOUM) ? PARAM_COLOUM :_nLen;
 
     if (_nMax == 0)
         return;
 
     int _j = 0;
+    DataMap* _pMap = NULL;
     for (int _i = m_nShowIndex; _i < m_nShowIndex + _nMax; ++_i, ++_j)
     {
-        m_aParamArray[_j].pIndex->setText(QString::number(m_vParamData[_i]->iIndex));
-        m_aParamArray[_j].pName->setText(m_vParamData[_i]->strName);
-        m_aParamArray[_j].pData->setText(m_vParamData[_i]->Value());
-        m_aParamArray[_j].pUnit->setText(g_szUnit[m_vParamData[_i]->cUnit]);
+        _pMap = m_pSysParam->at(_i);
+        m_aParamArray[_j].pIndex->setText(QString::number(_pMap->iNo));
+        m_aParamArray[_j].pName->setText(_pMap->strName.data());
+        //m_aParamArray[_j].pData->setText(m_vParamData[_i]->Value());
+        m_aParamArray[_j].pUnit->setText(_pMap->strUnit.data());
     }
 
     for (; _j < PARAM_COLOUM; ++_j)
@@ -116,18 +118,22 @@ void QSysParamPage::Show()
         m_aParamArray[_j].pName->setText("");
         m_aParamArray[_j].pData->setText("");
         m_aParamArray[_j].pUnit->setText("");
-    }*/
+    }
 }
 
 void QSysParamPage::UpdateView(int nIndex_)
 {
    m_nShow = SHOW_VIEW;
-    /*m_vParamData.clear();
-    for (int _i = 0; _i < m_vViewParam.size(); ++_i)
-    {
-        m_vParamData.append(m_vViewParam[_i]);
-    }
-    Show();*/
+   
+   if (0 == nIndex_)
+        m_pSysParam = & m_vParamData0;
+   else if (1 == nIndex_)
+        m_pSysParam = & m_vParamData1;
+   else if (2 == nIndex_)
+        m_pSysParam = & m_vParamData2;
+   else if (3 == nIndex_)
+        m_pSysParam = & m_vParamData3;
+    Show();
 }
 
 void QSysParamPage::UpdateSystem(int nIndex_)

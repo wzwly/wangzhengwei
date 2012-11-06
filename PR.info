@@ -22,8 +22,8 @@ DATABEGIN  //数据开始
 
 GROUP       1
 
-#1=23.12  ADDR = 222 FRAC = 2 MUL = 1.0 UNIT = "mm/s" TEXT = "测试参数 速度"
-#3=3.12  ADDR = 32 FRAC = 2  MUL = 1.0 UNIT = "mm" TEXT = "测试参数 距离"
+#1=23.12  ADDR = 222  NAME="速度" FRAC = 2 MUL = 1.0  UNIT = "mm/s" TEXT = "测试参数 速度"
+#3=3.12  ADDR = 32 NAME="长度" FRAC = 2  MUL = 1.0  UNIT = "mm" TEXT = "测试参数 距离"
 
 DATAEND
 

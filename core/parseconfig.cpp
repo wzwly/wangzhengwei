@@ -144,7 +144,7 @@ void CParseConfig::CloseFile()
     for (int _i = 0; _i < m_pConfigData->m_pArrayData.size(); ++_i)
     {
             _pMap = m_pConfigData->m_pArrayData[_i];
-            qDebug()<< "Param # Val Addr Group"<<_pMap->iNo << _pMap->dVal << _pMap->iAddr << _pMap->iGroup;
+            qDebug()<< "Param # Val Addr Group"<<_pMap->iNo << _pMap->strName.data() << _pMap->iAddr << _pMap->iGroup;
             qDebug()<< "Frac Mul"<< _pMap->iFraction << _pMap->dMult << _pMap->strUnit.data() << _pMap->strText.data();
     }
 #endif
@@ -207,7 +207,7 @@ CParseConfig::Token CParseConfig::GetLineToken()
      //qDebug() << "group" << _grp;
  }
 
-static const char* g_szItem[5] = {"ADDR", "FRAC", "MUL", "UNIT", "TEXT"};
+static const char* g_szItem[6] = {"ADDR", "FRAC", "MUL","NAME", "UNIT", "TEXT"};
  void CParseConfig::GetParam()
  {
     m_nLinePos += 1;
@@ -218,7 +218,7 @@ static const char* g_szItem[5] = {"ADDR", "FRAC", "MUL", "UNIT", "TEXT"};
         int _addr = -1, _frac = 0;
         double _dMul = 1.0;
         int _i = 0;
-        string _strUnit, _strText;
+        string  _strName, _strUnit, _strText;
         string::size_type  _tPos;
         _tPos = m_strCurLine.find(g_szItem[_i++]);//ADDR
         if (_tPos != string::npos)
@@ -237,6 +237,13 @@ static const char* g_szItem[5] = {"ADDR", "FRAC", "MUL", "UNIT", "TEXT"};
         {
           m_nLinePos =  _tPos + 3;
           GetDouble(_dMul);
+        }
+
+        _tPos = m_strCurLine.find(g_szItem[_i++]);//NAME
+        if (_tPos != string::npos)
+        {
+             m_nLinePos =  _tPos + 4;
+             GetText(_strName);
         }
 
         _tPos = m_strCurLine.find(g_szItem[_i++]);//UNIT
@@ -262,7 +269,7 @@ static const char* g_szItem[5] = {"ADDR", "FRAC", "MUL", "UNIT", "TEXT"};
             _addr += m_nBaseAddr;
         }
         m_pConfigData->m_pArrayData.push_back(new DataMap(_nNo, _addr, _nGrp,  _frac,
-                                                         _dMul, _dVal, _strUnit, _strText));
+                                                         _dMul, _strName, _strUnit, _strText));
        // qDebug() <<"#" <<_nNo << "="<<_dVal << _addr << _frac << _dMul<< QString(_strUnit.data())<<QString(_strText.data());
     }
  }

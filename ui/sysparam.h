@@ -53,7 +53,7 @@ public:
    vector<DataMap*> m_vParamData2;
    vector<DataMap*> m_vParamData3;
 
-   vector<DataMap*> m_vSysParam;
+   vector<DataMap*>* m_pSysParam;
 
     int m_nShow;
     int m_nShowIndex;

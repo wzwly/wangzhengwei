@@ -11,10 +11,9 @@ struct DataMap
        int iNo; //参数号 ，索引参数
        int iAddr;//地址，发送地址
        int iGroup; //组属性
-       int iFraction;//小数点位数
-       float dVal;
+       int iFraction;//小数点位数    
        double dMult; //显示发大倍数
-
+       string strName;
        string  strUnit;  //单位
        string  strText;
        DataMap()
@@ -23,22 +22,22 @@ struct DataMap
            iAddr = 1;
            iGroup = 0;
            iFraction = 0;
-           dMult = 1.0;
-           dVal = 1.0;
+           dMult = 1.0;      
        };
 
        DataMap(int iNo_, int iAddr_, int iGroup_, int iFrac_,
-               double dMul_, double dVal_,
+               double dMul_, const string& szName_,
                const string& szUnit_, const string szText_)
        {
            iNo =  iNo_;
            iAddr = iAddr_;
            iGroup = iGroup_;
            iFraction = iFrac_;
-           dMult = dMul_;
+           dMult = dMul_;         
+           strName = szName_;
            strUnit = szUnit_;
            strText = szText_;
-           dVal = dVal_;
+
        }
 };
 
@@ -125,7 +124,7 @@ private:
 // ‘//’注释符号
 //
 //整体格式
-//#参数号=初始值 ADDR=地址 FRAC=小数 MUL=显示倍数 UNIT="单位" TEXT="参数说明"
+//#参数号=初始值 ADDR=地址 NAME= "参数名" FRAC=小数 MUL=显示倍数  UNIT="单位" TEXT="参数说明"
 //--参数号必须写，且不能重复
 //--初始值最好写，否则默认值可能不正确，一但参数保存之后，初始值将不读取
 //--小数不写时默认0
@@ -143,10 +142,10 @@ private:
 
 DATABEGIN  //数据开始
 
-GROUP       1
+GROUP     1
 
-#1=23.12  ADDR = 222 FRAC = 2 MUL = 1.0 UNIT = "mm/s" TEXT = "测试参数 速度"
-#3=3.12  ADDR = 32 FRAC = 2  MUL = 1.0 UNIT = "mm" TEXT = "测试参数 距离"
+#1=23.12  ADDR = 222  NAME="速度" FRAC = 2 MUL = 1.0  UNIT = "mm/s" TEXT = "测试参数 速度"
+#3=3.12  ADDR = 32 NAME="长度" FRAC = 2  MUL = 1.0  UNIT = "mm" TEXT = "测试参数 距离"
 
 DATAEND
 */
