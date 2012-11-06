@@ -98,8 +98,8 @@ void QSysParamPage::Show()
     int _nLen = m_pSysParam->size() - m_nShowIndex;
     int _nMax = (_nLen > PARAM_COLOUM) ? PARAM_COLOUM :_nLen;
 
-    if (_nMax == 0)
-        return;
+    //if (_nMax == 0)
+    //    return;
 
     int _j = 0;
     DataMap* _pMap = NULL;
@@ -132,40 +132,6 @@ void QSysParamPage::UpdateView(int nIndex_)
     else if (3 == nIndex_)
         m_pSysParam = & m_vParamData3;
     Show();
-}
-
-void QSysParamPage::UpdateSystem(int nIndex_)
-{
-    /*m_vParamData.clear();
-    int _nSize = m_vSysParam.size();
-    for (int _i = 0; _i < _nSize ; ++_i)
-    {
-        m_vParamData.append(m_vSysParam[_i]);
-    }
-    Show();*/
-}
-
-void QSysParamPage::UpdateSpeed(int nIndex_)
-{
-    /* m_nShow = SHOW_SPEED;
-    m_vParamData.clear();
-    int _nSize = m_vSpeedParam.size();
-    for (int _i = 0; _i < _nSize ; ++_i)
-    {
-        m_vParamData.append(m_vSpeedParam[_i]);
-    }
-    Show();*/
-}
-
-void QSysParamPage::UpdateLimit(int nIndex_)
-{
-    /*m_vParamData.clear();
-    int _nSize = m_vLimitParam.size();
-    for (int _i = 0; _i < _nSize ; ++_i)
-    {
-        m_vParamData.append(m_vLimitParam[_i]);
-    }
-    Show();*/
 }
 
 void QSysParamPage::OnListClick(int nId_)
@@ -210,7 +176,13 @@ void QSysParamPage::OnListClick(int nId_)
 
 void QSysParamPage::OnSndBtnClick(int nIndex_)
 {
-    if (nIndex_ == 0)
+
+    if (nIndex_ <= 3)
+    {
+        m_nShowIndex = 0;
+        UpdateView(nIndex_);
+    }
+    else if (nIndex_ == 4)
     {
         if(m_nShowIndex > 0)
         {
@@ -218,34 +190,14 @@ void QSysParamPage::OnSndBtnClick(int nIndex_)
             Show();
         }
     }
-    else if (nIndex_ == 1)
+    else if (nIndex_ == 5)
     {
-        //int _nLen = m_vParamData.size() - m_nShowIndex;
-        // if (_nLen > PARAM_COLOUM)
-        // {
-        //     m_nShowIndex += PARAM_COLOUM;
-        //      Show();
-        //  }
-    }
-    else if (nIndex_ == 2)
-    {
-        m_nShowIndex = 0;
-        UpdateSystem(0);
-    }
-    else if (nIndex_ == 3)
-    {
-        m_nShowIndex = 0;
-        UpdateSpeed(0);
-    }
-    else if (nIndex_ == 4)
-    {
-        m_nShowIndex = 0;
-        UpdateLimit(0);
-    }
-    else if(nIndex_ == 5)
-    {
-        m_nShowIndex = 0;
-        UpdateView(0);
+         int _nLen = m_pSysParam->size() - m_nShowIndex;
+         if (_nLen > PARAM_COLOUM)
+         {
+             m_nShowIndex += PARAM_COLOUM;
+              Show();
+         }
     }
 
 }

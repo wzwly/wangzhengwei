@@ -31,10 +31,6 @@ public slots:
 private:
     void CreatePageInfo();
     void InitParam();
-
-    void UpdateSystem(int nIndex_);
-    void UpdateSpeed(int nIndex_);
-    void UpdateLimit(int nIndex_);
     void UpdateView(int nIndex_);
     void Show();
 
