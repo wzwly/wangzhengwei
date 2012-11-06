@@ -107,6 +107,8 @@ private:
     bool GetInt(int& nRet_);
     bool GetText(string& str_);
 
+    void SetVal(int nNo_, double dVal_, double dMult_);
+
 private:
     int m_nBaseAddr;
     int m_nGroup;
@@ -131,8 +133,8 @@ private:
 //--倍数不写时默认1
 //--单位和参数说明不写时，默认为空
 //参数的Group，分为6大组
-//1组用于下位机向上更新显示的参数，如坐标，报警等。参数号1-50
-//2-5组用于从上至下发送的参数。参数号51-250
+//1-4组用于从上至下发送的参数。参数号51-250
+//5组用于下位机向上更新显示的参数，如坐标，报警等。参数号1-50
 //6组用于按键向下发送的命令。参数号251-300
 //
 //报警命令格式：

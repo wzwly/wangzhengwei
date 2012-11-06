@@ -30,13 +30,29 @@ QSysData::QSysData()
          m_cGlbData.bIsLoaded = true;
          LoadFile(_path, _name);
     }
-    m_cGlbData.pData = m_iParamRI;
+    m_cGlbData.pData = m_iParamRO0;
     InitParamData();
 }
 
   QSysData::~QSysData()
  {
          SaveClassData(&__n_Save_Begin__,  &__n_Save_End__, "QSysData");
+ }
+
+
+ QString QSysData::GetValText(const DataMap* pMap_)
+ {
+    int _nVal = ParamData(pMap_->iNo);
+    double _fVal = _nVal * pMap_->dMult;
+    //QString _str = QString::number(_fVal, 'f', pMap_->iFraction);
+    QString _str = QString("%1").arg(_fVal,0, 'f', pMap_->iFraction);
+    return _str;
+ }
+
+ void QSysData::SetVal(const DataMap* pMap_, double fVal_)
+ {
+     int _nVal =  Round(fVal_ / pMap_->dMult);
+     ParamData(pMap_->iNo) = _nVal;
  }
 
 void QSysData::InitParamData()

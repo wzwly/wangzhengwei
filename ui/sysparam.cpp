@@ -22,73 +22,73 @@
 
 
 QSysParamPage::QSysParamPage(QWidget* parent_)
- :QBasePage( parent_)
+    :QBasePage( parent_)
 {
+    m_nShowIndex = 0;
     CreatePageInfo();
-    m_nShow = SHOW_VIEW;
 }
 
 void QSysParamPage::CreatePageInfo()
 {
-
     QTipLabel* _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
     _pTemp->InitShow("编号", 0, 0, FILE_ITEM_W0, FILE_ITEM_H0, FILE_FONT_SIZE);
-     _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
+    _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
     _pTemp->InitShow("参数名", 100, 0, FILE_ITEM_W1, FILE_ITEM_H0, FILE_FONT_SIZE);
     _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
     _pTemp->InitShow("参数值", 554, 0, FILE_ITEM_W2, FILE_ITEM_H0, FILE_FONT_SIZE);
     _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
     _pTemp->InitShow("单位", 704, 0, FILE_ITEM_W3, FILE_ITEM_H0, FILE_FONT_SIZE);
 
-        for (int _i = 0; _i < PARAM_COLOUM; ++_i)
-        {
-            m_aParamArray[_i].pIndex = new QTipLabel(this, QItem::LABEL_LIST);
-            m_aParamArray[_i].pIndex->InitShow(0, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W0, FILE_ITEM_H, FILE_FONT_SIZE);
-            m_aParamArray[_i].pName = new QTipLabel(this, QItem::LABEL_LIST, Qt::AlignLeft);
-            m_aParamArray[_i].pName->InitShow(100, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W1, FILE_ITEM_H, FILE_FONT_SIZE);
-            m_aParamArray[_i].pData = new QPushBtn(this, QItem::LABEL_TIP,_i,Qt::AlignLeft);
-            m_aParamArray[_i].pData->InitShow(554, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W2, FILE_ITEM_H, FILE_FONT_SIZE);
-            m_aParamArray[_i].pData->SetBdWide(5);
-            m_aParamArray[_i].pUnit = new QTipLabel(this, QItem::LABEL_LIST);
-            m_aParamArray[_i].pUnit->InitShow(704, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W3, FILE_ITEM_H, FILE_FONT_SIZE);
-            connect(m_aParamArray[_i].pData, SIGNAL(ClickedEvent(int)), this, SLOT(OnListClick(int)));
-        }
+    for (int _i = 0; _i < PARAM_COLOUM; ++_i)
+    {
+        m_aParamArray[_i].pIndex = new QTipLabel(this, QItem::LABEL_LIST);
+        m_aParamArray[_i].pIndex->InitShow(0, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W0, FILE_ITEM_H, FILE_FONT_SIZE);
+        m_aParamArray[_i].pName = new QTipLabel(this, QItem::LABEL_LIST, Qt::AlignLeft);
+        m_aParamArray[_i].pName->InitShow(100, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W1, FILE_ITEM_H, FILE_FONT_SIZE);
+        m_aParamArray[_i].pData = new QPushBtn(this, QItem::LABEL_TIP,_i,Qt::AlignLeft);
+        m_aParamArray[_i].pData->InitShow(554, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W2, FILE_ITEM_H, FILE_FONT_SIZE);
+        m_aParamArray[_i].pData->SetBdWide(5);
+        m_aParamArray[_i].pUnit = new QTipLabel(this, QItem::LABEL_LIST);
+        m_aParamArray[_i].pUnit->InitShow(704, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W3, FILE_ITEM_H, FILE_FONT_SIZE);
+        connect(m_aParamArray[_i].pData, SIGNAL(ClickedEvent(int)), this, SLOT(OnListClick(int)));
+    }
 
-        InitParam();
-        UpdateView(0);
+    InitParam();
+    UpdateView(0);
 }
 
 
 void QSysParamPage::InitParam()
 {    
-    m_cGlbData = QSysData::Instance()->GetCfgData();
+    m_pSysData = QSysData::Instance();
+    m_cConfigData = QSysData::Instance()->GetCfgData();
 
     DataMap* _pMap = NULL;
-    for (int _i = 0; _i <  m_cGlbData->m_pArrayData.size(); ++_i)
+    for (int _i = 0; _i <  m_cConfigData->m_pArrayData.size(); ++_i)
     {
-            _pMap = m_cGlbData->m_pArrayData[_i];
-            switch(_pMap-> iGroup)
-            {
-                    case  1:
-                            break;
-                    case 2:
-                            m_vParamData0.push_back(_pMap);
-                            break;
-                    case 3:
-                            m_vParamData1.push_back(_pMap);
-                            break;
-                    case 4:
-                            m_vParamData2.push_back(_pMap);
-                            break;
-                    case 5:
-                            m_vParamData3.push_back(_pMap);
-                            break;
-                    case 6:
-                            break;
-                    default:
-                            assert(false);
-                            break;
-            }
+        _pMap = m_cConfigData->m_pArrayData[_i];
+        switch(_pMap->iGroup)
+        {
+        case 1:
+            m_vParamData0.push_back(_pMap);
+            break;
+        case 2:
+            m_vParamData1.push_back(_pMap);
+            break;
+        case 3:
+            m_vParamData2.push_back(_pMap);
+            break;
+        case 4:
+            m_vParamData3.push_back(_pMap);
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        default:
+            assert(false);
+            break;
+        }
     }
 
 }
@@ -108,7 +108,7 @@ void QSysParamPage::Show()
         _pMap = m_pSysParam->at(_i);
         m_aParamArray[_j].pIndex->setText(QString::number(_pMap->iNo));
         m_aParamArray[_j].pName->setText(_pMap->strName.data());
-        //m_aParamArray[_j].pData->setText(m_vParamData[_i]->Value());
+        m_aParamArray[_j].pData->setText(m_pSysData->GetValText(_pMap));
         m_aParamArray[_j].pUnit->setText(_pMap->strUnit.data());
     }
 
@@ -123,22 +123,19 @@ void QSysParamPage::Show()
 
 void QSysParamPage::UpdateView(int nIndex_)
 {
-   m_nShow = SHOW_VIEW;
-   
-   if (0 == nIndex_)
+    if (0 == nIndex_)
         m_pSysParam = & m_vParamData0;
-   else if (1 == nIndex_)
+    else if (1 == nIndex_)
         m_pSysParam = & m_vParamData1;
-   else if (2 == nIndex_)
+    else if (2 == nIndex_)
         m_pSysParam = & m_vParamData2;
-   else if (3 == nIndex_)
+    else if (3 == nIndex_)
         m_pSysParam = & m_vParamData3;
     Show();
 }
 
 void QSysParamPage::UpdateSystem(int nIndex_)
 {
-    m_nShow = SHOW_SYS;
     /*m_vParamData.clear();
     int _nSize = m_vSysParam.size();
     for (int _i = 0; _i < _nSize ; ++_i)
@@ -150,7 +147,7 @@ void QSysParamPage::UpdateSystem(int nIndex_)
 
 void QSysParamPage::UpdateSpeed(int nIndex_)
 {
-   /* m_nShow = SHOW_SPEED;
+    /* m_nShow = SHOW_SPEED;
     m_vParamData.clear();
     int _nSize = m_vSpeedParam.size();
     for (int _i = 0; _i < _nSize ; ++_i)
@@ -162,7 +159,6 @@ void QSysParamPage::UpdateSpeed(int nIndex_)
 
 void QSysParamPage::UpdateLimit(int nIndex_)
 {
-    m_nShow = SHOW_LIMIT;
     /*m_vParamData.clear();
     int _nSize = m_vLimitParam.size();
     for (int _i = 0; _i < _nSize ; ++_i)
@@ -224,12 +220,12 @@ void QSysParamPage::OnSndBtnClick(int nIndex_)
     }
     else if (nIndex_ == 1)
     {
-       //int _nLen = m_vParamData.size() - m_nShowIndex;
-      // if (_nLen > PARAM_COLOUM)
-      // {
-      //     m_nShowIndex += PARAM_COLOUM;
-      //      Show();
-     //  }
+        //int _nLen = m_vParamData.size() - m_nShowIndex;
+        // if (_nLen > PARAM_COLOUM)
+        // {
+        //     m_nShowIndex += PARAM_COLOUM;
+        //      Show();
+        //  }
     }
     else if (nIndex_ == 2)
     {
@@ -260,7 +256,7 @@ void QSysParamPage::SendSystemParam(int nPos_)
     if (nPos_ >= 0)
         return;
 
-   // Cmd06WriteKeepReg(GEN_PARAM::DRILL_AXIS_QTY,m_cGlbData->iDrillAxis);
+    // Cmd06WriteKeepReg(GEN_PARAM::DRILL_AXIS_QTY,m_cGlbData->iDrillAxis);
     //Cmd06WriteKeepReg(GEN_PARAM::RUN_QUERY_TIME,m_cGlbData->iAskTime);
 }
 
@@ -280,6 +276,6 @@ void QSysParamPage::SendLimitParam(int nPos_)
     if (nPos_ >= 0)
         return;
 
-   // CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XP, 6, (unsigned char*)m_cGlbData->fLimitP);
+    // CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XP, 6, (unsigned char*)m_cGlbData->fLimitP);
     //CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XN, 6, (unsigned char*)m_cGlbData->fLimitN);
 }

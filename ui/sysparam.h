@@ -47,16 +47,15 @@ public:
  private:
     _ParamItem m_aParamArray[PARAM_COLOUM];
 
-   ConfigData* m_cGlbData;
+   ConfigData* m_cConfigData;
+   QSysData* m_pSysData;
    vector<DataMap*> m_vParamData0;
    vector<DataMap*> m_vParamData1;
    vector<DataMap*> m_vParamData2;
    vector<DataMap*> m_vParamData3;
-
    vector<DataMap*>* m_pSysParam;
 
-    int m_nShow;
-    int m_nShowIndex;
+   int m_nShowIndex;
 };
 
 

@@ -24,12 +24,12 @@ private:
     int __n_Save_Begin__;
     char m_szPath[ MAX_FILE_NAME_SIZE + 1];
     char m_szName[ MAX_FILE_NAME_SIZE + 1];
-    //for new protecol
-    int  m_iParamRI[PAGE_PARAM_COUNT]; //用于输入
+    //for new protecol 
     int  m_iParamRO0[PAGE_PARAM_COUNT]; //用于输出
     int  m_iParamRO1[PAGE_PARAM_COUNT]; //用于输出
     int  m_iParamRO2[PAGE_PARAM_COUNT]; //用于输出
     int  m_iParamRO3[PAGE_PARAM_COUNT]; //用于输出
+    int  m_iParamRI[PAGE_PARAM_COUNT]; //用于输入
     int  m_iParamRBtn[PAGE_PARAM_COUNT]; //用于按键发送
     int __n_Save_End__;
      ConfigData m_cGlbData;
@@ -42,7 +42,11 @@ public:
     bool IsLoadFile(){return !m_strFilePath.isEmpty();}
     const QString& GetFileName() {return m_strFileName;}
 
-   ConfigData* GetCfgData() {return &m_cGlbData;}
+    ConfigData* GetCfgData() {return &m_cGlbData;}
+
+    int& ParamData(int i_) {return m_iParamRO0[i_];}
+    QString GetValText(const DataMap* pMap_);
+    void SetVal(const DataMap* pMap_, double fVal_);
 private:
     void InitParamData();
     void LoadFromDxfFile(const QString& path);

@@ -139,7 +139,7 @@ void CParseConfig::CloseFile()
             }
         }
 
-# if 1
+# if 0
     DataMap* _pMap;
     for (int _i = 0; _i < m_pConfigData->m_pArrayData.size(); ++_i)
     {
@@ -270,6 +270,10 @@ static const char* g_szItem[6] = {"ADDR", "FRAC", "MUL","NAME", "UNIT", "TEXT"};
         }
         m_pConfigData->m_pArrayData.push_back(new DataMap(_nNo, _addr, _nGrp,  _frac,
                                                          _dMul, _strName, _strUnit, _strText));
+        if (!m_pConfigData->bIsLoaded)
+        {
+            SetVal(_nNo, _dVal, _dMul);
+        }
        // qDebug() <<"#" <<_nNo << "="<<_dVal << _addr << _frac << _dMul<< QString(_strUnit.data())<<QString(_strText.data());
     }
  }
@@ -396,6 +400,12 @@ bool CParseConfig::GetText(string& str_)
 }
 
 
+void CParseConfig::SetVal(int nNo_, double dVal_, double dMult_)
+{
+   int _nVal =  Round(dVal_ / dMult_);
+   m_pConfigData->pData[nNo_] = _nVal;
+   //qDebug() << "int"<<_nVal;
+}
 
 
 
