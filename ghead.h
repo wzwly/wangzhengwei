@@ -91,5 +91,6 @@ extern QList<QObject*> g_pListObject;
 #define  AXIS_NUM  6
 #define  PAGE_PARAM_COUNT  50
 #define  MAX_LINE_READ  256
+#define MAX_FILE_NAME_SIZE  128
 
 #endif

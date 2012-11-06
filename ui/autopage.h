@@ -49,7 +49,7 @@ private:
 
     double m_dDeltH;
     double m_dDeltW;
-    GlbConfig* m_pGlbCfg;
+   // GlbConfig* m_pGlbCfg;
 
     float m_fStep;
     int  m_nAxisSel;

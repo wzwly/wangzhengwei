@@ -25,7 +25,7 @@ QAutoPage::QAutoPage(QWidget* parent_)
     m_pPaint = m_pDrawArea->GetPainter();
     m_pDrawArea->GetWidthHeight(m_nWidth,m_nHeight);
     CreatePageInfo();
-    m_pGlbCfg = m_pSysData->GetCfgData();
+    //m_pGlbCfg = m_pSysData->GetCfgData();
     m_fZoom = 1.0;
     m_fStep = 1.0;
     m_nAxisSel = 0;
@@ -33,10 +33,10 @@ QAutoPage::QAutoPage(QWidget* parent_)
 
 void QAutoPage::DrawRuler()
 {
-    m_pDrawArea->DrawRightRuler(m_pGlbCfg->fXoffsetView,m_pGlbCfg->fViewWidth + m_pGlbCfg->fXoffsetView,"mm");
-    m_pDrawArea->DrawBottomRuler(m_pGlbCfg->fYoffsetView,m_pGlbCfg->fViewHeight + m_pGlbCfg->fYoffsetView, "mm");
-    //m_pDrawArea->DrawRightRuler(0,1000,"mm");
-    //m_pDrawArea->DrawBottomRuler(0,1500, "mm");
+    //m_pDrawArea->DrawRightRuler(m_pGlbCfg->fXoffsetView,m_pGlbCfg->fViewWidth + m_pGlbCfg->fXoffsetView,"mm");
+    //m_pDrawArea->DrawBottomRuler(m_pGlbCfg->fYoffsetView,m_pGlbCfg->fViewHeight + m_pGlbCfg->fYoffsetView, "mm");
+    m_pDrawArea->DrawRightRuler(0,1000,"mm");
+    m_pDrawArea->DrawBottomRuler(0,1500, "mm");
 }
 
 static const char* g_szXYZ[] = {"X", "Y", "Z", "A", "B","U"};
@@ -74,13 +74,13 @@ void QAutoPage::CreatePageInfo()
 
 void QAutoPage::showEvent ( QShowEvent * event )
 {
-    if (m_pGlbCfg->bReDrawRule)
-    {
-        DrawRuler();
-        m_pGlbCfg->bReDrawRule = false;
-        m_dDeltH = double(m_nHeight) / m_pGlbCfg->fViewHeight;
-        m_dDeltW = double(m_nWidth) / m_pGlbCfg->fViewWidth;
-    }
+    //if (m_pGlbCfg->bReDrawRule)
+   // {
+   //     DrawRuler();
+    //    m_pGlbCfg->bReDrawRule = false;
+    //    m_dDeltH = double(m_nHeight) / m_pGlbCfg->fViewHeight;
+    //    m_dDeltW = double(m_nWidth) / m_pGlbCfg->fViewWidth;
+   // }
     if (m_pSysData->IsLoadFile())
     {
         m_pMainFrame->SetTiltleLabel(QString("文件:%1").arg(m_pSysData->GetFileName()));
@@ -211,7 +211,7 @@ void QAutoPage::DrawSimulate()
      //_p->translate(m_nOrg.x, m_nOrg.y);
      //_p->scale( m_fZoom,  m_fZoom);
 
-   int _x, _y;
+  /* int _x, _y;
    int _nRadius =  m_pSysData->m_cGlbData.fHoleRadius;
    QSysData::FLOAT_POINT _fP;
    for (int _i = 0; _i < m_pSysData->m_vDrillData.size(); ++_i)
@@ -220,7 +220,7 @@ void QAutoPage::DrawSimulate()
         _x = _fP.x * m_dDeltW;
         _y = _fP.y * m_dDeltH;
         _p->drawArc(_x, _y, _nRadius, _nRadius, 0.0, 360 * 16);
-   }
+   }*/
    m_pDrawArea->update();
    //_p->scale( 1.0/m_fZoom,  1.0/m_fZoom);
    //_p->translate(-m_nOrg.x, -m_nOrg.y);
@@ -233,12 +233,18 @@ void QAutoPage::OnUpDate(int nFlag_)
     for(int _i = 0; _i < AXIS_NUM; ++_i)
     {
         //Cmd03ReadKeepReg(CTL_PARAM_ADDR::AXIS_X_POS,6,(unsigned char*)m_pGlbCfg->fAxisPos);
-        m_pXYZCoor[_i]->setText(QString::number(m_pGlbCfg->fAxisPos[_i], 'f', 2));
+        //m_pXYZCoor[_i]->setText(QString::number(m_pGlbCfg->fAxisPos[_i], 'f', 2));
         //qDebug() <<"update!";
 
         //Cmd06WriteKeepReg(1, 0x55);
         const  char * _p = "1234567890\n00";
         //CmdWriteKeepReg(1, 11, (const unsigned char*)_p);
+        //for(int _i = 0; _i < 100)
+        static int _iCont = 0;
+        _iCont++;
+        if (_iCont > 100)
+            _iCont = 0;
+        CmdWriteKeepReg(_iCont, 4, (const unsigned char*)&_iCont);
     }
 }
 

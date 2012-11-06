@@ -56,8 +56,8 @@ void QSerial::InitSerial(int nId_)
    }
 
   tcgetattr(_fd, &_opt);
-  cfsetispeed(&_opt, B115200);
-  cfsetospeed(&_opt, B115200);
+  cfsetispeed(&_opt, B9600);
+  cfsetospeed(&_opt, B9600);
 
   if(tcsetattr(_fd, TCSANOW, &_opt) != 0 )
   {

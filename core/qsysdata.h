@@ -4,89 +4,8 @@
 #include <QVector>
 #include "typedef.h"
 #include "./../ghead.h"
+#include "parseconfig.h"
 
-
-struct PARAM_DEF
-{
-    enum DATA_CLASS{   //属性
-        SYSTEM_PARAM = 0, //系统参数设置
-        SPEED_PARAM,  //速度参数
-        LIMIT_PARAM,  //限位参数
-        VIEW_PARM,    //试图参数
-        DATA_QTY,
-    };
-    enum DATA_UNIT{    //单位
-        UNIT_MM = 0, //mm
-        UNIT_M,  //m
-        UNIT_S,  //s
-        UNIT_MIN,  //minite
-        UNIT_MS,  //ms
-        UNIT_MMPS, //mm/s
-        UNIT_MMPMIN,//mm/min
-        UNIT_MPS,  //m/s
-        UNIT_MPMIN, //m/min
-        UINT_NONE,
-        UNIT_QTY,
-    };
-
-    enum DATA_P
-    {
-        DATA_INT = 1,//浮点数
-        DATA_FLR,
-    };
-
-    DATA_CLASS cType; //参数分类
-    DATA_UNIT  cUnit; //单位
-    DATA_P    cDataP; //数据类型
-    int  iIndex; //编号
-    void *p;
-    QString   strName; //参数名
-
-    PARAM_DEF(float* pf_,DATA_CLASS T_,DATA_UNIT U_, const char* pName_);
-    PARAM_DEF(int* pn_,DATA_CLASS T_,DATA_UNIT U_,const char* pName_);
-    QString Value();
-    float Data();
-    void SetData(float f);
-};
-
-
-struct GlbConfig
-{
-    //显示类参数
-    float fXoffsetView;
-    float fYoffsetView;
-    float fViewWidth;
-    float fViewHeight;
-    bool  bReDrawRule;
-    float fRowGap;  //参数小于该值，认为是一排
-    float fHoleRadius;
-
-    //限位参数、
-    float fLimitN[AXIS_NUM]; //x y z a b u
-    float fLimitP[AXIS_NUM];
-    //速度参
-    float fSpeed[AXIS_NUM];
-    float fManuSpeed;
-    float fManuStep; //手动步长
-
-
-    //系统参数
-    int iDrillAxis; //
-    int iAskTime;//ms
-    //控制信息
-    float fAxisPos[AXIS_NUM]; //x y z a b u
-    int  iManuAxis;  //手动轴
-    //控制命令
-    unsigned short wRunStatus; // 0 停止 ，1 加工 ，2暂停，3断电继续
-    unsigned short wBackOrg;  //回原点， -1 ，全部回， 1-6 分别每个轴回
-    unsigned short wManulStep; // 1步进， 2连续开始， 3连续停止
-    GlbConfig();
-    void ReSet(); 
-};
-
-
-
-#define MAX_FILE_NAME_SIZE  128
 class QSysData
 {
    friend class QAutoPage;
@@ -105,8 +24,16 @@ private:
     int __n_Save_Begin__;
     char m_szPath[ MAX_FILE_NAME_SIZE + 1];
     char m_szName[ MAX_FILE_NAME_SIZE + 1];
-    GlbConfig m_cGlbData;
-     int __n_Save_End__;
+    //for new protecol
+    int  m_iParamRI[PAGE_PARAM_COUNT]; //用于输入
+    int  m_iParamRO0[PAGE_PARAM_COUNT]; //用于输出
+    int  m_iParamRO1[PAGE_PARAM_COUNT]; //用于输出
+    int  m_iParamRO2[PAGE_PARAM_COUNT]; //用于输出
+    int  m_iParamRO3[PAGE_PARAM_COUNT]; //用于输出
+    int  m_iParamRBtn[PAGE_PARAM_COUNT]; //用于按键发送
+    int __n_Save_End__;
+     ConfigData m_cGlbData;
+
 public:
     void LoadFile(const QString& path_, const QString& name_);
     void ReSetData(){m_vDrillData.clear();}
@@ -115,7 +42,7 @@ public:
     bool IsLoadFile(){return !m_strFilePath.isEmpty();}
     const QString& GetFileName() {return m_strFileName;}
 
-    GlbConfig* GetCfgData() {return &m_cGlbData;}
+   ConfigData* GetCfgData() {return &m_cGlbData;}
 private:
     void InitParamData();
     void LoadFromDxfFile(const QString& path);

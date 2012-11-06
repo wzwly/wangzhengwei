@@ -20,8 +20,6 @@
 #define SHOW_SPEED 3
 #define SHOW_SYS   2
 
-const static char* g_szUnit[PARAM_DEF::UNIT_QTY] =
-{"mm", "m", "s", "min", "ms", "mm/min", "m/s","m/min", ""};
 
 QSysParamPage::QSysParamPage(QWidget* parent_)
  :QBasePage( parent_)
@@ -42,7 +40,6 @@ void QSysParamPage::CreatePageInfo()
     _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
     _pTemp->InitShow("单位", 704, 0, FILE_ITEM_W3, FILE_ITEM_H0, FILE_FONT_SIZE);
 
-
         for (int _i = 0; _i < PARAM_COLOUM; ++_i)
         {
             m_aParamArray[_i].pIndex = new QTipLabel(this, QItem::LABEL_LIST);
@@ -61,59 +58,44 @@ void QSysParamPage::CreatePageInfo()
         UpdateView(0);
 }
 
-const static char* g_szAxixLimitP[AXIS_NUM] =
-                    {"X+软限位", "Y+软限位", "Z+软限位", "A+软限位", "B+软限位", "U+软限位"};
-const static char* g_szAxixLimitN[AXIS_NUM] =
-                    {"X-软限位", "Y-软限位", "Z-软限位", "A-软限位", "B-软限位", "U-软限位"};
-
-const static char* g_szAxixSpeed[AXIS_NUM] =
-                    {"X轴速度", "Y轴速度", "Z轴速度", "A轴速度", "B轴速度", "U轴速度"};
 
 void QSysParamPage::InitParam()
-{
+{    
     m_cGlbData = QSysData::Instance()->GetCfgData();
 
-    //视图参数
-    m_vViewParam.append(new PARAM_DEF(&m_cGlbData->fXoffsetView,
-                    PARAM_DEF::VIEW_PARM,PARAM_DEF::UNIT_MM,"视图X起点"));
-    m_vViewParam.append(new PARAM_DEF(&m_cGlbData->fYoffsetView,
-                    PARAM_DEF::VIEW_PARM,PARAM_DEF::UNIT_MM,"视图Y起点"));
-    m_vViewParam.append(new PARAM_DEF(&m_cGlbData->fViewWidth,
-                    PARAM_DEF::VIEW_PARM,PARAM_DEF::UNIT_MM,"视图宽度"));
-    m_vViewParam.append(new PARAM_DEF(&m_cGlbData->fViewHeight,
-                    PARAM_DEF::VIEW_PARM,PARAM_DEF::UNIT_MM,"视图高度"));
-    m_vViewParam.append(new PARAM_DEF(&m_cGlbData->fRowGap,
-                    PARAM_DEF::VIEW_PARM,PARAM_DEF::UNIT_MM,"排间距"));
-    //限位参数
-    for (int _i = 0; _i < AXIS_NUM; ++_i)
+    DataMap* _pMap = NULL;
+    for (int _i = 0; _i <  m_cGlbData->m_pArrayData.size(); ++_i)
     {
-        m_vLimitParam.append(new PARAM_DEF(&m_cGlbData->fLimitP[_i],
-                        PARAM_DEF::LIMIT_PARAM,PARAM_DEF::UNIT_MM,g_szAxixLimitP[_i]));
-        m_vLimitParam.append(new PARAM_DEF(&m_cGlbData->fLimitN[_i],
-                        PARAM_DEF::LIMIT_PARAM,PARAM_DEF::UNIT_MM,g_szAxixLimitN[_i]));
+            _pMap = m_cGlbData->m_pArrayData[_i];
+            switch(_pMap-> iGroup)
+            {
+                    case  1:
+                            break;
+                    case 2:
+                            m_vParamData0.push_back(_pMap);
+                            break;
+                    case 3:
+                            m_vParamData1.push_back(_pMap);
+                            break;
+                    case 4:
+                            m_vParamData2.push_back(_pMap);
+                            break;
+                    case 5:
+                            m_vParamData3.push_back(_pMap);
+                            break;
+                    case 6:
+                            break;
+                    default:
+                            assert(false);
+                            break;
+            }
     }
-    //速度参参数
-    for (int _i = 0; _i < AXIS_NUM; ++_i)
-    {
-        m_vSpeedParam.append(new PARAM_DEF(&m_cGlbData->fSpeed[_i],
-                        PARAM_DEF::SPEED_PARAM,PARAM_DEF::UNIT_MMPS,g_szAxixSpeed[_i]));
-    }
-    m_vSpeedParam.append(new PARAM_DEF(&m_cGlbData->fManuSpeed,
-                    PARAM_DEF::SPEED_PARAM,PARAM_DEF::UNIT_MMPS,"手动速度"));
-    m_vSpeedParam.append(new PARAM_DEF(&m_cGlbData->fManuStep,
-                    PARAM_DEF::SPEED_PARAM,PARAM_DEF::UNIT_MM,"手动步长"));
 
-    //系统参数
-
-    m_vSysParam.append(new PARAM_DEF(&m_cGlbData->iDrillAxis,
-                        PARAM_DEF::SYSTEM_PARAM,PARAM_DEF::UINT_NONE,"钻孔轴个数"));
-    m_vSysParam.append(new PARAM_DEF(&m_cGlbData->iAskTime,
-                        PARAM_DEF::SYSTEM_PARAM,PARAM_DEF::UNIT_MS,"系统查询时间"));
 }
 
 void QSysParamPage::Show()
 {
-    int _nLen = m_vParamData.size() - m_nShowIndex;
+    /*int _nLen = m_vParamData.size() - m_nShowIndex;
     int _nMax = (_nLen > PARAM_COLOUM) ? PARAM_COLOUM :_nLen;
 
     if (_nMax == 0)
@@ -134,58 +116,58 @@ void QSysParamPage::Show()
         m_aParamArray[_j].pName->setText("");
         m_aParamArray[_j].pData->setText("");
         m_aParamArray[_j].pUnit->setText("");
-    }
+    }*/
 }
 
 void QSysParamPage::UpdateView(int nIndex_)
 {
    m_nShow = SHOW_VIEW;
-    m_vParamData.clear();
+    /*m_vParamData.clear();
     for (int _i = 0; _i < m_vViewParam.size(); ++_i)
     {
         m_vParamData.append(m_vViewParam[_i]);
     }
-    Show();
+    Show();*/
 }
 
 void QSysParamPage::UpdateSystem(int nIndex_)
 {
     m_nShow = SHOW_SYS;
-    m_vParamData.clear();
+    /*m_vParamData.clear();
     int _nSize = m_vSysParam.size();
     for (int _i = 0; _i < _nSize ; ++_i)
     {
         m_vParamData.append(m_vSysParam[_i]);
     }
-    Show();
+    Show();*/
 }
 
 void QSysParamPage::UpdateSpeed(int nIndex_)
 {
-    m_nShow = SHOW_SPEED;
+   /* m_nShow = SHOW_SPEED;
     m_vParamData.clear();
     int _nSize = m_vSpeedParam.size();
     for (int _i = 0; _i < _nSize ; ++_i)
     {
         m_vParamData.append(m_vSpeedParam[_i]);
     }
-    Show();
+    Show();*/
 }
 
 void QSysParamPage::UpdateLimit(int nIndex_)
 {
     m_nShow = SHOW_LIMIT;
-    m_vParamData.clear();
+    /*m_vParamData.clear();
     int _nSize = m_vLimitParam.size();
     for (int _i = 0; _i < _nSize ; ++_i)
     {
         m_vParamData.append(m_vLimitParam[_i]);
     }
-    Show();
+    Show();*/
 }
 
 void QSysParamPage::OnListClick(int nId_)
-{
+{/*
     if (nId_ >= m_vParamData.size())
         return;
     PARAM_DEF* _p = m_vParamData[nId_];
@@ -221,7 +203,7 @@ void QSysParamPage::OnListClick(int nId_)
     {
         float _fData =  float (_data);
         Cmd06WriteKeepReg( _wAddr,  _fData);
-    }
+    }*/
 }
 
 void QSysParamPage::OnSndBtnClick(int nIndex_)
@@ -236,12 +218,12 @@ void QSysParamPage::OnSndBtnClick(int nIndex_)
     }
     else if (nIndex_ == 1)
     {
-       int _nLen = m_vParamData.size() - m_nShowIndex;
-       if (_nLen > PARAM_COLOUM)
-       {
-           m_nShowIndex += PARAM_COLOUM;
-            Show();
-       }
+       //int _nLen = m_vParamData.size() - m_nShowIndex;
+      // if (_nLen > PARAM_COLOUM)
+      // {
+      //     m_nShowIndex += PARAM_COLOUM;
+      //      Show();
+     //  }
     }
     else if (nIndex_ == 2)
     {
@@ -272,8 +254,8 @@ void QSysParamPage::SendSystemParam(int nPos_)
     if (nPos_ >= 0)
         return;
 
-    Cmd06WriteKeepReg(GEN_PARAM::DRILL_AXIS_QTY,m_cGlbData->iDrillAxis);
-    Cmd06WriteKeepReg(GEN_PARAM::RUN_QUERY_TIME,m_cGlbData->iAskTime);
+   // Cmd06WriteKeepReg(GEN_PARAM::DRILL_AXIS_QTY,m_cGlbData->iDrillAxis);
+    //Cmd06WriteKeepReg(GEN_PARAM::RUN_QUERY_TIME,m_cGlbData->iAskTime);
 }
 
 void QSysParamPage::SendSpeedParam(int nPos_)
@@ -282,9 +264,9 @@ void QSysParamPage::SendSpeedParam(int nPos_)
     if (nPos_ >= 0)
         return;
 
-    CmdWriteKeepRegEx(GEN_PARAM::AXIS_SPPED_X, 6, (unsigned char*)m_cGlbData->fSpeed);
-    CmdWriteKeepRegEx(GEN_PARAM::MANUAL_SPPED, 1, (unsigned char*)&m_cGlbData->fManuSpeed);
-    CmdWriteKeepRegEx(GEN_PARAM::STEP_LENGHT, 1, (unsigned char*)&m_cGlbData->fManuStep);
+    //CmdWriteKeepRegEx(GEN_PARAM::AXIS_SPPED_X, 6, (unsigned char*)m_cGlbData->fSpeed);
+    //CmdWriteKeepRegEx(GEN_PARAM::MANUAL_SPPED, 1, (unsigned char*)&m_cGlbData->fManuSpeed);
+    //CmdWriteKeepRegEx(GEN_PARAM::STEP_LENGHT, 1, (unsigned char*)&m_cGlbData->fManuStep);
 }
 
 void QSysParamPage::SendLimitParam(int nPos_)
@@ -292,6 +274,6 @@ void QSysParamPage::SendLimitParam(int nPos_)
     if (nPos_ >= 0)
         return;
 
-    CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XP, 6, (unsigned char*)m_cGlbData->fLimitP);
-    CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XN, 6, (unsigned char*)m_cGlbData->fLimitN);
+   // CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XP, 6, (unsigned char*)m_cGlbData->fLimitP);
+    //CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XN, 6, (unsigned char*)m_cGlbData->fLimitN);
 }

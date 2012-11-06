@@ -333,8 +333,8 @@ void Cmd06WriteKeepReg(unsigned short wAddr_, int nVal_)
 */
 void CmdWriteKeepReg(unsigned short wAddr_, unsigned short wRegQty_, const unsigned char* pDest_)
 {
-    QSerial::WriteData(pDest_, wRegQty_);
-    return; //wzwtest
+    //QSerial::WriteData(pDest_, wRegQty_);
+    //return; //wzwtest
     int _nRpt = MAX_REPEAT_COUNT;
 
     assert(wRegQty_ < 125);

@@ -47,12 +47,14 @@ public:
  private:
     _ParamItem m_aParamArray[PARAM_COLOUM];
 
-    GlbConfig* m_cGlbData;
-    QVector<PARAM_DEF*> m_vParamData;
-    QVector<PARAM_DEF*> m_vViewParam;
-    QVector<PARAM_DEF*> m_vLimitParam;
-    QVector<PARAM_DEF*> m_vSpeedParam;
-    QVector<PARAM_DEF*> m_vSysParam;
+   ConfigData* m_cGlbData;
+   vector<DataMap*> m_vParamData0;
+   vector<DataMap*> m_vParamData1;
+   vector<DataMap*> m_vParamData2;
+   vector<DataMap*> m_vParamData3;
+
+   vector<DataMap*> m_vSysParam;
+
     int m_nShow;
     int m_nShowIndex;
 };

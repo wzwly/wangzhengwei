@@ -7,83 +7,6 @@
 #include "./../ui/addrdef.h"
 #include "./../ghead.h"
 
-static int g_sIndex[PARAM_DEF::DATA_QTY] = {0};
-PARAM_DEF::PARAM_DEF(float* pf_,DATA_CLASS T_,DATA_UNIT U_,const char* pName_)
-:strName(pName_)
-{
-    p = pf_;
-    cType = T_;
-    cUnit = U_;
-    cDataP = DATA_FLR;
-    iIndex = g_sIndex[T_]++;
-}
-
-PARAM_DEF::PARAM_DEF(int* pn_,DATA_CLASS T_,DATA_UNIT U_,const char* pName_)
-:strName(pName_)
-{
-   p = pn_;
-   cType = T_;
-   cUnit = U_;
-   cDataP = DATA_INT;
-   iIndex = g_sIndex[T_]++;
-}
-
-
- QString PARAM_DEF::Value()
- {
-    if (cDataP == DATA_INT)
-        return QString::number(*((int*)p));
-    else
-         return QString::number(*((float*)p), 'f', 3);
- }
-
-
- float PARAM_DEF::Data()
- {
-    if (cDataP == DATA_INT)
-        return *((int*)p);
-    else
-        return *((float*)p);
- }
- void PARAM_DEF::SetData(float f)
- {
-     if (cDataP == DATA_INT)
-         *((int*)p) = int(f);
-     else
-       *((float*)p) = f;
- }
-
-GlbConfig::GlbConfig()
-{
-}
-
-void GlbConfig::ReSet()
-{
-    //=============
-    fXoffsetView = 0.0;
-    fYoffsetView = 0.0;
-    fViewWidth = 1500.0;
-    fViewHeight = 1000.0;
-    fRowGap = 10.0;
-    fHoleRadius = 5.0;
-
-    bReDrawRule = true;
-
-    //===========================
-    for (int _i = 0; _i < AXIS_NUM; ++_i)
-    {
-         fLimitN[_i] = 0.0;
-         fLimitP[_i] = 1500;
-
-         fSpeed[_i] = 30.0;
-         fAxisPos[_i] = 0.0;
-    }
-
-    //===================
-    iDrillAxis = 4;
-    iAskTime = 2000;
-}
-
 QSysData* QSysData::Instance()
 {
     static QSysData* _s_pSysData = NULL;
@@ -97,16 +20,17 @@ QSysData::QSysData()
     bool _bRet =  LoadClassData(&__n_Save_Begin__,  &__n_Save_End__, "QSysData");
     if (!_bRet)
     {
-        m_cGlbData.ReSet();
+         m_cGlbData.bIsLoaded = false;
          ReSetLoad();
     }
     else
     {
          QString _path(m_szPath);
          QString _name(m_szName);
-          LoadFile(_path, _name);
+         m_cGlbData.bIsLoaded = true;
+         LoadFile(_path, _name);
     }
-    m_cGlbData.bReDrawRule = true;
+    m_cGlbData.pData = m_iParamRI;
     InitParamData();
 }
 
@@ -117,7 +41,9 @@ QSysData::QSysData()
 
 void QSysData::InitParamData()
 {
-
+        CParseConfig _cfg;
+        _cfg.OpenConfigFile("PR.info");
+        _cfg.StartLoadConfig(&m_cGlbData);
 }
 
 void QSysData::LoadFile(const QString& path_, const QString& name_)
@@ -202,7 +128,7 @@ void QSysData::LoadFromXtfFile(const QString& path)
 
 void QSysData::SortDxfData()
 {
-     float  _fTemp,_fGap = m_cGlbData.fRowGap;
+     /*float  _fTemp,_fGap = m_cGlbData.fRowGap;
      int _aRow[HOLE_POS::ROW_MAX] = {0};
      int _nClone = 0, _k = 0;
      FLOAT_POINT _fSortData[HOLE_POS::ROW_MAX][HOLE_POS::HOLE_ROW_MAX];
@@ -246,7 +172,7 @@ void QSysData::SortDxfData()
             }
             _nAddr += HOLE_POS::HOLE_ROW_MAX;
            Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW0_HOLE_QTY + _i,  _aRow[_i]);
-     }
+     }*/
 
 }
 

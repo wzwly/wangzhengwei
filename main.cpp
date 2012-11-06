@@ -7,14 +7,13 @@
 
 int main(int argc, char *argv[])
 {
-       //QApplication app(argc, argv);
-
        //使能中文
         QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
         QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
         QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
- #if 0
+ #if 1
+         QApplication app(argc, argv);
         QMainFrame _Wind(NULL);
         _Wind.show();
 
@@ -22,13 +21,15 @@ int main(int argc, char *argv[])
         _font.setPixelSize(20);
         _Wind.setFont (_font);
 
-#endif
-        CParseConfig _config;
-       if( _config.OpenConfigFile("PR.conf"))
-             _config.StartLoadConfig(NULL);
+        return app.exec();
+#else
 
-        //Q_INIT_RESOURCE(Resource);//包含资源
-        //return app.exec();
+       ConfigData _Data;
+       CParseConfig _config;
+       if( _config.OpenConfigFile("PR.info"))
+             _config.StartLoadConfig(&_Data);
+
+ #endif
 }
 
 

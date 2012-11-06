@@ -20,9 +20,9 @@ static const char* g_szMainMenu[MAIN_MENU_COUNT] = {"自动页面", "程序文�
 static const int g_nSndMenuQyt[MAIN_MENU_COUNT] = {3, 5, 4, 5, 4};  //二级菜单显示个数
 
 static const char* g_szPageBtn0[SECOND_MENU_COUNT] = {"启动","暂停", "停止", "回原点", "仿真", "手动"};
-static const char* g_szPageBtn1[SECOND_MENU_COUNT] = {"↑","↓", "加载", "拷贝", "删除", ""};
-static const char* g_szPageBtn2[SECOND_MENU_COUNT] = {"↑","↓","保存文件", "恢复默认", "读取文件", ""};
-static const char* g_szPageBtn3[SECOND_MENU_COUNT] = {"↑","↓","系统参数", "速度参数", "限位参数", "视图参数"};
+static const char* g_szPageBtn1[SECOND_MENU_COUNT] = {"加载", "拷贝", "删除", "", "↑","↓"};
+static const char* g_szPageBtn2[SECOND_MENU_COUNT] = {"保存文件", "恢复默认", "读取文件", "", "↑","↓"};
+static const char* g_szPageBtn3[SECOND_MENU_COUNT] = {"系统参数", "速度参数", "限位参数", "视图参数","↑","↓",};
 static const char* g_szPageBtn4[SECOND_MENU_COUNT] = {"","", "", "", "", "触屏校准"};
 
 static const char* g_szPageBtn01[SECOND_MENU_COUNT] = {"步进","连续", "全部回原点", "单轴回原点", "设定原点", "自动"};
