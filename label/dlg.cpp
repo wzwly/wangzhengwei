@@ -186,7 +186,7 @@ QNuberInput::QNuberInput(QWidget* parent_)
         m_pEdit->setStyleSheet("QLineEdit{font-size:18px;}");
 
         m_pRange = new QTipLabel(this, QItem::LABEL_DLG);
-        m_pRange->InitShow(1,1,298,60,18);
+        m_pRange->InitShow(1,1,298,60,15);
         //m_pRange->move(1, 1);
 
         SetRange(0, 1000.0, 12);
@@ -243,6 +243,13 @@ void QNuberInput::OnBtnPushed(int nIndex_)
 
          IsValidData( _strOld);
 
+}
+
+void QNuberInput::SetRange(double dMin_, double dMax_, const QString& str_)
+{
+        m_dMin = dMin_; m_dMax = dMax_;
+        m_pRange->setText(QString("最小值:%1 最大值:%2").arg(m_dMin).arg(m_dMax));
+        m_pEdit->setText(str_);
 }
 
 

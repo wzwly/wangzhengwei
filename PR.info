@@ -1,35 +1,59 @@
-//注释�?
-// �?/’注释符�?
+//注释行
+// ‘//’注释符号
 //
 //整体格式
-//#参数�?初始�?ADDR=地址 FRAC=小数 MUL=显示倍数 UNIT="单位" TEXT="参数说明"
+//#参数号=初始值 ADDR=地址 NAME= "参数名" FRAC=小数 MUL=显示倍数  UNIT="单位" TEXT="参数说明"
 //--参数号必须写，且不能重复
-//--初始值最好写，否则默认值可能不正确，一但参数保存之后，初始值将不读�?
-//--小数不写时默�?
-//--倍数不写时默�?
-//--单位和参数说明不写时，默认为�?
-//参数的Group，分�?大组
-//1组用于下位机向上更新显示的参数，如坐标，报警等。参数号1-50
-//2-5组用于从上至下发送的参数。参数号51-250
+//--初始值最好写，否则默认值可能不正确，一但参数保存之后，初始值将不读取
+//--小数不写时默认0
+//--倍数不写时默认1
+//--单位和参数说明不写时，默认为空
+//参数的Group，分为6大组
+//1-4组用于从上至下发送的参数。参数号51-250
+//5组用于下位机向上更新显示的参数，如坐标，报警等。参数号1-50
 //6组用于按键向下发送的命令。参数号251-300
 //
-//报警命令格式�?
+//报警命令格式：
 //!=命令  TEXT = "报警提示"
 //
 //
 
-DATABEGIN  //数据开�?
+DATABEGIN 
+GROUP 1
+#1=1.12  ADDR = 1  NAME="X速度" FRAC = 2 MUL = 1.0  UNIT = "mm/s"  TEXT = "X速度"
+#2=2.12  ADDR = 2 NAME="Y速度"  FRAC = 2 MUL = 1.0  UNIT = "m/min" TEXT = "Y速度"
+#3=1.12  ADDR = 1  NAME="X速度" FRAC = 2 MUL = 1.0  UNIT = "mm/s"  TEXT = "X速度"
+#4=2.12  ADDR = 2 NAME="Y速度"  FRAC = 2 MUL = 1.0  UNIT = "m/min" TEXT = "Y速度"
+#5=1.12  ADDR = 1  NAME="X速度" FRAC = 2 MUL = 1.0  UNIT = "mm/s"  TEXT = "X速度"
+#6=2.12  ADDR = 2 NAME="Y速度"  FRAC = 2 MUL = 1.0  UNIT = "m/min" TEXT = "Y速度"
+#7=1.12  ADDR = 1  NAME="X速度" FRAC = 2 MUL = 1.0  UNIT = "mm/s"  TEXT = "X速度"
+#8=2.12  ADDR = 2 NAME="Y速度"  FRAC = 2 MUL = 1.0  UNIT = "m/min" TEXT = "Y速度"
+#9=1.12  ADDR = 1  NAME="X速度" FRAC = 2 MUL = 1.0  UNIT = "mm/s"  TEXT = "X速度"
+#10=2.12  ADDR = 2 NAME="Y速度"  FRAC = 2 MUL = 1.0  UNIT = "m/min" TEXT = "Y速度"
 
-GROUP       1
-
-#1=23.12  ADDR = 222  NAME="速度" FRAC = 2 MUL = 0.01  UNIT = "mm/s" TEXT = "测试参数 速度"
-#3=3.12  ADDR = 32 NAME="长度" FRAC = 2  MUL = 0.01  UNIT = "mm" TEXT = "测试参数 距离"
-
+#11=1.12  ADDR = 1  NAME="X速度" FRAC = 2 MUL = 1.0  UNIT = "mm/s"  TEXT = "X速度"
+#12=2.12  ADDR = 2 NAME="Y速度"  FRAC = 2 MUL = 1.0  UNIT = "m/min" TEXT = "Y速度"
 DATAEND
+
+DATABEGIN 
+GROUP 2
+#51=51.123  ADDR = 51  NAME="X中心" FRAC = 3 MUL = 1.0  UNIT = "mm" TEXT = "X原点"
+#52=52.123  ADDR = 52 NAME="Y中心" FRAC = 3  MUL = 1.0  UNIT = "mm" TEXT = "Y原点"
+DATAEND
+
+DATABEGIN 
+GROUP 3
+#101=101.1  ADDR = 101 NAME="循环时间" FRAC = 1 MUL = 1.0  UNIT = "ms" TEXT = "循环时间间隔"
+#102=102.7  ADDR = 102 NAME="等待时间" FRAC = 1  MUL = 1.0  UNIT = "ms" TEXT = "等待时间间隔"
+DATAEND
+
+DATABEGIN 
+GROUP 4
+#151=151.12  ADDR = 151  NAME="工件计数" FRAC = 0 MUL = 1.0  UNIT = "" TEXT = "加工工件计数"
+#152=152.12  ADDR = 152 NAME="报警次数" FRAC = 0  MUL = 1.0  UNIT = "mm" TEXT = "报警次数"
+DATAEND
+
 
 DATABEGIN
-
-!=1  TEXT= "系统出错"
+!=1  TEXT= "系统错误"
 DATAEND
-
-

@@ -18,6 +18,7 @@ class QSysParamPage : public QBasePage
         QTipLabel* pName; //
         QPushBtn* pData;  //
         QTipLabel* pUnit; //
+        DataMap*  pDataMap;
     };
 
 public:
@@ -34,9 +35,6 @@ private:
     void UpdateView(int nIndex_);
     void Show();
 
-    void SendSystemParam(int nPos_ = -1);
-    void SendSpeedParam(int nPos_ = -1);
-    void SendLimitParam(int nPos_ = -1);
 public:
     virtual void OnSndBtnClick(int nIndex_);//响应mainframe 二级菜单点击
     virtual void OnUpDate(int nFlag_){};

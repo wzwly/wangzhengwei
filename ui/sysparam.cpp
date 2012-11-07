@@ -110,6 +110,7 @@ void QSysParamPage::Show()
         m_aParamArray[_j].pName->setText(_pMap->strName.data());
         m_aParamArray[_j].pData->setText(m_pSysData->GetValText(_pMap));
         m_aParamArray[_j].pUnit->setText(_pMap->strUnit.data());
+        m_aParamArray[_j].pDataMap = _pMap;
     }
 
     for (; _j < PARAM_COLOUM; ++_j)
@@ -118,6 +119,7 @@ void QSysParamPage::Show()
         m_aParamArray[_j].pName->setText("");
         m_aParamArray[_j].pData->setText("");
         m_aParamArray[_j].pUnit->setText("");
+         m_aParamArray[_j].pDataMap = NULL;
     }
 }
 
@@ -135,43 +137,32 @@ void QSysParamPage::UpdateView(int nIndex_)
 }
 
 void QSysParamPage::OnListClick(int nId_)
-{/*
-    if (nId_ >= m_vParamData.size())
+{
+    DataMap* _pMap = m_aParamArray[nId_].pDataMap;
+
+    if (_pMap == NULL)
         return;
-    PARAM_DEF* _p = m_vParamData[nId_];
+
     QNuberInput _SoftKey(this);
-    _SoftKey.SetRange(-1000, 2000, _p->Data());
+    double _dMin, _dMax;
+    m_pSysData->GetMaxMinRange(_pMap, _dMin, _dMax);
+    _SoftKey.SetRange(_dMin, _dMax, m_pSysData->GetValText(_pMap));
     if (!_SoftKey.exec())
         return;
+
     double _data = _SoftKey.GetDbData();
-    _p->SetData(_data);
-    m_aParamArray[nId_].pData->setText(m_vParamData[nId_]->Value());
 
-     short _wAddr;
-    if (m_nShow == SHOW_VIEW)
+    if (!m_pSysData->CheckValid(_pMap,_data))
     {
-        m_cGlbData->bReDrawRule = true;
+        QPopTip::ShowTextInMainframe(" 参数范围设置错误！", 25);
         return;
     }
-    else if (m_nShow ==  SHOW_SYS)
-        _wAddr = GEN_PARAM::DRILL_AXIS_QTY + _p->iIndex;
-    else if (m_nShow == SHOW_SPEED)
-         _wAddr = GEN_PARAM::OFFSET_SPEED + _p->iIndex;
-    else if (m_nShow == SHOW_LIMIT)
-        _wAddr = GEN_PARAM::OFFSET_LIMIT + _p->iIndex;
-    else
-        return;
 
-    if ( _p->cDataP == PARAM_DEF::DATA_INT)
-    {
-           int _nData =  int (_data);
-           Cmd06WriteKeepReg( _wAddr,  _nData);
-    }
-    else
-    {
-        float _fData =  float (_data);
-        Cmd06WriteKeepReg( _wAddr,  _fData);
-    }*/
+    m_pSysData->SetVal(_pMap, _data);
+    m_aParamArray[nId_].pData->setText(m_pSysData->GetValText(_pMap));
+
+    //float _fData =  float (_data);
+    //Cmd06WriteKeepReg( _wAddr,  _fData);
 }
 
 void QSysParamPage::OnSndBtnClick(int nIndex_)
@@ -200,34 +191,4 @@ void QSysParamPage::OnSndBtnClick(int nIndex_)
          }
     }
 
-}
-
-
-void QSysParamPage::SendSystemParam(int nPos_)
-{
-    if (nPos_ >= 0)
-        return;
-
-    // Cmd06WriteKeepReg(GEN_PARAM::DRILL_AXIS_QTY,m_cGlbData->iDrillAxis);
-    //Cmd06WriteKeepReg(GEN_PARAM::RUN_QUERY_TIME,m_cGlbData->iAskTime);
-}
-
-void QSysParamPage::SendSpeedParam(int nPos_)
-{
-
-    if (nPos_ >= 0)
-        return;
-
-    //CmdWriteKeepRegEx(GEN_PARAM::AXIS_SPPED_X, 6, (unsigned char*)m_cGlbData->fSpeed);
-    //CmdWriteKeepRegEx(GEN_PARAM::MANUAL_SPPED, 1, (unsigned char*)&m_cGlbData->fManuSpeed);
-    //CmdWriteKeepRegEx(GEN_PARAM::STEP_LENGHT, 1, (unsigned char*)&m_cGlbData->fManuStep);
-}
-
-void QSysParamPage::SendLimitParam(int nPos_)
-{
-    if (nPos_ >= 0)
-        return;
-
-    // CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XP, 6, (unsigned char*)m_cGlbData->fLimitP);
-    //CmdWriteKeepRegEx(GEN_PARAM::AXIS_LINMIT_XN, 6, (unsigned char*)m_cGlbData->fLimitN);
 }

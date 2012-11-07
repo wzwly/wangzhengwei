@@ -32,9 +32,10 @@ private:
     int  m_iParamRI[PAGE_PARAM_COUNT]; //用于输入
     int  m_iParamRBtn[PAGE_PARAM_COUNT]; //用于按键发送
     int __n_Save_End__;
-     ConfigData m_cGlbData;
+    ConfigData m_cGlbData;
 
 public:
+    //文件加载操作
     void LoadFile(const QString& path_, const QString& name_);
     void ReSetData(){m_vDrillData.clear();}
     void ReSetLoad();
@@ -44,9 +45,15 @@ public:
 
     ConfigData* GetCfgData() {return &m_cGlbData;}
 
+    //参数操作
     int& ParamData(int i_) {return m_iParamRO0[i_];}
     QString GetValText(const DataMap* pMap_);
-    void SetVal(const DataMap* pMap_, double fVal_);
+    double GetVal(const DataMap* pMap_);
+    void SetVal(const DataMap* pMap_, double fVal_);    
+    bool CheckValid(const DataMap* pMap_,double dVal_);
+    void GetMaxMinRange(const DataMap*pMap_, double& dMin_, double& dMax_);   
+    void SetToModelBus(const DataMap* pMap_);
+
 private:
     void InitParamData();
     void LoadFromDxfFile(const QString& path);

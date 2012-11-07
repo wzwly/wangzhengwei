@@ -101,6 +101,7 @@ public:
         void SetRange(double dMin_, double dMax_, double dVal_);
         void SetRange(double dMin_, double dMax_, float fVal_);
         void SetRange(double dMin_, double dMax_, int nVal_);
+        void SetRange(double dMin_, double dMax_, const QString& str_);
 };
 
 

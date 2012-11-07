@@ -5,8 +5,6 @@ CParseConfig::CParseConfig()
     m_pFile = NULL;
     m_nFileSize = 0;
     m_pConfigData = NULL;
-
-    m_nBaseAddr = -1;
     m_nGroup = -1;
 }
 
@@ -176,25 +174,21 @@ CParseConfig::Token CParseConfig::GetLineToken()
 
  void CParseConfig::EnterDataBegin()
  {
-        m_stkSeg.push(m_nBaseAddr);
         m_stkSeg.push(m_nGroup);
  }
 
  void CParseConfig::LeaveDataEnd()
  {
       m_nGroup =  m_stkSeg.top();
-      m_stkSeg.pop();
-
-      m_nBaseAddr = m_stkSeg.top();
-      m_stkSeg.pop();
+      m_stkSeg.pop();   
  }
 
  void CParseConfig::GetBaseAddr()
  {
         m_nLinePos += 8;  //"BASEADDR"
         int _addr;
-        if (GetInt(_addr))
-            m_nBaseAddr =_addr;
+        //if (GetInt(_addr))
+        //    m_nBaseAddr =_addr;
         //qDebug() << "addr" << _addr;
  }
 
@@ -207,7 +201,6 @@ CParseConfig::Token CParseConfig::GetLineToken()
      //qDebug() << "group" << _grp;
  }
 
-static const char* g_szItem[6] = {"ADDR", "FRAC", "MUL","NAME", "UNIT", "TEXT"};
  void CParseConfig::GetParam()
  {
     m_nLinePos += 1;
@@ -215,45 +208,94 @@ static const char* g_szItem[6] = {"ADDR", "FRAC", "MUL","NAME", "UNIT", "TEXT"};
     double _dVal;
     if (GetInt(_nNo) && GetDouble(_dVal))
     {
-        int _addr = -1, _frac = 0;
+        int _addr = 555, _frac = 0;
         double _dMul = 1.0;
         int _i = 0;
         string  _strName, _strUnit, _strText;
         string::size_type  _tPos;
-        _tPos = m_strCurLine.find(g_szItem[_i++]);//ADDR
+        _tPos = m_strCurLine.find("ADDR");//
         if (_tPos != string::npos)
         {
             m_nLinePos =  _tPos + 4;
             GetInt(_addr);
         }
-        _tPos = m_strCurLine.find(g_szItem[_i++]);//FRAC
+        _tPos = m_strCurLine.find("FRAC");//FRAC
         if (_tPos != string::npos)
         {
           m_nLinePos =  _tPos + 4;
           GetInt(_frac);
         }
-        _tPos = m_strCurLine.find(g_szItem[_i++]);//MUL
+        _tPos = m_strCurLine.find("MUL");//MUL
         if (_tPos != string::npos)
         {
           m_nLinePos =  _tPos + 3;
-          GetDouble(_dMul);
+          GetDouble(_dMul);       
         }
 
-        _tPos = m_strCurLine.find(g_szItem[_i++]);//NAME
+        int _nLoop = _frac;
+        while(_nLoop > 0)
+        {
+              --_nLoop;
+              _dMul *= 10.0;
+        }
+
+        DataRangeMap* _pMin = NULL;
+        _tPos = m_strCurLine.find("MIN#"); //MIN#
+        if (_tPos != string::npos)
+        {
+          m_nLinePos =  _tPos + 4;
+          int _nMinNo;
+          GetInt(_nMinNo);
+          _pMin = new DataRangeMap(_nMinNo);
+        }
+        else
+        {
+            _tPos = m_strCurLine.find("MIN"); //MIN
+            if (_tPos != string::npos)
+            {
+              m_nLinePos =  _tPos + 3;
+              double _dMin;
+              GetDouble(_dMin);
+              _pMin = new DataRangeMap(_dMin);
+            }
+        }
+
+        DataRangeMap* _pMax = NULL;
+        _tPos = m_strCurLine.find("MAX#"); //MAX#
+        if (_tPos != string::npos)
+        {
+          m_nLinePos =  _tPos + 4;
+          int _nMaxNo;
+          GetInt(_nMaxNo);
+          _pMax = new DataRangeMap(_nMaxNo);
+        }
+        else
+        {
+             _tPos = m_strCurLine.find("MAX"); //MAX
+             if (_tPos != string::npos)
+             {
+                m_nLinePos =  _tPos + 3;
+                double _dMax;
+                GetDouble(_dMax);
+                _pMax = new DataRangeMap(_dMax);
+             }
+        }
+
+        _tPos = m_strCurLine.find("NAME");//NAME
         if (_tPos != string::npos)
         {
              m_nLinePos =  _tPos + 4;
              GetText(_strName);
         }
 
-        _tPos = m_strCurLine.find(g_szItem[_i++]);//UNIT
+        _tPos = m_strCurLine.find("UNIT");//UNIT
         if (_tPos != string::npos)
         {
           m_nLinePos =  _tPos + 4;
           GetText(_strUnit);
         }
 
-        _tPos = m_strCurLine.find(g_szItem[_i++]); //TEXT
+        _tPos = m_strCurLine.find("TEXT"); //TEXT
         if (_tPos != string::npos)
         {
           m_nLinePos =  _tPos + 4;
@@ -262,20 +304,15 @@ static const char* g_szItem[6] = {"ADDR", "FRAC", "MUL","NAME", "UNIT", "TEXT"};
 
         int _nGrp = 0;
         if (m_nGroup > 0)
-             _nGrp = m_nGroup;
+             _nGrp = m_nGroup;   
 
-        if (_addr < 0)
-        {
-            _addr += m_nBaseAddr;
-        }
         m_pConfigData->m_pArrayData.push_back(new DataMap(_nNo, _addr, _nGrp,  _frac,
-                                                         _dMul, _strName, _strUnit, _strText));
+               _dMul, _pMin, _pMax,_strName, _strUnit, _strText));
         if (!m_pConfigData->bIsLoaded)
         {
             SetVal(_nNo, _dVal, _dMul);
         }
-       // qDebug() <<"#" <<_nNo << "="<<_dVal << _addr << _frac << _dMul<< QString(_strUnit.data())<<QString(_strText.data());
-    }
+     }
  }
 
  void  CParseConfig::GetAlarmInfo()
@@ -402,7 +439,7 @@ bool CParseConfig::GetText(string& str_)
 
 void CParseConfig::SetVal(int nNo_, double dVal_, double dMult_)
 {
-   int _nVal =  Round(dVal_ / dMult_);
+   int _nVal =  Round(dVal_ * dMult_);
    m_pConfigData->pData[nNo_] = _nVal;
    //qDebug() << "int"<<_nVal;
 }

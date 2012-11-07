@@ -54,7 +54,6 @@ inline int Round(float f_) { return int (f_ + 0.5);}
 #define MIN(a, b)  ((a) <= b ? (a) : (b))
 
 
-
 //界面颜色 在状态相关
 enum WIND_STATE
 {
@@ -72,7 +71,7 @@ enum LANG
 };
 
 
-#define COLOR_F  230
+#define COLOR_F  30
 
 
 #define DISABLE_BK_COLOR  QColor(212, 207, 178, COLOR_F)

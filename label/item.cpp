@@ -1,6 +1,8 @@
 #include "item.h"
 #include <QPainter>
 #include <QFocusEvent>
+#include <QTimer>
+#include "./../ui/mainframe.h"
 
 static QColor TITLE_LABEL_FGCOLOR[] = {QColor(50, 43, 87, COLOR_F), QColor(50, 43, 87, COLOR_F)};
 static QColor TITLE_LABEL_BKCOLOR[] = {QColor(62, 187, 124, COLOR_F), QColor(177, 193, 155, COLOR_F)};
@@ -220,3 +222,47 @@ void QShape::paintEvent (QPaintEvent* e_)
         _p.setPen(m_cFgColor[m_eSate]);
         _p.drawText(0, 0,  width(), height(), m_nFlag, text());
 }
+
+//================================================
+//================================================
+QPointer<QLabel> QPopTip::m_label = NULL;
+void QPopTip::ShowTextInMainframe(QString text, int fontSize, int time)
+{
+    if (!m_label.isNull())
+        delete m_label;
+
+    m_label = new QLabel(GetMainFrame());
+    m_label->hide();
+    //字体
+    QFont font = m_label->font();
+    font.setPixelSize(fontSize);
+    m_label->setFont(font);
+    m_label->setAlignment(Qt::AlignCenter);
+    m_label->setText(text);
+    //背景色
+    m_label->setStyleSheet("background-color: rgb(177, 193, 155)");
+    //定位
+    m_label->adjustSize();
+    QSize size = m_label->size();
+    size.rwidth() = size.width() + 30;
+    m_label->resize(size);
+    int x = (GetMainFrame()->width() - m_label->width()) / 2;
+    int y = 30;
+    m_label->move(x, y);
+    //定时消失
+    m_label->show();
+
+    if (time > 0)
+    {
+        QTimer* timer = new QTimer(m_label);
+        timer->start(2000);
+        QObject::connect(timer, SIGNAL(timeout()), m_label, SLOT(deleteLater()));
+    }
+}
+
+void QPopTip::HideTextInMainframe()
+{
+    if (!m_label.isNull())
+        delete m_label;
+}
+

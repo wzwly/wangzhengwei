@@ -28,7 +28,9 @@ QSysData::QSysData()
          QString _path(m_szPath);
          QString _name(m_szName);
          m_cGlbData.bIsLoaded = true;
-         LoadFile(_path, _name);
+
+         if ((!_path.isEmpty()) && (!_name.isEmpty()))
+            LoadFile(_path, _name);
     }
     m_cGlbData.pData = m_iParamRO0;
     InitParamData();
@@ -43,23 +45,83 @@ QSysData::QSysData()
  QString QSysData::GetValText(const DataMap* pMap_)
  {
     int _nVal = ParamData(pMap_->iNo);
-    double _fVal = _nVal * pMap_->dMult;
-    //QString _str = QString::number(_fVal, 'f', pMap_->iFraction);
+    double _fVal = double(_nVal) / pMap_->dMult;
     QString _str = QString("%1").arg(_fVal,0, 'f', pMap_->iFraction);
     return _str;
  }
 
+ double QSysData::GetVal(const DataMap* pMap_)
+ {
+     int _nVal = ParamData(pMap_->iNo);
+     double _fVal = double(_nVal) / pMap_->dMult;
+     return _fVal;
+ }
+
  void QSysData::SetVal(const DataMap* pMap_, double fVal_)
  {
-     int _nVal =  Round(fVal_ / pMap_->dMult);
+     int _nVal =  Round(fVal_ * pMap_->dMult);
      ParamData(pMap_->iNo) = _nVal;
+ }
+
+ bool QSysData::CheckValid(const DataMap* pMap_,double dVal_)
+ {
+     int _nVal =  Round(dVal_ * pMap_->dMult);
+     DataRangeMap* _pMin = pMap_->pMin;
+     if (_pMin)
+     {
+            if (_pMin->bSysNo)
+            {
+                if (ParamData(_pMin->nNo) > _nVal)
+                    return false;
+            }
+            else if (DB_G(_pMin->dMaxMin , dVal_))
+                return false;
+     }
+
+     DataRangeMap* _pMax = pMap_->pMax;
+     if (_pMax)
+     {
+            if (_pMax->bSysNo)
+            {
+                if (ParamData(_pMax->nNo) < _nVal)
+                    return false;
+            }
+            else if (DB_L(_pMax->dMaxMin , dVal_))
+                return false;
+     }
+     return true;
+ }
+
+ void QSysData::GetMaxMinRange(const DataMap*pMap_, double& dMin_, double& dMax_)
+ {
+     DataRangeMap* _pMin = pMap_->pMin;
+     if (_pMin)
+     {
+         if (_pMin->bSysNo)
+             dMin_ = ParamData(_pMin->nNo);
+         else
+             dMin_ = _pMin->dMaxMin;
+     }
+     else
+         dMin_ = -9999.0;
+
+     DataRangeMap* _pMax = pMap_->pMax;
+     if (_pMax)
+     {
+         if (_pMax->bSysNo)
+            dMax_ =  ParamData(_pMax->nNo);
+         else
+            dMax_ = _pMax->dMaxMin;
+     }
+     else
+         dMax_ = 9999.0;
  }
 
 void QSysData::InitParamData()
 {
-        CParseConfig _cfg;
-        _cfg.OpenConfigFile("PR.info");
-        _cfg.StartLoadConfig(&m_cGlbData);
+     CParseConfig _cfg;
+     _cfg.OpenConfigFile("PR.info");
+     _cfg.StartLoadConfig(&m_cGlbData);
 }
 
 void QSysData::LoadFile(const QString& path_, const QString& name_)

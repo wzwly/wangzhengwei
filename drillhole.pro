@@ -46,6 +46,5 @@ HEADERS += ghead.h \
     ui/addrdef.h \
     core/parseconfig.h
 DEFINES += PC_BEBUG
-
-OTHER_FILES += \
-    备注.txt
+OTHER_FILES += 备注.txt \
+    PR.info

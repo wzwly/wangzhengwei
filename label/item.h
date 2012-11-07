@@ -4,6 +4,7 @@
 #include "./../ghead.h"
 #include <QLabel>
 #include <QDoubleSpinBox>
+#include <QPointer>
 
 struct  DataMap;
 
@@ -96,5 +97,16 @@ public:
    QPainterPath m_drawPath;
  };
 
+//=========================================
+ class QPopTip
+ {
+ public:
+     //time 为Tip显示的时间（ms）,time小于0显示时间无穷大，
+     //直到主动调用ShowTextInMainframe或HideTextInMainframe才消失。
+     static void ShowTextInMainframe(QString text, int fontSize=20, int time = 2000);
+     static void HideTextInMainframe();
+ private:
+     static QPointer<QLabel> m_label;
+ };
 
 #endif // ITEM_H
