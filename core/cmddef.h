@@ -31,6 +31,7 @@
   [3]起始偏移地址3072；
 #endif
 
+
 #include <QDebug>
 #include "serial.h"
 
@@ -43,7 +44,7 @@ public:
         ECHO_ERRO,
         RECEIVE_STATUS,
     };
-    DevMaster(int nAddr_ = 1, QSerial::TxRxBuffer* pBuffer_ = NULL);
+    DevMaster(int nAddr_ = 1, QSerial* pSerial_ = NULL);
 
 public:
 
@@ -63,14 +64,17 @@ private:
     CheckStatus CheckPresetMultipleRegisters(unsigned short wQty_);//16
 private:
     //===========================
+    void BegineSend();
+    void StopRecieve();
     unsigned short MakeShort(unsigned char H_, unsigned int L)
     {
         unsigned short _ret = H_ & 0xff;
         return ((_ret << 8) + L);
     };
-    void BegineSend();
+
 private:
     QSerial::TxRxBuffer* m_pBuffer;
+    QSerial* m_pSerial;
     unsigned char m_cSlaveAddr;
     const int m_nRepeatTime;
     /*
@@ -152,4 +156,5 @@ private:
      */
 
 };
+
 #endif

@@ -1,6 +1,7 @@
 #include "serial.h"
-#include "./../ghead.h"
-#include "cmddef.h"
+//#include "./../ghead.h"
+//
+//#include "cmddef.h"
 
 #include <QWSServer>
 #include <QSocketNotifier>
@@ -15,12 +16,13 @@
 
 
 QSerial::TxRxBuffer QSerial::m_gTxRxBuffer;
+
 const static char* g_szSerialName[] = {"/dev/ttyUSB0", "/dev/ttySAC0", "/dev/ttySAC1"};
 
 QSerial::QSerial(DevMaster* pSlave_, QObject * p_)
 {
     m_nFdModbus = -1;
-    m_pSlave = pSlave_;
+    m_pModbus = pSlave_;
     InitModbus();
     m_nTimer = startTimer(1); //开启定时器，1ms一次
 }
@@ -53,7 +55,7 @@ void QSerial::InitModbus()
         assert(false);
         exit(1);
     }   
-    //注册响应
+
     QSocketNotifier* notify = new QSocketNotifier(m_nFdModbus, QSocketNotifier::Read, this);
     connect(notify, SIGNAL(activated(int)), this, SLOT(OnReceiveChar()));
 }
@@ -61,12 +63,8 @@ void QSerial::InitModbus()
 
 void QSerial::OnReceiveChar()
 {
-    if (!m_gTxRxBuffer.bRxEn)
-        return;
-
     unsigned char _cRead[10];
     int _ret = Read(m_nFdModbus, _cRead, 10);
-
     if (_ret <= 0)
         return;
 
@@ -74,7 +72,7 @@ void QSerial::OnReceiveChar()
     {
         m_gTxRxBuffer.szRxBuffer[m_gTxRxBuffer.iRxLen++] = _cRead[_i];
     }
-    m_nTemMs = 10;  
+    m_nTemMs = 10;
 }
 
 
@@ -94,18 +92,22 @@ void QSerial::SendBuffer()
 
 void QSerial::timerEvent(QTimerEvent *event_)
 {
-    //in receive mode
-   // if (m_nTemMs > 0 && m_gTxRxBuffer.iRxLen > 0)
-   // {
-   //     --m_nTemMs;
-   //     if (m_nTemMs == 0)
-   //     {
-    //       m_gTxRxBuffer.iRxLen = 0; //receive time out, start a new package
-   //     }
-   // }
-
     if (m_gTxRxBuffer.m_nEchoTimeOut > 0)
         m_gTxRxBuffer.m_nEchoTimeOut--;
+
+    if (m_gTxRxBuffer.bRxTimerEn)
+    {
+        //in receive mode
+        if (m_nTemMs > 0 && m_gTxRxBuffer.iRxLen > 0)
+        {
+            --m_nTemMs;
+            if (m_nTemMs == 0)
+            {
+                m_gTxRxBuffer.iRxLen = 0;
+                //receive time out, start a new package
+            }
+        }
+    }
 }
 
 

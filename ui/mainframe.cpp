@@ -5,7 +5,7 @@
 #include "./../label/button.h"
 #include "./../core/qsysdata.h"
 #include "./../core/cmddef.h"
-#include "./../core/serial.h"
+
 
 #include "basepage.h"
 #include "autopage.h"
