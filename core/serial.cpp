@@ -19,13 +19,17 @@ QSerial::TxRxBuffer QSerial::m_gTxRxBuffer;
 
 const static char* g_szSerialName[] = {"/dev/ttyUSB0", "/dev/ttySAC0", "/dev/ttySAC1"};
 
-QSerial::QSerial(DevMaster* pSlave_, QObject * p_)
+QSerial::QSerial(QObject * p_)
 {
-    m_nFdModbus = -1;
-    m_pModbus = pSlave_;
+    m_nFdModbus = -1; 
     InitModbus();
     m_nTimer = startTimer(1); //开启定时器，1ms一次
 }
+
+ void QSerial::SetModbus(DevMaster* pSlave_)
+ {
+     m_pModbus = pSlave_;
+ }
 
 QSerial::~QSerial()
 {

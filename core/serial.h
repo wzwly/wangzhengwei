@@ -31,7 +31,7 @@ class QSerial : public QObject
 {
    Q_OBJECT
 public:
-    QSerial(DevMaster* pSlave_,QObject * p_);
+    QSerial(QObject * p_);
     ~QSerial();
     enum
     {
@@ -68,6 +68,7 @@ private:
 public:
     static TxRxBuffer m_gTxRxBuffer;
     void SendBuffer();
+    void SetModbus(DevMaster* pSlave_);
     //void ClearReceive(){ m_gTxRxBuffer.iRxLen = 0;}
 };
 
