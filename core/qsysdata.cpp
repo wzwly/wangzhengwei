@@ -194,13 +194,13 @@ void QSysData::LoadFromXtfFile(const QString& path)
             _fX = _pData.m_fDataX[_i];
             _fY = _pData.m_fDataY[_i * 12 + _j];
             m_vDrillData[_nPos++] = FLOAT_POINT(_fX, _fY);
-            Cmd06WriteKeepReg(_nAddr + _j, _fX);
-            Cmd06WriteKeepReg(_nAddr + _j + 1, _fY);
+            //Cmd06WriteKeepReg(_nAddr + _j, _fX);
+            //Cmd06WriteKeepReg(_nAddr + _j + 1, _fY);
         }
          _nAddr += HOLE_POS::HOLE_ROW_MAX;
-         Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW0_HOLE_QTY + _i, 10);
+         //Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW0_HOLE_QTY + _i, 10);
     }
-     Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW_QTY, 12);
+    //Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW_QTY, 12);
 }
 
 

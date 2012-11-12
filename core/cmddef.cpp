@@ -3,8 +3,12 @@
 #include "serial.h"
 #include "./../ghead.h"
 
-// CRC 高位字节值表
-static unsigned char g_auchCRCHi[] = {
+
+//字地址 0 - 255 (只取低8位)
+//位地址 0 - 255 (只取低8位)
+
+/* CRC 高位字节值表 */
+static const unsigned char auchCRCHi[] = {
 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0,
 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0,
@@ -33,9 +37,8 @@ static unsigned char g_auchCRCHi[] = {
 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40
 } ;
 
-
-// CRC低位字节值表
-static char g_auchCRCLo[] = {
+/* CRC低位字节值表*/
+static const unsigned auchCRCLo[] = {
 0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6, 0x06,
 0x07, 0xC7, 0x05, 0xC5, 0xC4, 0x04, 0xCC, 0x0C, 0x0D, 0xCD,
 0x0F, 0xCF, 0xCE, 0x0E, 0x0A, 0xCA, 0xCB, 0x0B, 0xC9, 0x09,
@@ -64,363 +67,536 @@ static char g_auchCRCLo[] = {
 0x43, 0x83, 0x41, 0x81, 0x80, 0x40
 } ;
 
-#define MAX_COMBUFF_LEN   264
-#define MAX_REPEAT_COUNT   1
 
-
-static unsigned char g_sRxBuff[MAX_COMBUFF_LEN];
-static unsigned char g_sTxBuff[MAX_COMBUFF_LEN];
-
-
-static unsigned char g_sComBuff[MAX_COMBUFF_LEN];
-//CRC简单函数如下：
-unsigned short GetCrc16(unsigned char *puchMsg,int usDataLen) // 消息中字节数
+static unsigned short crc16(unsigned char *puchMsg, unsigned int nDataLen)
 {
-    unsigned char uchCRCHi = 0xFF ; // 高CRC字节初始化
-    unsigned char uchCRCLo = 0xFF ; // 低CRC 字节初始化
-    unsigned uIndex ; // CRC循环中的索引
-    while (usDataLen--) // 传输消息缓冲区
+    unsigned char uchCRCHi = 0xFF ; /* 高CRC字节初始化 */
+    unsigned char uchCRCLo = 0xFF ; /* 低CRC 字节初始化 */
+    unsigned int uIndex ;   /* CRC循环中的索引 */
+    while (nDataLen--)      /* 传输消息缓冲区 */
     {
-        uIndex = uchCRCHi ^ *puchMsg++ ; // 计算CRC
-        uchCRCHi = uchCRCLo ^ g_auchCRCHi[uIndex] ;
-        uchCRCLo = g_auchCRCLo[uIndex] ;
+        uIndex = uchCRCHi ^ *puchMsg++ ; /* 计算CRC */
+        uchCRCHi = uchCRCLo ^ auchCRCHi[uIndex] ;
+        uchCRCLo = auchCRCLo[uIndex] ;
     }
     return (uchCRCHi << 8 | uchCRCLo) ;
 }
 
-void ExchangeByte(unsigned char* p_, int nSize_)
+
+DevMaster::DevMaster(int nAddr_, QSerial::TxRxBuffer* pBuffer_)
+:m_nRepeatTime(300)
 {
-    unsigned char _tW;
-    for(int _i = 0; _i < nSize_; _i += 2)
-    {
-        _tW = p_[_i];
-        p_[_i] = p_[_i + 1];
-        p_[_i + 1] = _tW;
-    }
+       m_pBuffer = pBuffer_;
+       m_cSlaveAddr = nAddr_;
 }
 
-unsigned char GetAddr()
+void DevMaster::BegineSend()
 {
-    return 1;
+ #if TEST
+    unsigned char* _pRecBuf = QSerial::m_gSlaveBuffer.szRxBuffer;
+    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    QSerial::m_gSlaveBuffer.iRxLen = m_pBuffer->iTxLen;
+    memcpy(_pRecBuf, _pTxBuf, m_pBuffer->iTxLen);
+#else
+
+
+        m_pBuffer->bTxEn = true;
+        m_pBuffer->m_nEchoTimeOut = 20;
+        m_pBuffer->iRxLen = 0;
+#endif
 }
 
-//=========================================
-//=========================================
-///========================================
-/*
-02(0x02)读离散量输入
-【用了读取输入端口的状态】
-
-请求码格式：[0x02][地址高字节][地址低字节][输入数量高字节][输入数量低字节][Crc低字节][Crc高字节]
-响应码格式：[0x02][字节数][输入状态N*1个字节][Crc低字节][Crc高字节]
-异常响应格式：[0x82][异常码]
-
-备注：
---N = 输入数量/8,如果余数不为零，则N=N+1；
---输入数量为1-2000，超过算是错误；
-*/
-void Cmd02ReadInput(unsigned short wAddr_, unsigned short wNum_, unsigned char* pSrc_)
+//1
+void DevMaster::ReadCoil(unsigned short wAddr_, unsigned short wQty_,unsigned char* pData_)
 {
-    int _nRpt = MAX_REPEAT_COUNT;
-    int _nN = wNum_;
-    wNum_ = _nN/ 8;
-    if (_nN % 8 != 0)
-        wNum_++;
+    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
 
-    g_sTxBuff[0] = GetAddr();
-    g_sTxBuff[1] = 0x02;
-    g_sTxBuff[2] = (wAddr_ & 0xff00) >> 8;
-    g_sTxBuff[3] = (wAddr_ & 0x00ff);
-    g_sTxBuff[4] = (wNum_ & 0xff00) >> 8;
-    g_sTxBuff[5] = (wNum_ & 0x00ff);
-
-    unsigned short _crc, _crcT;
-    _crc = GetCrc16(g_sTxBuff, 6);
-    g_sTxBuff[6] = (_crc & 0x00ff);
-    g_sTxBuff[7] = (_crc & 0xff00) >> 8;
-
-    while(_nRpt--)
+    _pTxBuf[0] = m_cSlaveAddr;
+    _pTxBuf[1] = 0x01;
+    _pTxBuf[2] = wAddr_ >> 8;
+    _pTxBuf[3] = wAddr_ & 0xff;
+    _pTxBuf[4] = wQty_ >> 8;
+    _pTxBuf[5] = wQty_ & 0xff;
+    unsigned short _crcData = crc16(_pTxBuf, 6);
+    _pTxBuf[6] = _crcData >> 8;
+    _pTxBuf[7] = _crcData & 0xff;
+    m_pBuffer->iTxLen = 8;
+# if TEST
+    BegineSend(); //发送
+#else
+    int _nloop = m_nRepeatTime;
+    CheckStatus _sRet;
+    while(_nloop > 0)
     {
-        if(!QSerial::WriteData(g_sTxBuff, 8))
-            assert(false);
+        _nloop--;
+        BegineSend(); //发送
 
-        g_sRxBuff[0] = '\0';
-        g_sRxBuff[1] = '\0';
-        //读取前两个字节
-        if (QSerial::ReadChar(&g_sRxBuff[0]))
+        while(1)
         {
-           QSerial::ReadChar(&g_sRxBuff[1]);
-           QSerial::ReadChar(&g_sRxBuff[2]);
-           if (g_sRxBuff[0] != g_sTxBuff[0] || g_sRxBuff[1] != g_sTxBuff[1])
-               continue;
-           QSerial::ReadData(&g_sRxBuff[3],g_sRxBuff[2] + 2);
-           int _nLen = 3 + g_sRxBuff[2];
-            _crc = GetCrc16(g_sRxBuff, _nLen);
-            _crcT = g_sTxBuff[_nLen] | (g_sTxBuff[_nLen + 1] << 8);
-            if (_crcT == _crc)
+            usleep(1);
+            if (m_pBuffer->m_nEchoTimeOut <= 0)
+                break; //超时
+            _sRet = CheckReadCoil(wQty_,pData_);
+            if (CHECK_OK == _sRet) //校验正确
             {
-                memcpy(pSrc_, &g_sTxBuff[3],wNum_);
+                _nloop = 0;
                 break;
+            }
+            else if (ECHO_ERRO == _sRet)
+            {
+                break;  //校验错误
             }
         }
     }
+#endif
+}
+//1
+DevMaster::CheckStatus DevMaster::CheckReadCoil(unsigned short wQty_,unsigned char* pData_)
+{
+    //最少5为 slave cmd addr crc0 crc1
+    if (m_pBuffer->iRxLen <= 4)
+        return RECEIVE_STATUS;
+
+    unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
+    if (_pRecBuf[0] == m_cSlaveAddr)
+    {
+        if (_pRecBuf[1] == 0x81)
+            return ECHO_ERRO;//接受错误
+
+        if (_pRecBuf[1] == 0x01)
+        {
+            unsigned char _byteCnt = wQty_ / 8;
+            if (wQty_ % 8 != 0)
+                _byteCnt++;
+            int _nLen = _byteCnt + 5;
+            if (m_pBuffer->iRxLen < _nLen)
+                return RECEIVE_STATUS;
+            unsigned short _crcData, _crcOld;
+            _crcData = crc16(_pRecBuf,_nLen - 2);
+            _crcOld = MakeShort(_pRecBuf[_nLen - 2],_pRecBuf[_nLen -1]);
+
+            if (_crcData == _crcOld)
+            {
+                memcpy(pData_, &_pRecBuf[3], _byteCnt);
+                qDebug() << "check ReadCoil Ok";
+                return CHECK_OK;//接受OK
+            }
+            else
+               return ECHO_ERRO;//接受错误
+        }
+    }
+    return ECHO_ERRO;//接受错误
 }
 
-/*
-05(0x05)写单个线圈
-【用来写输出端口的状态】
-请求码格式：[0x05][地址高字节][地址低字节][FF/00][00][Crc低字节][Crc高字节]
-响应码格式：[0x05][地址高字节][地址低字节][FF/00][00][Crc低字节][Crc高字节]
-异常响应格式：[0x85][异常码]
-
-备注：
---ff00表示On，0000表示offf；
---输入数量为1-ffff，超过算是错误；
-*/
-void Cmd05WriteOutput(unsigned short wAddr_, bool bOn_)
+void DevMaster::ReadRegisters(unsigned short wAddr_, unsigned short wQty_, unsigned char* pData_)//3
 {
-    int _nRpt = MAX_REPEAT_COUNT;
+    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
 
-    g_sTxBuff[0] = GetAddr();
-    g_sTxBuff[1] = 0x05;
-    g_sTxBuff[2] = (wAddr_ & 0xff00) >> 8;
-    g_sTxBuff[3] = (wAddr_ & 0x00ff);
-    g_sTxBuff[4] = bOn_? 0xff : 0;
-    g_sTxBuff[5] = 0;
-
-    unsigned short _crc, _crcT;
-    _crc = GetCrc16(g_sTxBuff, 6);
-    g_sTxBuff[6] = (_crc & 0x00ff);
-    g_sTxBuff[7] = (_crc & 0xff00) >> 8;
-
-    while(_nRpt--)
+    _pTxBuf[0] = m_cSlaveAddr;
+    _pTxBuf[1] = 0x03;
+    _pTxBuf[2] = wAddr_ >> 8;
+    _pTxBuf[3] = wAddr_ & 0xff;
+    _pTxBuf[4] = wQty_ >> 8;
+    _pTxBuf[5] = wQty_ & 0xff;
+    unsigned short _crcData = crc16(_pTxBuf, 6);
+    _pTxBuf[6] = _crcData >> 8;
+    _pTxBuf[7] = _crcData & 0xff;
+    m_pBuffer->iTxLen = 8;
+# if TEST
+    BegineSend(); //发送
+#else
+    int _nloop = m_nRepeatTime;
+    CheckStatus _sRet;
+    while(_nloop > 0)
     {
-        if(!QSerial::WriteData(g_sTxBuff, 8))
-            assert(false);
+        _nloop--;
+        BegineSend(); //发送
 
-        g_sRxBuff[0] = '\0';
-        g_sRxBuff[1] = '\0';
-        //读取前两个字节
-        if (QSerial::ReadChar(&g_sRxBuff[0]))
+        while(1)
         {
-            QSerial::ReadData(&g_sRxBuff[1],7);
-            _crcT = g_sTxBuff[6] | (g_sTxBuff[7] << 8);
-            if (_crcT == _crc)
+            usleep(1);
+            if (m_pBuffer->m_nEchoTimeOut <= 0)
+                break; //超时
+            _sRet = CheckReadRegisters(wQty_,pData_);
+            if (CHECK_OK == _sRet) //校验正确
             {
+                _nloop = 0;
                 break;
+            }
+            else if (ECHO_ERRO == _sRet)
+            {
+                break;  //校验错误
             }
         }
     }
+#endif
+
 }
 
-
-/*
-03(0x03)读保持寄存器
-【用来读取浮点数值和16位整形数值】
-请求码格式：[0x03][地址高字节][地址低字节][寄存器数量高字节][寄存器数量低字节][Crc低字节][Crc高字节]
-响应码格式：[0x03][字节数][N字节][Crc低字节][Crc高字节]
-异常响应格式：[0x83][异常码]
-
-备注：
---对于浮点数，N=4 * 寄存器数量， 对于16位整形， N=2*寄存器数量；
---返回是根据地址来区别，如果是浮点数地址，则返回4字节；
---对应16位整形，最多一次读125个；浮点数最多读60个；
-*/
-void Cmd03ReadKeepReg(unsigned short wAddr_, unsigned short wRegQty_, unsigned char* pDest_)
+DevMaster::CheckStatus DevMaster::CheckReadRegisters(unsigned short wQty_,unsigned char* pData_) //3
 {
-    int _nRpt = MAX_REPEAT_COUNT;
+    //最少5为 slave cmd addr crc0 crc1
+    if (m_pBuffer->iRxLen <= 4)
+        return RECEIVE_STATUS;
 
-    g_sTxBuff[0] = GetAddr();
-    g_sTxBuff[1] = 0x03;
-    g_sTxBuff[2] = (wAddr_ & 0xff00) >> 8;
-    g_sTxBuff[3] = (wAddr_ & 0x00ff);
-    g_sTxBuff[4] = (wRegQty_ & 0xff00) >> 8;
-    g_sTxBuff[5] = (wRegQty_ & 0x00ff);
-
-    unsigned short _crc, _crcT;
-    _crc = GetCrc16(g_sTxBuff, 6);
-    g_sTxBuff[6] = (_crc & 0x00ff);
-    g_sTxBuff[7] = (_crc & 0xff00) >> 8;
-
-    while(_nRpt--)
+    unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
+    if (_pRecBuf[0] == m_cSlaveAddr)
     {
-        if(!QSerial::WriteData(g_sTxBuff, 8))
-            assert(false);
+        if (_pRecBuf[1] == 0x83)
+            return ECHO_ERRO;//接受错误
 
-        g_sRxBuff[0] = '\0';
-        g_sRxBuff[1] = '\0';
-        //读取前两个字节
-        if (QSerial::ReadChar(&g_sRxBuff[0]))
+        if (_pRecBuf[1] == 0x03)
         {
-           QSerial::ReadChar(&g_sRxBuff[1]);
-           QSerial::ReadChar(&g_sRxBuff[2]);
-           if (g_sRxBuff[0] != g_sTxBuff[0] || g_sRxBuff[1] != g_sTxBuff[1])
-               continue;
-           QSerial::ReadData(&g_sRxBuff[3],g_sRxBuff[2] + 2);
-           int _nLen = 3 + g_sRxBuff[2];
-            _crc = GetCrc16(g_sRxBuff, _nLen);
-            _crcT = g_sTxBuff[_nLen] | (g_sTxBuff[_nLen + 1] << 8);
-            if (_crcT == _crc)
+            unsigned char _byteCnt = _pRecBuf[2];
+            int _nLen = _byteCnt + 5;
+            if (m_pBuffer->iRxLen < _nLen)
+                return RECEIVE_STATUS;
+            unsigned short _crcData, _crcOld;
+            _crcData = crc16(_pRecBuf,_nLen - 2);
+            _crcOld = MakeShort(_pRecBuf[_nLen - 2],_pRecBuf[_nLen -1]);
+
+            if (_crcData == _crcOld)
             {
-                ExchangeByte(&g_sTxBuff[3],g_sRxBuff[2]);//高低字节交换
-                memcpy(pDest_, &g_sTxBuff[3], g_sRxBuff[2]);
+                memcpy(pData_, &_pRecBuf[3], _byteCnt);
+                qDebug() << "check ReadRegisters Ok";
+                return CHECK_OK;//接受OK
+            }
+            else
+               return ECHO_ERRO;//接受错误
+        }
+    }
+    return ECHO_ERRO;//接受错误
+}
+
+void DevMaster::ForceSingleCoil(unsigned short wAddr_, bool bOnOff_) //5
+{
+    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    unsigned short _wOnOff = 0x00;
+    if (bOnOff_)
+        _wOnOff = 0xffff;
+    _pTxBuf[0] = m_cSlaveAddr;
+    _pTxBuf[1] = 0x05;
+    _pTxBuf[2] = wAddr_ >> 8;
+    _pTxBuf[3] = wAddr_ & 0xff;
+    _pTxBuf[4] = _wOnOff >> 8;
+    _pTxBuf[5] = _wOnOff & 0xff;
+    unsigned short _crcData = crc16(_pTxBuf, 6);
+    _pTxBuf[6] = _crcData >> 8;
+    _pTxBuf[7] = _crcData & 0xff;
+    m_pBuffer->iTxLen = 8;
+# if TEST
+    BegineSend(); //发送
+#else
+    int _nloop = m_nRepeatTime;
+    CheckStatus _sRet;
+    while(_nloop > 0)
+    {
+        _nloop--;
+        BegineSend(); //发送
+
+        while(1)
+        {
+            usleep(1);
+            if (m_pBuffer->m_nEchoTimeOut <= 0)
+                break; //超时
+            _sRet = CheckForceSingleCoil(_wOnOff);
+            if (CHECK_OK == _sRet) //校验正确
+            {
+                _nloop = 0;
                 break;
+            }
+            else if (ECHO_ERRO == _sRet)
+            {
+                break;  //校验错误
             }
         }
     }
+#endif
+
 }
 
-/*
-06(0x06)写单个寄存器
-【用来读取浮点数值和16位整形数值】
-请求码格式：[0x06][地址高字节][地址低字节][2字节数据][Crc低字节][Crc高字节]
-响应码格式：[0x06][地址高字节][地址低字节][2字节数据][Crc低字节][Crc高字节]
-异常响应格式：[0x86][异常码]
-*/
-void Cmd06WriteKeepReg(unsigned short wAddr_, unsigned short wVal_)
+ DevMaster::CheckStatus DevMaster::CheckForceSingleCoil(unsigned short wOnOff_) //5
+ {
+     //最少5为 slave cmd addr crc0 crc1
+     if (m_pBuffer->iRxLen <= 4)
+         return RECEIVE_STATUS;
+
+     unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
+     if (_pRecBuf[0] == m_cSlaveAddr)
+     {
+         if (_pRecBuf[1] == 0x85)
+             return ECHO_ERRO;//接受错误
+
+         if (_pRecBuf[1] == 0x05)
+         {
+             if (m_pBuffer->iRxLen < 8)
+
+                 return RECEIVE_STATUS;
+             unsigned short _crcData, _crcOld;
+             _crcData = crc16(_pRecBuf, 6);
+             _crcOld = MakeShort(_pRecBuf[6], _pRecBuf[7]);
+             if (_crcData == _crcOld)
+             {
+                 qDebug() << "check ForceSingleCoil Ok";
+                 return CHECK_OK;//接受OK
+             }
+             else
+                return ECHO_ERRO;//接受错误
+         }
+     }
+     return ECHO_ERRO;//接受错误
+ }
+
+//6
+void DevMaster::PresetSingleRegister(unsigned short wAddr_, unsigned short wVal_)
 {
-    int _nRpt = MAX_REPEAT_COUNT;
-
-    g_sTxBuff[0] = GetAddr();
-    g_sTxBuff[1] = 0x06;
-    g_sTxBuff[2] = (wAddr_ & 0xff00) >> 8;
-    g_sTxBuff[3] = (wAddr_ & 0x00ff);
-    g_sTxBuff[4] = (wVal_ & 0xff00) >> 8;
-    g_sTxBuff[5] = (wVal_ & 0x00ff);
-
-    unsigned short _crc, _crcT;
-    _crc = GetCrc16(g_sTxBuff, 6);
-    g_sTxBuff[6] = (_crc & 0x00ff);
-    g_sTxBuff[7] = (_crc & 0xff00) >> 8;
-
-    while(_nRpt--)
+    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    _pTxBuf[0] = m_cSlaveAddr;
+    _pTxBuf[1] = 0x06;
+    _pTxBuf[2] = wAddr_ >> 8;
+    _pTxBuf[3] = wAddr_ & 0xff;
+    _pTxBuf[4] = wVal_ >> 8;
+    _pTxBuf[5] = wVal_ & 0xff;
+    unsigned short _crcData = crc16(_pTxBuf, 6);
+    _pTxBuf[6] = _crcData >> 8;
+    _pTxBuf[7] = _crcData & 0xff;
+    m_pBuffer->iTxLen = 8;
+# if TEST
+    BegineSend(); //发送
+#else
+    int _nloop = m_nRepeatTime;
+    CheckStatus _sRet;
+    while(_nloop > 0)
     {
-        if(!QSerial::WriteData(g_sTxBuff, 8))
-            assert(false);
+        _nloop--;
+        BegineSend(); //发送
 
-        g_sRxBuff[0] = '\0';
-        g_sRxBuff[1] = '\0';
-        //读取前两个字节
-        if (QSerial::ReadChar(&g_sRxBuff[0]))
+        while(1)
         {
-            QSerial::ReadData(&g_sRxBuff[1],7);
-            _crcT = g_sTxBuff[6] | (g_sTxBuff[7] << 8);
-            if (_crcT == _crc)
+            usleep(1);
+            if (m_pBuffer->m_nEchoTimeOut <= 0)
+                break; //超时
+            _sRet = CheckPresetSingleRegister(wVal_);
+            if (CHECK_OK == _sRet) //校验正确
             {
+                _nloop = 0;
                 break;
+            }
+            else if (ECHO_ERRO == _sRet)
+            {
+                break;  //校验错误
             }
         }
     }
+#endif
 }
 
-void Cmd06WriteKeepReg(unsigned short wAddr_, float fVal_)
+//6
+DevMaster::CheckStatus DevMaster::CheckPresetSingleRegister(unsigned short wVal_)
 {
-    CmdWriteKeepRegEx(wAddr_, 1, (unsigned char*)&fVal_);
-}
+    //最少5为 slave cmd addr crc0 crc1
+    if (m_pBuffer->iRxLen <= 4)
+        return RECEIVE_STATUS;
 
-void Cmd06WriteKeepReg(unsigned short wAddr_, int nVal_)
-{
-    CmdWriteKeepRegEx(wAddr_, 1, (unsigned char*)&nVal_);
-}
-
-/*
-16(0x10)写多个寄存器
-【用来读取浮点数值和16位整形数值】
-请求码格式：[0x10][地址高字节][地址低字节][寄存器数量高字节][寄存器数量低字节][字节数][N字节数据][Crc低字
-节][Crc高字节]
-响应码格式：[0x10][地址高字节][地址低字节]寄存器数量高字节][寄存器数量低字节[Crc低字节][Crc高字节]
-异常响应格式：[0x90][异常码]
-*/
-void CmdWriteKeepReg(unsigned short wAddr_, unsigned short wRegQty_, const unsigned char* pDest_)
-{
-    //QSerial::WriteData(pDest_, wRegQty_);
-    //return; //wzwtest
-    int _nRpt = MAX_REPEAT_COUNT;
-
-    assert(wRegQty_ < 125);
-    g_sTxBuff[0] = GetAddr();
-    g_sTxBuff[1] = 0x10;
-    g_sTxBuff[2] = (wAddr_ & 0xff00) >> 8;
-    g_sTxBuff[3] = (wAddr_ & 0x00ff);
-    g_sTxBuff[4] = (wRegQty_ & 0xff00) >> 8;
-    g_sTxBuff[5] = (wRegQty_ & 0x00ff);
-    unsigned char _cLen = wRegQty_ * 2;
-    g_sTxBuff[6] = _cLen;
-    memcpy(&g_sTxBuff[7],pDest_,_cLen);
-    ExchangeByte(&g_sTxBuff[7],wRegQty_ * 2);//高低字节交换
-    _cLen += 7;
-
-    unsigned short _crc, _crcT;
-    _crc = GetCrc16(g_sTxBuff, _cLen);
-    g_sTxBuff[_cLen] = (_crc & 0x00ff);
-    g_sTxBuff[_cLen + 1] = (_crc & 0xff00) >> 8;
-
-    while(_nRpt--)
+    unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
+    if (_pRecBuf[0] == m_cSlaveAddr)
     {
-        if(!QSerial::WriteData(g_sTxBuff, _cLen + 2))
-            assert(false);
+        if (_pRecBuf[1] == 0x86)
+            return ECHO_ERRO;//接受错误
 
-        g_sRxBuff[0] = '\0';
-        g_sRxBuff[1] = '\0';
-        //读取前两个字节
-        if (QSerial::ReadChar(&g_sRxBuff[0]))
+        if (_pRecBuf[1] == 0x06)
         {
-            QSerial::ReadChar(&g_sRxBuff[1]);
-            if (g_sRxBuff[0] != g_sTxBuff[0] || g_sRxBuff[1] != g_sTxBuff[1])
-                continue;
-            QSerial::ReadData(&g_sRxBuff[2],6);
-            _crc = GetCrc16(g_sRxBuff, 6);
-            _crcT = g_sTxBuff[6] | (g_sTxBuff[7] << 8);
-            if (_crcT == _crc)
+            if (m_pBuffer->iRxLen < 8)
+
+                return RECEIVE_STATUS;
+            unsigned short _crcData, _crcOld;
+            _crcData = crc16(_pRecBuf, 6);
+            _crcOld = MakeShort(_pRecBuf[6], _pRecBuf[7]);
+            if (_crcData == _crcOld)
             {
+                qDebug() << "check PresetSingleRegister Ok";
+                return CHECK_OK;//接受OK
+            }
+            else
+               return ECHO_ERRO;//接受错误
+        }
+    }
+    return ECHO_ERRO;//接受错误
+}
+
+ //15
+void DevMaster::ForceMultipleCoils(unsigned short wAddr_, unsigned short wQty_,
+                        unsigned char* pData_, unsigned char byteCnt_)
+{
+    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    _pTxBuf[0] = m_cSlaveAddr;
+    _pTxBuf[1] = 0x0f;
+    _pTxBuf[2] = wAddr_ >> 8;
+    _pTxBuf[3] = wAddr_ & 0xff;
+    _pTxBuf[4] = wQty_ >> 8;
+    _pTxBuf[5] = wQty_ & 0xff;
+
+    if (byteCnt_ == 0)
+    {
+        byteCnt_ = wQty_ / 8;
+        if (wQty_ % 8 != 0)
+           byteCnt_++;
+    }
+    _pTxBuf[6] = byteCnt_;
+
+    for (int _i = 0; _i < byteCnt_; ++_i)
+       _pTxBuf[7 + _i] = pData_[_i];
+
+    byteCnt_ += 7;
+    unsigned short _crcData = crc16(_pTxBuf, byteCnt_);
+    _pTxBuf[byteCnt_++] = _crcData >> 8;
+    _pTxBuf[byteCnt_++] = _crcData & 0xff;
+    m_pBuffer->iTxLen = byteCnt_;
+# if TEST
+    BegineSend(); //发送
+#else
+    int _nloop = m_nRepeatTime;
+    CheckStatus _sRet;
+    while(_nloop > 0)
+    {
+        _nloop--;
+        BegineSend(); //发送
+        while(1)
+        {
+            usleep(1);
+            if (m_pBuffer->m_nEchoTimeOut <= 0)
+                break; //超时
+            _sRet = CheckForceMultipleCoils(wQty_);
+            if (CHECK_OK == _sRet) //校验正确
+            {
+                _nloop = 0;
                 break;
+            }
+            else if (ECHO_ERRO == _sRet)
+            {
+                break;  //校验错误
             }
         }
     }
+#endif
 }
 
-void CmdWriteKeepRegEx(unsigned short wAddr_, unsigned short wRegQty_, const unsigned char* pDest_)
+//15
+DevMaster::CheckStatus DevMaster::CheckForceMultipleCoils(unsigned short wQty_)
 {
-    int _nRpt = MAX_REPEAT_COUNT;
+    //最少5为 slave cmd addr crc0 crc1
+    if (m_pBuffer->iRxLen <= 4)
+        return RECEIVE_STATUS;
 
-    assert(wRegQty_ < 60);
-    g_sTxBuff[0] = GetAddr();
-    g_sTxBuff[1] = 0x10;
-    g_sTxBuff[2] = (wAddr_ & 0xff00) >> 8;
-    g_sTxBuff[3] = (wAddr_ & 0x00ff);
-    g_sTxBuff[4] = (wRegQty_ & 0xff00) >> 8;
-    g_sTxBuff[5] = (wRegQty_ & 0x00ff);
-    unsigned char _cLen = wRegQty_ * 4;
-    g_sTxBuff[6] = _cLen;
-    memcpy(&g_sTxBuff[7],pDest_,_cLen);
-    ExchangeByte(&g_sTxBuff[7],wRegQty_ * 4);//高低字节交换
-    _cLen += 7;
-
-    unsigned short _crc, _crcT;
-    _crc = GetCrc16(g_sTxBuff, _cLen);
-    g_sTxBuff[_cLen] = (_crc & 0x00ff);
-    g_sTxBuff[_cLen + 1] = (_crc & 0xff00) >> 8;
-
-    while(_nRpt--)
+    unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
+    if (_pRecBuf[0] == m_cSlaveAddr)
     {
-        if(!QSerial::WriteData(g_sTxBuff, _cLen + 2))
-            assert(false);
+        if (_pRecBuf[1] == 0x8f)
+            return ECHO_ERRO;//接受错误
 
-        g_sRxBuff[0] = '\0';
-        g_sRxBuff[1] = '\0';
-        //读取前两个字节
-        if (QSerial::ReadChar(&g_sRxBuff[0]))
+        if (_pRecBuf[1] == 0x0f)
         {
-            QSerial::ReadChar(&g_sRxBuff[1]);
-            if (g_sRxBuff[0] != g_sTxBuff[0] || g_sRxBuff[1] != g_sTxBuff[1])
-                continue;
-            QSerial::ReadData(&g_sRxBuff[2],6);
-            _crc = GetCrc16(g_sRxBuff, 6);
-            _crcT = g_sTxBuff[6] | (g_sTxBuff[7] << 8);
-            if (_crcT == _crc)
+            if (m_pBuffer->iRxLen < 8)
+                return RECEIVE_STATUS;
+
+            unsigned short _crcData, _crcOld;
+            _crcData = crc16(_pRecBuf, 6);
+            _crcOld = MakeShort(_pRecBuf[6], _pRecBuf[7]);
+            if (_crcData == _crcOld)
             {
+                qDebug() << "check ForceMultipleCoils Ok";
+                return CHECK_OK;//接受OK
+            }
+            else
+               return ECHO_ERRO;//接受错误
+        }
+    }
+    return ECHO_ERRO;//接受错误
+}
+
+
+void DevMaster::PresetMultipleRegisters(unsigned short wAddr_, unsigned short wQty_,
+                             unsigned char* pData_, unsigned char byteCnt_)//16
+{
+    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    _pTxBuf[0] = m_cSlaveAddr;
+    _pTxBuf[1] = 0x10;
+    _pTxBuf[2] = wAddr_ >> 8;
+    _pTxBuf[3] = wAddr_ & 0xff;
+    _pTxBuf[4] = wQty_ >> 8;
+    _pTxBuf[5] = wQty_ & 0xff;
+    if (byteCnt_ == 0)
+    {
+        byteCnt_ = wQty_ * 2;
+    }
+    _pTxBuf[6] = byteCnt_;
+
+    for (int _i = 0; _i < byteCnt_; ++_i)
+       _pTxBuf[7 + _i] = pData_[_i];
+
+    byteCnt_ += 7;
+    unsigned short _crcData = crc16(_pTxBuf, byteCnt_);
+    _pTxBuf[byteCnt_++] = _crcData >> 8;
+    _pTxBuf[byteCnt_++] = _crcData & 0xff;
+    m_pBuffer->iTxLen = byteCnt_;
+# if TEST
+    BegineSend(); //发送
+#else
+    int _nloop = m_nRepeatTime;
+    CheckStatus _sRet;
+    while(_nloop > 0)
+    {
+        _nloop--;
+        BegineSend(); //发送
+        while(1)
+        {
+            usleep(1);
+            if (m_pBuffer->m_nEchoTimeOut <= 0)
+                break; //超时
+            _sRet = CheckPresetMultipleRegisters(wQty_);
+            if (CHECK_OK == _sRet) //校验正确
+            {
+                _nloop = 0;
                 break;
+            }
+            else if (ECHO_ERRO == _sRet)
+            {
+                break;  //校验错误
             }
         }
     }
+#endif
+
 }
+
+ DevMaster::CheckStatus DevMaster::CheckPresetMultipleRegisters(unsigned short wQty_)
+ {
+     //最少5为 slave cmd addr crc0 crc1
+     if (m_pBuffer->iRxLen <= 4)
+         return RECEIVE_STATUS;
+
+     unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
+     if (_pRecBuf[0] == m_cSlaveAddr)
+     {
+         if (_pRecBuf[1] == 0x90)
+             return ECHO_ERRO;//接受错误
+
+         if (_pRecBuf[1] == 0x10)
+         {
+             if (m_pBuffer->iRxLen < 8)
+                 return RECEIVE_STATUS;
+
+             unsigned short _crcData, _crcOld;
+             _crcData = crc16(_pRecBuf, 6);
+             _crcOld = MakeShort(_pRecBuf[6], _pRecBuf[7]);
+             if (_crcData == _crcOld)
+             {
+                 qDebug() << "check PresetMultipleRegisters Ok";
+                 return CHECK_OK;//接受OK
+             }
+             else
+                return ECHO_ERRO;//接受错误
+         }
+     }
+     return ECHO_ERRO;//接受错误
+ }

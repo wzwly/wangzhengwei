@@ -68,7 +68,7 @@ QMainFrame::QMainFrame(QWidget *parent) :
     CreateMainMenu();
     CreatePage();
 
-    QSerial* _p = QSerial::Instance(0);
+    //QSerial* _p = QSerial::Instance(0);
     OnTimerUpdate();  //初始化时更新一次
     startTimer(1000);  //开启定时器，1s一次
 }

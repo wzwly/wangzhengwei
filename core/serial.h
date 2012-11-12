@@ -8,24 +8,73 @@
 --设置一个足够大的超时，一旦超时，认为没有读到数据；
 --读到一个数据，则开始往下读完一帧数据；
 */
+#if ARM
+    #define  Write(a, b, c)  write(a, b, c)
+    #define  Ioctl(a,b,c)   ioctl(a, b, c)
+    #define  Open(a,b) open(a, b)
+    #define  Read(a, b, c) read(a, b, c)
+    #define  Close(a)       close(a)
+    #define Mmap(a, b, c, d, e, f)  mmap(a, b, c, d, e, f)
+    #define Munmap(a, b)     munmap(a, b)
+    #define Tcgetattr(a, b)     tcgetattr(a, b)
+    #define Tcsetattr(a, b, c)  tcsetattr(a, b,c)
+#else
+    #define  Write(a, b, c)  (c)
+    #define  Ioctl(a,b,c)   0
+    #define  Open(a, b)   1
+    #define  Read(a, b, c)  c; memset(b, 1, c)
+    #define  Close(a)
+    #define Mmap(a, b, c, d, e, f)  malloc(b)
+    #define Munmap(a, b)     free(a)
+    #define Tcgetattr(a, b)
+    #define Tcsetattr(a, b, c)  0
+#endif
 
-class QSerial:public QObject
+
+class DevMaster;
+class QSerial : public QObject
 {
+    Q_OBJECT
 public:
-    static QSerial* Instance(int nId_ = 0);
+    QSerial(DevMaster* pSlave_,QObject * p_);
     ~QSerial();
-private:
-    QSerial(int nId_ = 0);
+    enum
+    {
+        MAX_BUFFER_SIZE = 128,
+    };
+    struct TxRxBuffer
+    {
+        unsigned char szTxBuffer[MAX_BUFFER_SIZE];
+        unsigned char szRxBuffer[MAX_BUFFER_SIZE];
+        int  iRxLen;
+        int  iTxLen;
+        bool bRxEn;
+        bool bTxEn;
+        int m_nEchoTimeOut;
+        TxRxBuffer()
+        {
+            iRxLen = 0; iTxLen = 0;
+            bRxEn = true;
+            bTxEn = false;
+        };
+    };
+
+protected:
+    void InitModbus();
+    void timerEvent(QTimerEvent *event_); //定时器响应函数
+    virtual void run();
+private slots:
+    void OnReceiveChar();
 
 private:
-    static int m_nFdCom;
-private:
-    void InitSerial(int nId_);
-
+    int m_nFdModbus;//
+    int m_nTimer;
+    int m_nTemMs;
+    DevMaster* m_pSlave;
 public:
-   static bool WriteData(const unsigned char* p_, int size_);
-   static int ReadData(unsigned char* p_, int size_);
-   static bool ReadChar(unsigned char* p_);
+    static TxRxBuffer m_gTxRxBuffer;
+    void SendBuffer();
+    void ClearReceive(){ m_gTxRxBuffer.iRxLen = 0;}
 };
 
 #endif // SERIAL_H

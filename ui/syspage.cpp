@@ -61,8 +61,7 @@ void QSysPage::OnSndBtnClick(int nId_)
 {
     if (5 == nId_) //触摸屏校准
     {
-#if  PC_BEBUG
-#else
+#if  ARM
         //m_pMainFrame->hide();
         QProcess::execute("rm /etc/pointercal");
         QProcess::execute("sync");

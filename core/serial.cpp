@@ -1,130 +1,112 @@
 #include "serial.h"
+#include "./../ghead.h"
+#include "cmddef.h"
+
+#include <QWSServer>
+#include <QSocketNotifier>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <termios.h>
-#include <errno.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <linux/fb.h>
+#include <termios.h>	//串口头文件
+#include <assert.h>
 
 
-#include "./../ghead.h"
+QSerial::TxRxBuffer QSerial::m_gTxRxBuffer;
+const static char* g_szSerialName[] = {"/dev/ttyUSB0", "/dev/ttySAC0", "/dev/ttySAC1"};
 
-int QSerial::m_nFdCom = -1;
-
-QSerial* QSerial::Instance(int nId_)
+QSerial::QSerial(DevMaster* pSlave_, QObject * p_)
 {
-    static QSerial* _s_pCom = NULL;
-    if (_s_pCom == NULL)
-    {
-        _s_pCom = new QSerial(nId_);
-        g_pListObject.push_back(_s_pCom);
-    }
-
-    return _s_pCom;
-}
-
-QSerial::QSerial(int nId_)
-{
-    InitSerial(nId_);
+    m_nFdModbus = -1;
+    m_pSlave = pSlave_;
+    InitModbus();
+    m_nTimer = startTimer(1); //开启定时器，1ms一次
 }
 
 QSerial::~QSerial()
 {
-
-    close(m_nFdCom);
+    Close(m_nFdModbus);
 }
 
-const static char* g_szSerialName[] = {"/dev/ttyUSB0", "/dev/ttySAC0", "/dev/ttySAC1"};
-
-void QSerial::InitSerial(int nId_)
+void QSerial::InitModbus()
 {
-    struct termios _opt;
-    int _fd = 1;
-#if PC_BEBUG
-    _fd = 0;
-    return;
-#else
-    _fd = 1;
-#endif
-    _fd = m_nFdCom = open(g_szSerialName[_fd], O_RDWR | O_NONBLOCK);    //默认为阻塞读方式
-   if(_fd == -1)
-   {
-       perror("open serial 0\n");
-       assert(false);
-   }
-
-  tcgetattr(_fd, &_opt);
-  cfsetispeed(&_opt, B9600);
-  cfsetospeed(&_opt, B9600);
-
-  if(tcsetattr(_fd, TCSANOW, &_opt) != 0 )
-  {
-      perror("tcsetattr error");
-      assert(false);
-  }
-
-  _opt.c_cflag &= ~CSIZE;
-  _opt.c_cflag |= CS8;  //8bit
-  _opt.c_cflag &= ~CSTOPB; //1bit stop bit
-  _opt.c_cflag &= ~PARENB; //无校验
-  _opt.c_cflag |= (CLOCAL | CREAD);
-
-  _opt.c_cc[VTIME] = 1;
-  _opt.c_cc[VMIN] = 0;
-
-  //tcflush(_fd, TCIOFLUSH);
-
-
-  if(tcsetattr(_fd, TCSANOW, &_opt) != 0)
-  {
-      perror("serial error");
-      assert(false);
-  }
-  qDebug() << "Com ID" <<_fd;
-}
-
-
-bool QSerial::WriteData(const unsigned char* p_, int size_)
-{
-#if PC_BEBUG
-    int _nRet = size_;
-#else
-   int _nRet = write(m_nFdCom, p_, size_);
-#endif
-    return (size_ == _nRet);
-}
-
-int QSerial::ReadData(unsigned char* p_, int size_)
-{
-
-    int _nRet = 0, _nCnt = 0;
-#if PC_BEBUG
-     memset(p_, 1,size_);
-     return size_;
-#else
-    _nRet = read(m_nFdCom, p_++, 1);
-#endif
-    while(_nCnt < size_ && _nRet > 0)
+    if ((m_nFdModbus = Open(g_szSerialName[0], O_RDWR | O_NOCTTY)) < 0)
     {
-        ++_nCnt;
-        _nRet = read(m_nFdCom, p_++, 1);
+        assert(false);
+        perror(g_szSerialName[0]);
+        return ;
     }
-    return _nCnt;
+    struct termios _opt;
+
+    bzero(&_opt, sizeof(_opt)); //清除结构体以放入新的序列埠设定值
+    Tcgetattr(m_nFdModbus, &_opt);
+    _opt.c_cc[VMIN] = 1;
+    _opt.c_iflag = 0;
+    _opt.c_oflag = 0;
+    _opt.c_lflag = 0;
+    _opt.c_cflag	= B115200 | CS8 | PARENB | CLOCAL | CREAD;
+    if (Tcsetattr(m_nFdModbus, TCSANOW, &_opt))
+    {
+        perror("tcsetattr   error");
+        assert(false);
+        exit(1);
+    }   
+    //注册响应
+    QSocketNotifier* notify = new QSocketNotifier(m_nFdModbus, QSocketNotifier::Read, this);
+    connect(notify, SIGNAL(activated(int)), this, SLOT(OnReceiveChar()));
 }
 
-bool QSerial::ReadChar(unsigned char* p_)
+
+void QSerial::OnReceiveChar()
 {
-#if PC_BEBUG
-    *p_ = '1';
-    return true;
-#else
-    int _nRet = read(m_nFdCom, p_, 1);
-    return (_nRet > 0);
-#endif
+    if (!m_gTxRxBuffer.bRxEn)
+        return;
+
+    unsigned char _cRead[10];
+    int _ret = Read(m_nFdModbus, _cRead, 10);
+
+    if (_ret <= 0)
+        return;
+
+    for (int _i = 0; _i < _ret; ++_i)
+    {
+        m_gTxRxBuffer.szRxBuffer[m_gTxRxBuffer.iRxLen++] = _cRead[_i];
+    }
+    m_nTemMs = 10;  
 }
 
+
+void QSerial::SendBuffer()
+{
+    int _nSendLen = m_gTxRxBuffer.iTxLen;
+    if (_nSendLen >0)
+    {
+        int _nRet = Write(m_nFdModbus,m_gTxRxBuffer.szTxBuffer ,_nSendLen);
+        if (_nRet != _nSendLen)
+        {
+            //deal send erro
+        }
+    }
+}
+
+
+void QSerial::timerEvent(QTimerEvent *event_)
+{
+    //in receive mode
+   // if (m_nTemMs > 0 && m_gTxRxBuffer.iRxLen > 0)
+   // {
+   //     --m_nTemMs;
+   //     if (m_nTemMs == 0)
+   //     {
+    //       m_gTxRxBuffer.iRxLen = 0; //receive time out, start a new package
+   //     }
+   // }
+
+    if (m_gTxRxBuffer.m_nEchoTimeOut > 0)
+        m_gTxRxBuffer.m_nEchoTimeOut--;
+}
 
 
 

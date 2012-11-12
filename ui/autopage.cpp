@@ -244,7 +244,7 @@ void QAutoPage::OnUpDate(int nFlag_)
         _iCont++;
         if (_iCont > 100)
             _iCont = 0;
-        CmdWriteKeepReg(_iCont, 4, (const unsigned char*)&_iCont);
+        //CmdWriteKeepReg(_iCont, 4, (const unsigned char*)&_iCont);
     }
 }
 
