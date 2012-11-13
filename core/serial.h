@@ -1,75 +1,73 @@
 #ifndef __SERIAL_H__
 #define __SERIAL_H__
-
 #include <QObject>
+#include <QVector>
+#include <QSemaphore>
 
-#if ARM
-    #define  Write(a, b, c)  write(a, b, c)
-    #define  Ioctl(a,b,c)   ioctl(a, b, c)
-    #define  Open(a,b) open(a, b)
-    #define  Read(a, b, c) read(a, b, c)
-    #define  Close(a)       close(a)
-    #define Mmap(a, b, c, d, e, f)  mmap(a, b, c, d, e, f)
-    #define Munmap(a, b)     munmap(a, b)
-    #define Tcgetattr(a, b)     tcgetattr(a, b)
-    #define Tcsetattr(a, b, c)  tcsetattr(a, b,c)
-#else
-    #define  Write(a, b, c)  (c)
-    #define  Ioctl(a,b,c)   0
-    #define  Open(a, b)   1
-    #define  Read(a, b, c)  c; memset(b, 1, c)
-    #define  Close(a)
-    #define Mmap(a, b, c, d, e, f)  malloc(b)
-    #define Munmap(a, b)     free(a)
-    #define Tcgetattr(a, b)
-    #define Tcsetattr(a, b, c)  0
-#endif
-
+//该宏定义硬件的操作，因此，对硬件的操作函用这里的宏来写，就不用加编译条件了
 
 class DevMaster;
 class QSerial : public QObject
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
     QSerial(QObject * p_);
     ~QSerial();
     enum
     {
+        TIMER_OUT = 20,
         MAX_BUFFER_SIZE = 128,
     };
-
-    struct TxRxBuffer
+    struct RxBuffer
     {
-        unsigned char szTxBuffer[MAX_BUFFER_SIZE];
         unsigned char szRxBuffer[MAX_BUFFER_SIZE];
         int  iRxLen;
-        int  iTxLen;
-        bool bRxTimerEn;
-        int m_nEchoTimeOut;
-        TxRxBuffer()
+    };
+
+    struct CmdSend
+    {
+        unsigned char szTxBuffer[MAX_BUFFER_SIZE];
+        unsigned int iTxLen;
+        unsigned int iTimerOut;
+        unsigned int iLoop;
+        bool  bDealRecv;
+        CmdSend(unsigned char* pBuffer_, unsigned int iLen_)
         {
-            iRxLen = 0; iTxLen = 0;
-            bRxTimerEn = true;
-        };
+            memcpy(szTxBuffer, pBuffer_, iLen_);
+            iTxLen = iLen_;
+            iTimerOut = TIMER_OUT;
+            iLoop = 3;
+            bDealRecv = false;
+        }
+        CmdSend()
+        {
+            iTimerOut = TIMER_OUT;
+            iLoop = 3;
+            bDealRecv = false;
+        }
     };
 
 protected:
     void InitModbus();
     void timerEvent(QTimerEvent *event_); //定时器响应函数
-
+    void SendBuffer(CmdSend* pCmd_);
+    void SendListCmd();
 private slots:
     void OnReceiveChar();
-
 private:
     int m_nFdModbus;//
     int m_nTimer;
+    DevMaster* m_pMaster;
+    QVector<CmdSend*> m_vCmdVector;
     int m_nTemMs;
-    DevMaster* m_pModbus;
+    CmdSend* m_pCurCmd;
 public:
-    static TxRxBuffer m_gTxRxBuffer;
-    void SendBuffer();
-    void SetModbus(DevMaster* pSlave_);
-    //void ClearReceive(){ m_gTxRxBuffer.iRxLen = 0;}
-};
+    RxBuffer m_gRxBuffer;
+    const CmdSend* GetCurSend() {return m_pCurCmd;}
+    void  StopTimer() {m_pCurCmd->bDealRecv = true;}
 
+    void SetModbus(DevMaster* p_){ m_pMaster = p_;}
+    void AddCmdSend(CmdSend* pCmd_);
+    void DeleteCmdSend();
+};
 #endif // SERIAL_H

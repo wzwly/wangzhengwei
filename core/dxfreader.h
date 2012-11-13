@@ -29,7 +29,6 @@ inline void Node_Vale::Reset()
 
 class QDxfReader
 {
-
     friend class QSysData;
 public:
     QDxfReader();

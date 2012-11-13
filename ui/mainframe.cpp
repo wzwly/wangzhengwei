@@ -5,7 +5,7 @@
 #include "./../label/button.h"
 #include "./../core/qsysdata.h"
 #include "./../core/cmddef.h"
-
+#include "./../core/serial.h"
 
 #include "basepage.h"
 #include "autopage.h"
@@ -68,13 +68,16 @@ QMainFrame::QMainFrame(QWidget *parent) :
     CreateMainMenu();
     CreatePage();
 
-    //QSerial* _p = QSerial::Instance(0);
+    QSerial* _pCom = new QSerial(this);
+    m_pModbus = new DevMaster(1, _pCom);
+    _pCom->SetModbus(m_pModbus);
     OnTimerUpdate();  //初始化时更新一次
     startTimer(1000);  //开启定时器，1s一次
 }
 
 QMainFrame::~QMainFrame()
 {
+    delete m_pModbus;
     for ( QList<QObject*>::iterator _iter = g_pListObject.begin (); _iter != g_pListObject.end(); ++_iter)
         delete (*_iter);
 
@@ -130,7 +133,6 @@ void QMainFrame::CreateMainMenu()
 //创建二级菜单
 void QMainFrame::CreatePage()
 {
-
     m_pMenuPage[0] = new QAutoPage(this);
     m_pMenuPage[1] = new QFilePage(this);
     m_pMenuPage[2] = new QDrillParamPage(this);
@@ -138,7 +140,10 @@ void QMainFrame::CreatePage()
     m_pMenuPage[4] = new QSysPage(this);
 
     for (int _i = 0; _i < 5; ++_i)
+    {
+        m_pMenuPage[_i]->SetModbus(m_pModbus);
         m_pMenuPage[_i]->SetSysData(m_pSysData);
+    }
     m_pCurMenuPage = m_pMenuPage[0];
     ChangeSndMenuText(0);
 }

@@ -1,7 +1,4 @@
 #include "cmddef.h"
-#include <unistd.h>
-#include "./../ghead.h"
-
 
 //字地址 0 - 255 (只取低8位)
 //位地址 0 - 255 (只取低8位)
@@ -36,6 +33,9 @@ static const unsigned char auchCRCHi[] = {
 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40
 } ;
 
+#define LOOP_WHILE  1
+#define VECTOR_TEST  1
+
 /* CRC低位字节值表*/
 static const unsigned auchCRCLo[] = {
 0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6, 0x06,
@@ -66,7 +66,6 @@ static const unsigned auchCRCLo[] = {
 0x43, 0x83, 0x41, 0x81, 0x80, 0x40
 } ;
 
-#define RECEIVE_SLEEP  10
 
 static unsigned short crc16(unsigned char *puchMsg, unsigned int nDataLen)
 {
@@ -82,33 +81,18 @@ static unsigned short crc16(unsigned char *puchMsg, unsigned int nDataLen)
     return (uchCRCHi << 8 | uchCRCLo) ;
 }
 
-
 DevMaster::DevMaster(int nAddr_, QSerial* pSerial_)
-:m_nRepeatTime(3)
 {
-       m_pBuffer = &pSerial_->m_gTxRxBuffer;
+       m_pBuffer = &pSerial_->m_gRxBuffer;
        m_cSlaveAddr = nAddr_;
        m_pSerial = pSerial_;
 }
 
-void DevMaster::BegineSend()
-{
-    m_pSerial->SendBuffer();
-    m_pBuffer->m_nEchoTimeOut = 20;
-    m_pBuffer->iRxLen = 0;
-    m_pBuffer->bRxTimerEn = true;
-}
-
-void DevMaster::StopRecieve()
-{
-    m_pBuffer->bRxTimerEn = false;
-}
-
 //1
-void DevMaster::ReadCoil(unsigned short wAddr_, unsigned short wQty_,unsigned char* pData_)
+void DevMaster::ReadCoil(unsigned short wAddr_, unsigned short wQty_)
 {
-    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
-
+    QSerial::CmdSend* _pCmd = new QSerial::CmdSend();
+    unsigned char* _pTxBuf =  _pCmd->szTxBuffer;
     _pTxBuf[0] = m_cSlaveAddr;
     _pTxBuf[1] = 0x01;
     _pTxBuf[2] = wAddr_ >> 8;
@@ -118,38 +102,14 @@ void DevMaster::ReadCoil(unsigned short wAddr_, unsigned short wQty_,unsigned ch
     unsigned short _crcData = crc16(_pTxBuf, 6);
     _pTxBuf[6] = _crcData >> 8;
     _pTxBuf[7] = _crcData & 0xff;
-    m_pBuffer->iTxLen = 8;
-
-    int _nloop = m_nRepeatTime;
-    CheckStatus _sRet;
-    while(_nloop > 0)
-    {
-        _nloop--;
-        BegineSend(); //发送
-        while(1)
-        {
-            usleep(RECEIVE_SLEEP);
-            if (m_pBuffer->m_nEchoTimeOut <= 0)
-                break; //超时
-            _sRet = CheckReadCoil(wQty_,pData_);
-            if (CHECK_OK == _sRet) //校验正确
-            {
-                _nloop = 0;
-                break;
-            }
-            else if (ECHO_ERRO == _sRet)
-            {
-                break;  //校验错误
-            }
-
-        }
-    }
+    _pCmd->iTxLen = 8;
+    BegineSend(_pCmd); //发送
 }
 //1
-DevMaster::CheckStatus DevMaster::CheckReadCoil(unsigned short wQty_,unsigned char* pData_)
+DevMaster::CheckStatus DevMaster::CheckReadCoil()
 {
     //最少5为 slave cmd addr crc0 crc1
-    if (m_pBuffer->iRxLen <= 4)
+    if (m_pBuffer->iRxLen < 5)
         return RECEIVE_STATUS;
 
     unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
@@ -160,21 +120,18 @@ DevMaster::CheckStatus DevMaster::CheckReadCoil(unsigned short wQty_,unsigned ch
 
         if (_pRecBuf[1] == 0x01)
         {
-            unsigned char _byteCnt = wQty_ / 8;
-            if (wQty_ % 8 != 0)
-                _byteCnt++;
-            int _nLen = _byteCnt + 5;
+            int _nLen = _pRecBuf[2] + 5;
             if (m_pBuffer->iRxLen < _nLen)
                 return RECEIVE_STATUS;
+
             unsigned short _crcData, _crcOld;
             _crcData = crc16(_pRecBuf,_nLen - 2);
             _crcOld = MakeShort(_pRecBuf[_nLen - 2],_pRecBuf[_nLen -1]);
-
             if (_crcData == _crcOld)
             {
-                StopRecieve();
-                memcpy(pData_, &_pRecBuf[3], _byteCnt);
-                qDebug() << "check ReadCoil Ok";
+                //deal the data here
+                m_pSerial->StopTimer();
+                qDebug() << "Cmd1 CheckReadCoil ok";
                 return CHECK_OK;//接受OK
             }
             else
@@ -184,9 +141,10 @@ DevMaster::CheckStatus DevMaster::CheckReadCoil(unsigned short wQty_,unsigned ch
     return ECHO_ERRO;//接受错误
 }
 //3
-void DevMaster::ReadRegisters(unsigned short wAddr_, unsigned short wQty_, unsigned char* pData_)
+void DevMaster::ReadRegisters(unsigned short wAddr_, unsigned short wQty_)
 {
-    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    QSerial::CmdSend* _pCmd = new QSerial::CmdSend();
+    unsigned char* _pTxBuf =  _pCmd->szTxBuffer;
 
     _pTxBuf[0] = m_cSlaveAddr;
     _pTxBuf[1] = 0x03;
@@ -197,36 +155,14 @@ void DevMaster::ReadRegisters(unsigned short wAddr_, unsigned short wQty_, unsig
     unsigned short _crcData = crc16(_pTxBuf, 6);
     _pTxBuf[6] = _crcData >> 8;
     _pTxBuf[7] = _crcData & 0xff;
-    m_pBuffer->iTxLen = 8;
-    int _nloop = m_nRepeatTime;
-    CheckStatus _sRet;
-    while(_nloop > 0)
-    {
-        _nloop--;
-        BegineSend(); //发送
-        while(1)
-        {
-            usleep(RECEIVE_SLEEP);
-            if (m_pBuffer->m_nEchoTimeOut <= 0)
-                break; //超时
-            _sRet = CheckReadRegisters(wQty_,pData_);
-            if (CHECK_OK == _sRet) //校验正确
-            {
-                _nloop = 0;
-                break;
-            }
-            else if (ECHO_ERRO == _sRet)
-            {
-                break;  //校验错误
-            }        
-        }
-    }
+    _pCmd->iTxLen = 8;
+    BegineSend(_pCmd); //发送
 }
 //3
-DevMaster::CheckStatus DevMaster::CheckReadRegisters(unsigned short wQty_,unsigned char* pData_)
+DevMaster::CheckStatus DevMaster::CheckReadRegisters()
 {
     //最少5为 slave cmd addr crc0 crc1
-    if (m_pBuffer->iRxLen <= 4)
+    if (m_pBuffer->iRxLen < 5)
         return RECEIVE_STATUS;
 
     unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
@@ -244,12 +180,10 @@ DevMaster::CheckStatus DevMaster::CheckReadRegisters(unsigned short wQty_,unsign
             unsigned short _crcData, _crcOld;
             _crcData = crc16(_pRecBuf,_nLen - 2);
             _crcOld = MakeShort(_pRecBuf[_nLen - 2],_pRecBuf[_nLen -1]);
-
             if (_crcData == _crcOld)
             {
-                StopRecieve();
-                memcpy(pData_, &_pRecBuf[3], _byteCnt);
-                qDebug() << "check ReadRegisters Ok";
+                m_pSerial->StopTimer();
+                qDebug() << "Cmd3 ReadRegisters Ok";
                 return CHECK_OK;//接受OK
             }
             else
@@ -258,10 +192,11 @@ DevMaster::CheckStatus DevMaster::CheckReadRegisters(unsigned short wQty_,unsign
     }
     return ECHO_ERRO;//接受错误
 }
-//5
+ //5
 void DevMaster::ForceSingleCoil(unsigned short wAddr_, bool bOnOff_)
 {
-    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    QSerial::CmdSend* _pCmd = new QSerial::CmdSend();
+    unsigned char* _pTxBuf =  _pCmd->szTxBuffer;
     unsigned short _wOnOff = 0x00;
     if (bOnOff_)
         _wOnOff = 0xffff;
@@ -274,36 +209,14 @@ void DevMaster::ForceSingleCoil(unsigned short wAddr_, bool bOnOff_)
     unsigned short _crcData = crc16(_pTxBuf, 6);
     _pTxBuf[6] = _crcData >> 8;
     _pTxBuf[7] = _crcData & 0xff;
-    m_pBuffer->iTxLen = 8;
-    int _nloop = m_nRepeatTime;
-    CheckStatus _sRet;
-    while(_nloop > 0)
-    {
-        _nloop--;
-        BegineSend(); //发送
-        while(1)
-        {
-            usleep(RECEIVE_SLEEP);
-            if (m_pBuffer->m_nEchoTimeOut <= 0)
-                break; //超时
-            _sRet = CheckForceSingleCoil(_wOnOff);
-            if (CHECK_OK == _sRet) //校验正确
-            {
-                _nloop = 0;
-                break;
-            }
-            else if (ECHO_ERRO == _sRet)
-            {
-                break;  //校验错误
-            }         
-        }      
-    }
+    _pCmd->iTxLen = 8;
+    BegineSend(_pCmd); //发送
 }
 //5
- DevMaster::CheckStatus DevMaster::CheckForceSingleCoil(unsigned short wOnOff_)
+ DevMaster::CheckStatus DevMaster::CheckForceSingleCoil()
  {
      //最少5为 slave cmd addr crc0 crc1
-     if (m_pBuffer->iRxLen <= 4)
+     if (m_pBuffer->iRxLen < 5)
          return RECEIVE_STATUS;
 
      unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
@@ -322,8 +235,7 @@ void DevMaster::ForceSingleCoil(unsigned short wAddr_, bool bOnOff_)
              _crcOld = MakeShort(_pRecBuf[6], _pRecBuf[7]);
              if (_crcData == _crcOld)
              {
-                 StopRecieve();
-                 qDebug() << "check ForceSingleCoil Ok";
+                 qDebug() << "Cmd5 ForceSingleCoil Ok";
                  return CHECK_OK;//接受OK
              }
              else
@@ -336,7 +248,8 @@ void DevMaster::ForceSingleCoil(unsigned short wAddr_, bool bOnOff_)
 //6
 void DevMaster::PresetSingleRegister(unsigned short wAddr_, unsigned short wVal_)
 {
-    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    QSerial::CmdSend* _pCmd = new QSerial::CmdSend();
+    unsigned char* _pTxBuf =  _pCmd->szTxBuffer;
     _pTxBuf[0] = m_cSlaveAddr;
     _pTxBuf[1] = 0x06;
     _pTxBuf[2] = wAddr_ >> 8;
@@ -346,39 +259,15 @@ void DevMaster::PresetSingleRegister(unsigned short wAddr_, unsigned short wVal_
     unsigned short _crcData = crc16(_pTxBuf, 6);
     _pTxBuf[6] = _crcData >> 8;
     _pTxBuf[7] = _crcData & 0xff;
-    m_pBuffer->iTxLen = 8;
-    int _nloop = m_nRepeatTime;
-    CheckStatus _sRet;
-    while(_nloop > 0)
-    {
-        _nloop--;
-        BegineSend(); //发送
-
-        while(1)
-        {
-            usleep(RECEIVE_SLEEP);
-            if (m_pBuffer->m_nEchoTimeOut <= 0)
-                break; //超时
-            _sRet = CheckPresetSingleRegister(wVal_);
-            if (CHECK_OK == _sRet) //校验正确
-            {
-                _nloop = 0;
-                break;
-            }
-            else if (ECHO_ERRO == _sRet)
-            {
-                break;  //校验错误
-            }
-        }
-    }
-
+    _pCmd->iTxLen = 8;
+    BegineSend(_pCmd); //发送
 }
 
 //6
-DevMaster::CheckStatus DevMaster::CheckPresetSingleRegister(unsigned short wVal_)
+DevMaster::CheckStatus DevMaster::CheckPresetSingleRegister()
 {
     //最少5为 slave cmd addr crc0 crc1
-    if (m_pBuffer->iRxLen <= 4)
+    if (m_pBuffer->iRxLen < 5)
         return RECEIVE_STATUS;
 
     unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
@@ -397,8 +286,7 @@ DevMaster::CheckStatus DevMaster::CheckPresetSingleRegister(unsigned short wVal_
             _crcOld = MakeShort(_pRecBuf[6], _pRecBuf[7]);
             if (_crcData == _crcOld)
             {
-                StopRecieve();
-                qDebug() << "check PresetSingleRegister Ok";
+                qDebug() << "Cmd6 PresetSingleRegister Ok";
                 return CHECK_OK;//接受OK
             }
             else
@@ -412,7 +300,8 @@ DevMaster::CheckStatus DevMaster::CheckPresetSingleRegister(unsigned short wVal_
 void DevMaster::ForceMultipleCoils(unsigned short wAddr_, unsigned short wQty_,
                         unsigned char* pData_, unsigned char byteCnt_)
 {
-    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    QSerial::CmdSend* _pCmd = new QSerial::CmdSend();
+    unsigned char* _pTxBuf =  _pCmd->szTxBuffer;
     _pTxBuf[0] = m_cSlaveAddr;
     _pTxBuf[1] = 0x0f;
     _pTxBuf[2] = wAddr_ >> 8;
@@ -435,37 +324,15 @@ void DevMaster::ForceMultipleCoils(unsigned short wAddr_, unsigned short wQty_,
     unsigned short _crcData = crc16(_pTxBuf, byteCnt_);
     _pTxBuf[byteCnt_++] = _crcData >> 8;
     _pTxBuf[byteCnt_++] = _crcData & 0xff;
-    m_pBuffer->iTxLen = byteCnt_;
-    int _nloop = m_nRepeatTime;
-    CheckStatus _sRet;
-    while(_nloop > 0)
-    {
-        _nloop--;
-        BegineSend(); //发送
-        while(1)
-        {
-            usleep(RECEIVE_SLEEP);
-            if (m_pBuffer->m_nEchoTimeOut <= 0)
-                break; //超时
-            _sRet = CheckForceMultipleCoils(wQty_);
-            if (CHECK_OK == _sRet) //校验正确
-            {
-                _nloop = 0;
-                break;
-            }
-            else if (ECHO_ERRO == _sRet)
-            {
-                break;  //校验错误
-            }
-        }
-    }
+    _pCmd->iTxLen = byteCnt_;
+    BegineSend(_pCmd); //发送
 }
 
 //15
-DevMaster::CheckStatus DevMaster::CheckForceMultipleCoils(unsigned short wQty_)
+DevMaster::CheckStatus DevMaster::CheckForceMultipleCoils()
 {
     //最少5为 slave cmd addr crc0 crc1
-    if (m_pBuffer->iRxLen <= 4)
+    if (m_pBuffer->iRxLen < 5)
         return RECEIVE_STATUS;
 
     unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
@@ -484,8 +351,7 @@ DevMaster::CheckStatus DevMaster::CheckForceMultipleCoils(unsigned short wQty_)
             _crcOld = MakeShort(_pRecBuf[6], _pRecBuf[7]);
             if (_crcData == _crcOld)
             {
-                StopRecieve();
-                qDebug() << "check ForceMultipleCoils Ok";
+                qDebug() << "Cmd15 ForceMultipleCoils Ok";
                 return CHECK_OK;//接受OK
             }
             else
@@ -499,7 +365,8 @@ DevMaster::CheckStatus DevMaster::CheckForceMultipleCoils(unsigned short wQty_)
 void DevMaster::PresetMultipleRegisters(unsigned short wAddr_, unsigned short wQty_,
                              unsigned char* pData_, unsigned char byteCnt_)
 {
-    unsigned char* _pTxBuf = m_pBuffer->szTxBuffer;
+    QSerial::CmdSend* _pCmd = new QSerial::CmdSend();
+    unsigned char* _pTxBuf =  _pCmd->szTxBuffer;
     _pTxBuf[0] = m_cSlaveAddr;
     _pTxBuf[1] = 0x10;
     _pTxBuf[2] = wAddr_ >> 8;
@@ -519,36 +386,14 @@ void DevMaster::PresetMultipleRegisters(unsigned short wAddr_, unsigned short wQ
     unsigned short _crcData = crc16(_pTxBuf, byteCnt_);
     _pTxBuf[byteCnt_++] = _crcData >> 8;
     _pTxBuf[byteCnt_++] = _crcData & 0xff;
-    m_pBuffer->iTxLen = byteCnt_;
-    int _nloop = m_nRepeatTime;
-    CheckStatus _sRet;
-    while(_nloop > 0)
-    {
-        _nloop--;
-        BegineSend(); //发送
-        while(1)
-        {
-            usleep(RECEIVE_SLEEP);
-            if (m_pBuffer->m_nEchoTimeOut <= 0)
-                break; //超时
-            _sRet = CheckPresetMultipleRegisters(wQty_);
-            if (CHECK_OK == _sRet) //校验正确
-            {
-                _nloop = 0;
-                break;
-            }
-            else if (ECHO_ERRO == _sRet)
-            {
-                break;  //校验错误
-            }
-        }
-    }
+    _pCmd->iTxLen = byteCnt_;
+    BegineSend(_pCmd); //发送
 }
 //16
- DevMaster::CheckStatus DevMaster::CheckPresetMultipleRegisters(unsigned short wQty_)
+ DevMaster::CheckStatus DevMaster::CheckPresetMultipleRegisters()
  {
      //最少5为 slave cmd addr crc0 crc1
-     if (m_pBuffer->iRxLen <= 4)
+     if (m_pBuffer->iRxLen < 5)
          return RECEIVE_STATUS;
 
      unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
@@ -567,8 +412,7 @@ void DevMaster::PresetMultipleRegisters(unsigned short wAddr_, unsigned short wQ
              _crcOld = MakeShort(_pRecBuf[6], _pRecBuf[7]);
              if (_crcData == _crcOld)
              {
-                  StopRecieve();
-                 qDebug() << "check PresetMultipleRegisters Ok";
+                 qDebug() << "Cmd16 PresetMultipleRegisters Ok";
                  return CHECK_OK;//接受OK
              }
              else
@@ -578,3 +422,57 @@ void DevMaster::PresetMultipleRegisters(unsigned short wAddr_, unsigned short wQ
      return ECHO_ERRO;//接受错误
  }
 
+ void DevMaster::CheckCommModbus()
+ {
+     if (m_pBuffer->iRxLen < 5)//最少5为 slave cmd addr crc0 crc1
+         return;
+
+     unsigned char* _pRecBuf = m_pBuffer->szRxBuffer;
+     CheckStatus _sRet = RECEIVE_STATUS;
+     switch(_pRecBuf[1])
+     {
+     case 1://读取线圈状态(读取点 16位以内)
+         _sRet = CheckReadCoil();
+         break;
+     case 3://读取保持寄存器(一个或多个)
+         _sRet = CheckReadRegisters();
+         break;
+     case 5://强制单个线圈
+         _sRet = CheckForceSingleCoil();
+         break;
+     case 6://设置单个寄存器
+         _sRet = CheckPresetSingleRegister();
+         break;
+     case 15://设置多个线圈
+        _sRet = CheckForceMultipleCoils();
+         break;
+     case 16://设置多个寄存器
+         _sRet =CheckPresetMultipleRegisters();
+         break;
+     default:
+         _sRet= INVALID_CMD;
+         break;
+     }
+
+     switch(_sRet)
+     {
+        case CHECK_OK:
+         m_pSerial->DeleteCmdSend();
+         m_pBuffer->iRxLen = 0;
+         break;
+        case ECHO_ERRO:
+         m_pBuffer->iRxLen = 0;
+         break;
+        case INVALID_CMD:
+         m_pBuffer->iRxLen = 0;
+         break;
+        default:
+         break;
+     }
+
+ }
+
+ void DevMaster::BegineSend(QSerial::CmdSend* pCmd_)
+ {
+     m_pSerial->AddCmdSend(pCmd_);
+ }

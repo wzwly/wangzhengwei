@@ -9,7 +9,7 @@ class  QBasePage;
 class  QTipLabel;
 class  QSysData;
 
-
+class DevMaster;
 
 
 class QMainFrame : public QMainWindow
@@ -44,6 +44,7 @@ private:
     bool    m_bHasPressed;
 
     QSysData* m_pSysData;
+    DevMaster* m_pModbus;
 
 protected:
     void CreateMainMenu();

@@ -3,10 +3,9 @@
 
 #include <QWidget>
 #include "./../core/qsysdata.h"
+#include "./../core/cmddef.h"
 
-//#include "./../label/glabel.h"
-//#include "./../lib/qsysdata.h"
-//#include "gpage.h"
+
 #include <QKeyEvent>
 
 
@@ -28,8 +27,10 @@ protected:
     int m_nSndMenuPos; //指向当前二级三级菜单值
     int m_nSndBtnShow; //
     bool m_bIsEditValue;
+    DevMaster* m_pModbus;
 
 public:
+    void SetModbus( DevMaster* p_){m_pModbus = p_;}
     int GetSndMenuPos(){return m_nSndMenuPos;} //返回当前选择的菜单
     int GetSndBtnShow(){return m_nSndBtnShow;}
     void SetSysData(QSysData* p_){m_pSysData = p_;}

@@ -32,6 +32,7 @@
 #endif
 
 
+
 #include <QDebug>
 #include "serial.h"
 
@@ -43,40 +44,37 @@ public:
         CHECK_OK = 0,
         ECHO_ERRO,
         RECEIVE_STATUS,
+        INVALID_CMD,
     };
     DevMaster(int nAddr_ = 1, QSerial* pSerial_ = NULL);
 
 public:
-
-    void ReadCoil(unsigned short wAddr_, unsigned short wQty_, unsigned char* pData_);    //1
-    void ReadRegisters(unsigned short wAddr_, unsigned short wQty_, unsigned char* pData_);//3
+    void CheckCommModbus();
+    void ReadCoil(unsigned short wAddr_, unsigned short wQty_);    //1
+    void ReadRegisters(unsigned short wAddr_, unsigned short wQty_);//3
     void ForceSingleCoil(unsigned short wAddr_, bool bOnOff_); //5
     void PresetSingleRegister(unsigned short wAddr_, unsigned short wVal_); //6
     void ForceMultipleCoils(unsigned short wAddr_, unsigned short wQty_, unsigned char* pData_, unsigned char byteCnt_ = 0); //15
     void PresetMultipleRegisters(unsigned short wAddr_, unsigned short wQty_, unsigned char* pData_, unsigned char byteCnt_ = 0);//16
-    //
 private:
-    CheckStatus CheckReadCoil(unsigned short wQty_,unsigned char* pData_); //1
-    CheckStatus CheckReadRegisters(unsigned short wQty_,unsigned char* pData_); //3
-    CheckStatus CheckForceSingleCoil(unsigned short wOnOff_); //5
-    CheckStatus CheckPresetSingleRegister(unsigned short wVal_); //6
-    CheckStatus CheckForceMultipleCoils(unsigned short wQty_);//15
-    CheckStatus CheckPresetMultipleRegisters(unsigned short wQty_);//16
+    CheckStatus CheckReadCoil(); //1
+    CheckStatus CheckReadRegisters(); //3
+    CheckStatus CheckForceSingleCoil(); //5
+    CheckStatus CheckPresetSingleRegister(); //6
+    CheckStatus CheckForceMultipleCoils();//15
+    CheckStatus CheckPresetMultipleRegisters();//16
 private:
     //===========================
-    void BegineSend();
-    void StopRecieve();
     unsigned short MakeShort(unsigned char H_, unsigned int L)
     {
         unsigned short _ret = H_ & 0xff;
         return ((_ret << 8) + L);
     };
-
+    void BegineSend(QSerial::CmdSend* pCmd_);
 private:
-    QSerial::TxRxBuffer* m_pBuffer;
+    QSerial::RxBuffer* m_pBuffer;
     QSerial* m_pSerial;
     unsigned char m_cSlaveAddr;
-    const int m_nRepeatTime;
     /*
      01(0x01 读线圈) 读去多个线圈状态，每个线圈是一个bit位
      请求码格式：【Dev】[0x01][地址高字节][地址低字节][读取数量高字节][读取数量低字节][Crc低字节][Crc高字节]
