@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rm -r moc_*
+rm -r *.o
+rm -r ui_*.h
+rm Makefile
+
