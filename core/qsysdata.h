@@ -6,14 +6,21 @@
 #include "./../ghead.h"
 #include "parseconfig.h"
 
+class DevMaster;
+
 class QSysData
 {
    friend class QAutoPage;
 
-public:
-    static QSysData* Instance();
+public: 
     typedef POINT_T<float> FLOAT_POINT ;
-     ~QSysData();
+    union BtyeToInt
+    {
+        int iVal;
+        unsigned char cByte[4];
+    };
+    static QSysData* Instance();
+    ~QSysData();
 protected:
     QSysData();
 
@@ -33,6 +40,7 @@ private:
     int  m_iParamRBtn[PAGE_PARAM_COUNT]; //用于按键发送
     int __n_Save_End__;
     ConfigData m_cGlbData;
+    DevMaster* m_pModbus;
 
 public:
     //文件加载操作
@@ -52,8 +60,9 @@ public:
     void SetVal(const DataMap* pMap_, double fVal_);    
     bool CheckValid(const DataMap* pMap_,double dVal_);
     void GetMaxMinRange(const DataMap*pMap_, double& dMin_, double& dMax_);
-
-    //modbus读写操作
+    int GetParamAddrNo(int nAddr_);
+    //modbus operater
+    void SetModbus(DevMaster* pModbus_){m_pModbus = pModbus_;}
     void SetToModelBus(const DataMap* pMap_);
     void OnReadCoil(unsigned short addr_, unsigned short qty_,
                     unsigned char*pData_, unsigned char byte_ = 0);

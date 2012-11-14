@@ -1,9 +1,10 @@
 #include "qsysdata.h"
+#include "dxfreader.h"
+#include "cmddef.h"
+
 #include "./../ui/drillparam.h"
 #include "./../label/configset.h"
 #include "./../label/dlg.h"
-#include "dxfreader.h"
-#include "./../core/cmddef.h"
 #include "./../ui/addrdef.h"
 #include "./../ghead.h"
 
@@ -41,7 +42,7 @@ QSysData::QSysData()
          SaveClassData(&__n_Save_Begin__,  &__n_Save_End__, "QSysData");
  }
 
-
+//================param parse operate=================
  QString QSysData::GetValText(const DataMap* pMap_)
  {
     int _nVal = ParamData(pMap_->iNo);
@@ -124,6 +125,86 @@ void QSysData::InitParamData()
      _cfg.StartLoadConfig(&m_cGlbData);
 }
 
+int QSysData::GetParamAddrNo(int nAddr_)
+{
+        int _nRet = -1;
+        _nRet = m_cGlbData.m_mapAddrToIndex.value(nAddr_, _nRet);
+        return _nRet;
+}
+
+//====================modbus operate==========================
+void QSysData::SetToModelBus(const DataMap* pMap_)
+{
+   if (pMap_->iAddr < 0)
+        return;
+
+   BtyeToInt _Val, _ValSend;
+   _Val.iVal = ParamData(pMap_->iNo);
+   _ValSend.cByte[1] = _Val.cByte[0];
+   _ValSend.cByte[0] = _Val.cByte[1];
+   _ValSend.cByte[3] = _Val.cByte[2];
+   _ValSend.cByte[2] = _Val.cByte[3];
+   m_pModbus->PresetMultipleRegisters(pMap_->iAddr, 2, _ValSend.cByte);
+}
+
+const static int g_iByte2Int[] = {1, 0, 3, 2};
+void QSysData::OnReadCoil(unsigned short addr_, unsigned short qty_,
+                unsigned char*pData_, unsigned char byte_)
+{
+    //[高8bit][低8bit] = [short]
+    //[低short][高short] = [int]
+    //[byte1][byte0][byte3][byte2] = int
+    int _nNo = GetParamAddrNo(addr_);
+    if (_nNo >= 0 && qty_ > 1)
+    {
+        BtyeToInt _Val;
+        if (qty_ > 32)
+            qty_ = 32;
+        if (byte_ > 4)
+            byte_ = 4;
+
+        _Val.iVal = 0;
+        for (int _i = 0; _i < byte_; ++_i)
+        {
+            _Val.cByte[_i] = pData_[g_iByte2Int[_i]];
+        }
+        unsigned int _nMask = pow(2, qty_);
+        _nMask -= 1;
+
+        int _nOldVal = ParamData(_nNo);
+
+        _nOldVal &= ~_nMask;
+        _Val.iVal &= _nMask;
+        _nOldVal = _nOldVal | _Val.iVal;
+        ParamData(_nNo) = _nOldVal;
+    }
+}
+
+void QSysData::OnReadRegisters(unsigned short addr_, unsigned short qty_,
+                     unsigned char*pData_, unsigned char byte_)
+{
+    //[高8bit][低8bit] = [short]
+    //[低short][高short] = [int]
+    //[byte1][byte0][byte3][byte2] = int
+    int _nNo = GetParamAddrNo(addr_);
+    if (qty_ == byte_ * 2 && _nNo >= 0)
+    {
+        BtyeToInt _Val;
+        int _nIndex = 0;
+        for(int _i  = 0; _i < qty_ / 2; ++_i)
+        {
+            _Val.cByte[0] = pData_[_nIndex + 1];
+            _Val.cByte[1] = pData_[_nIndex];
+            _Val.cByte[2] = pData_[_nIndex + 3];
+            _Val.cByte[3] = pData_[_nIndex + 2];
+            ParamData(_nNo) = _Val.iVal;
+            _nNo++;
+            _nIndex += 4;
+        }
+    }
+}
+
+//===========================file operater===================
 void QSysData::LoadFile(const QString& path_, const QString& name_)
 {
     m_strFilePath = path_;

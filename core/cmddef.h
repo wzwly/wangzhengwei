@@ -36,6 +36,8 @@
 #include <QDebug>
 #include "serial.h"
 
+class QSysData;
+
 class DevMaster
 {
 public:
@@ -74,6 +76,7 @@ private:
 private:
     QSerial::RxBuffer* m_pBuffer;
     QSerial* m_pSerial;
+    QSysData* m_pSysData;
     unsigned char m_cSlaveAddr;
     /*
      01(0x01 读线圈) 读去多个线圈状态，每个线圈是一个bit位
@@ -94,6 +97,10 @@ private:
      请求码格式：【Dev】[0x03][地址高字节][地址低字节][读取数量高字节][读取数量低字节][Crc低字节][Crc高字节]
      响应码格式：【Dev】[0x03][字节数][读取数量N*2个字节][Crc低字节][Crc高字节]
      异常响应格式：【Dev】[0x83][异常码][Crc低字节][Crc高字节]
+     备注：
+      对于后面跟随N或者N*2字节的情况，系统都以16位的SHORT数据来处理一个地址数据。
+      [高8bit][低8bit] = [short]
+      [低short][高short] = [int]
 
      例子：
      【Dev】[0x03][00][0x6B][00][0x03][CrcH][CrcL]

@@ -1,8 +1,8 @@
 #include "cmddef.h"
+#include "qsysdata.h"
 
 //字地址 0 - 255 (只取低8位)
 //位地址 0 - 255 (只取低8位)
-
 /* CRC 高位字节值表 */
 static const unsigned char auchCRCHi[] = {
 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0,
@@ -86,6 +86,7 @@ DevMaster::DevMaster(int nAddr_, QSerial* pSerial_)
        m_pBuffer = &pSerial_->m_gRxBuffer;
        m_cSlaveAddr = nAddr_;
        m_pSerial = pSerial_;
+       m_pSysData = QSysData::Instance();
 }
 
 //1
@@ -129,6 +130,10 @@ DevMaster::CheckStatus DevMaster::CheckReadCoil()
             _crcOld = MakeShort(_pRecBuf[_nLen - 2],_pRecBuf[_nLen -1]);
             if (_crcData == _crcOld)
             {
+                const QSerial::CmdSend* _pCurCmd = m_pSerial->GetCurSend();
+                unsigned short _addr = MakeShort(_pCurCmd->szTxBuffer[2],_pCurCmd->szTxBuffer[3]);
+                unsigned short _qty =  MakeShort(_pCurCmd->szTxBuffer[4],_pCurCmd->szTxBuffer[5]);
+                m_pSysData->OnReadCoil(_addr,_qty,&_pRecBuf[3],_pRecBuf[2]);
                 //deal the data here
                 m_pSerial->StopTimer();
                 qDebug() << "Cmd1 CheckReadCoil ok";
@@ -183,6 +188,10 @@ DevMaster::CheckStatus DevMaster::CheckReadRegisters()
             if (_crcData == _crcOld)
             {
                 m_pSerial->StopTimer();
+                const QSerial::CmdSend* _pCurCmd = m_pSerial->GetCurSend();
+                unsigned short _addr = MakeShort(_pCurCmd->szTxBuffer[2],_pCurCmd->szTxBuffer[3]);
+                unsigned short _qty =  MakeShort(_pCurCmd->szTxBuffer[4],_pCurCmd->szTxBuffer[5]);
+                m_pSysData->OnReadRegisters(_addr,_qty,&_pRecBuf[3],_byteCnt);
                 qDebug() << "Cmd3 ReadRegisters Ok";
                 return CHECK_OK;//接受OK
             }
