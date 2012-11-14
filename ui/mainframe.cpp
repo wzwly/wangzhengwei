@@ -49,7 +49,7 @@ QMainFrame* GetMainFrame() {return g_pMainFrame;}
 QMainFrame::QMainFrame(QWidget *parent) :
     QMainWindow(parent)
 {
-    setFixedSize (1024, 768);
+    setFixedSize (24, 768);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     move(0, 0);
     QPalette _pal = this->palette();
@@ -210,6 +210,44 @@ void QMainFrame::OnSndMenuBtn(int nId_)
       m_pDateHMS->setText(_str.section("w", 1, 1));
       //Frame更新
       OnTimerUpdate();
+
+#if 1
+    static int _s_n = 0;
+    switch(_s_n)
+    {
+    case 0:
+        m_pModbus->ReadCoil(0x10, 16);
+        _s_n = 1;
+        break;
+    case 1:
+        m_pModbus->ReadRegisters(0x10, 10);
+        _s_n = 2;
+        break;
+    case 2:
+        m_pModbus->ForceSingleCoil(0x10, 1);
+        m_pModbus->ForceSingleCoil(0x11, 0);
+        _s_n = 3;
+        break;
+    case 3:
+        m_pModbus->PresetSingleRegister(0x10, 0x27ae);
+        _s_n = 4;
+        break;
+    case 4:
+       {
+            unsigned char _out[5] = {0x33, 0xd7, 0xc8, 0xb9, 0xaa};
+            m_pModbus->ForceMultipleCoils(0x10, 16, _out);
+            _s_n = 5;
+       }
+        break;
+    case 5:
+        {
+            unsigned short _outReg[5] = {0xee33, 0xccd7, 0xddc8, 0xffb9, 0x45aa};
+            m_pModbus->PresetMultipleRegisters(0x10, 5, (unsigned char*)_outReg);
+            _s_n = 0;
+        }
+        break;
+    }
+#endif
   }
 
   unsigned short g_wSend[5] = {1,2,3,4,5};
