@@ -51,9 +51,14 @@ public:
     double GetVal(const DataMap* pMap_);
     void SetVal(const DataMap* pMap_, double fVal_);    
     bool CheckValid(const DataMap* pMap_,double dVal_);
-    void GetMaxMinRange(const DataMap*pMap_, double& dMin_, double& dMax_);   
-    void SetToModelBus(const DataMap* pMap_);
+    void GetMaxMinRange(const DataMap*pMap_, double& dMin_, double& dMax_);
 
+    //modbus读写操作
+    void SetToModelBus(const DataMap* pMap_);
+    void OnReadCoil(unsigned short addr_, unsigned short qty_,
+                    unsigned char*pData_, unsigned char byte_ = 0);
+    void OnReadRegisters(unsigned short addr_, unsigned short qty_,
+                         unsigned char*pData_, unsigned char byte_ = 0);
 private:
     void InitParamData();
     void LoadFromDxfFile(const QString& path);

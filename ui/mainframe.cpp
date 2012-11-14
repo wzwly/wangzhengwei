@@ -16,7 +16,6 @@
 
 
 static const char* g_szMainMenu[MAIN_MENU_COUNT] = {"自动页面", "程序文件","钻孔参数", "系统参数", "系统监视"};
-
 static const int g_nSndMenuQyt[MAIN_MENU_COUNT] = {3, 5, 4, 5, 4};  //二级菜单显示个数
 
 static const char* g_szPageBtn0[SECOND_MENU_COUNT] = {"启动","暂停", "停止", "回原点", "仿真", "手动"};
@@ -215,16 +214,10 @@ void QMainFrame::OnSndMenuBtn(int nId_)
 
   unsigned short g_wSend[5] = {1,2,3,4,5};
   unsigned short g_wRecive[5] = {1,2,3,4,5};
-
   //主界面定时更新函数
   void QMainFrame::OnTimerUpdate()
   {
-        m_pCurMenuPage->OnUpDate(0);
-
-        //CmdWriteKeepReg(1, 5,(unsigned char*)g_wSend);
-        //Cmd03ReadKeepReg(2, 5,(unsigned char*)g_wRecive);
-        //for(int _i = 0;_i < 5; ++_i)
-        //    qDebug()<<g_wRecive[_i];
+       m_pCurMenuPage->OnUpDate(0);
   }
 
 

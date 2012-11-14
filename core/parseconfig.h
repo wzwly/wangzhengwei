@@ -2,6 +2,8 @@
 #define __PARSECONFIG_H__
  #include <stack>
 #include <QFile>
+#include <QMap>
+
 #include  "./../ghead.h"
 
 //参数结构体
@@ -94,6 +96,7 @@ struct ConfigData
     bool bIsLoaded;
     vector<DataMap*> m_pArrayData;
     vector<AlarmCmd*> m_pAlarmInfo;
+    QMap<int ,int> m_mapAddrToIndex;
 };
 
 

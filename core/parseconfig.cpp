@@ -308,6 +308,8 @@ CParseConfig::Token CParseConfig::GetLineToken()
 
         m_pConfigData->m_pArrayData.push_back(new DataMap(_nNo, _addr, _nGrp,  _frac,
                _dMul, _pMin, _pMax,_strName, _strUnit, _strText));
+
+        m_pConfigData->m_mapAddrToIndex.insert(_addr, _nNo);
         if (!m_pConfigData->bIsLoaded)
         {
             SetVal(_nNo, _dVal, _dMul);
