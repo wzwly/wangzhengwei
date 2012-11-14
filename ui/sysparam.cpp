@@ -98,8 +98,6 @@ void QSysParamPage::Show()
     int _nLen = m_pSysParam->size() - m_nShowIndex;
     int _nMax = (_nLen > PARAM_COLOUM) ? PARAM_COLOUM :_nLen;
 
-    //if (_nMax == 0)
-    //    return;
 
     int _j = 0;
     DataMap* _pMap = NULL;
@@ -161,8 +159,7 @@ void QSysParamPage::OnListClick(int nId_)
     m_pSysData->SetVal(_pMap, _data);
     m_aParamArray[nId_].pData->setText(m_pSysData->GetValText(_pMap));
 
-    //float _fData =  float (_data);
-    //Cmd06WriteKeepReg( _wAddr,  _fData);
+    m_pSysData->SendToModelBus(_pMap);
 }
 
 void QSysParamPage::OnSndBtnClick(int nIndex_)

@@ -49,7 +49,7 @@ QMainFrame* GetMainFrame() {return g_pMainFrame;}
 QMainFrame::QMainFrame(QWidget *parent) :
     QMainWindow(parent)
 {
-    setFixedSize (24, 768);
+    setFixedSize (1024, 768);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     move(0, 0);
     QPalette _pal = this->palette();
@@ -70,6 +70,7 @@ QMainFrame::QMainFrame(QWidget *parent) :
     QSerial* _pCom = new QSerial(this);
     m_pModbus = new DevMaster(1, _pCom);
     _pCom->SetModbus(m_pModbus);
+    m_pSysData->SetModbus(m_pModbus);
     OnTimerUpdate();  //初始化时更新一次
     startTimer(1000);  //开启定时器，1s一次
 }
@@ -211,7 +212,7 @@ void QMainFrame::OnSndMenuBtn(int nId_)
       //Frame更新
       OnTimerUpdate();
 
-#if 1
+#if 0
     static int _s_n = 0;
     switch(_s_n)
     {

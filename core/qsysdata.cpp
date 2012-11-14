@@ -133,7 +133,7 @@ int QSysData::GetParamAddrNo(int nAddr_)
 }
 
 //====================modbus operate==========================
-void QSysData::SetToModelBus(const DataMap* pMap_)
+void QSysData::SendToModelBus(const DataMap* pMap_)
 {
    if (pMap_->iAddr < 0)
         return;

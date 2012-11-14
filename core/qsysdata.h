@@ -63,7 +63,7 @@ public:
     int GetParamAddrNo(int nAddr_);
     //modbus operater
     void SetModbus(DevMaster* pModbus_){m_pModbus = pModbus_;}
-    void SetToModelBus(const DataMap* pMap_);
+    void SendToModelBus(const DataMap* pMap_);
     void OnReadCoil(unsigned short addr_, unsigned short qty_,
                     unsigned char*pData_, unsigned char byte_ = 0);
     void OnReadRegisters(unsigned short addr_, unsigned short qty_,
