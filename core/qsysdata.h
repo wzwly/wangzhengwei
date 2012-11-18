@@ -13,7 +13,7 @@ class QSysData
    friend class QAutoPage;
 
 public: 
-    typedef POINT_T<float> FLOAT_POINT ;
+    typedef POINT_T<int> INT_POINT;
     union BtyeToInt
     {
         int iVal;
@@ -27,7 +27,8 @@ protected:
 private:
     QString m_strFilePath;
     QString m_strFileName;
-    QVector<FLOAT_POINT> m_vDrillData;
+    QVector<INT_POINT> m_vDrillData;
+
     int __n_Save_Begin__;
     char m_szPath[ MAX_FILE_NAME_SIZE + 1];
     char m_szName[ MAX_FILE_NAME_SIZE + 1];
@@ -39,9 +40,9 @@ private:
     int  m_iParamRI[PAGE_PARAM_COUNT]; //用于输入
     int  m_iParamRBtn[PAGE_PARAM_COUNT]; //用于按键发送
     int __n_Save_End__;
+
     ConfigData m_cGlbData;
     DevMaster* m_pModbus;
-
 public:
     //文件加载操作
     void LoadFile(const QString& path_, const QString& name_);
@@ -73,7 +74,7 @@ private:
     void LoadFromDxfFile(const QString& path);
     void LoadFromXtfFile(const QString& path);
     void SortDxfData();
-    void SortOneRow(FLOAT_POINT* p_,  int nSize_);
+    void SortOneRow(INT_POINT* p_,  int nSize_);
 };
 
 #endif // QSYSDATA_H

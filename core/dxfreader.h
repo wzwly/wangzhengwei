@@ -33,7 +33,7 @@ class QDxfReader
 public:
     QDxfReader();
     ~QDxfReader();
-    typedef POINT_T<float> FLOAT_POINT ;
+    typedef POINT_T<int> INT_POINT ;
 
 public:
         void AtachFile(const QString& file_){Open(file_);}//关联读取的文件
@@ -56,7 +56,7 @@ protected:
         int  m_nLine;// the current line
         long m_nFileSize;
         QFile* m_pFile;
-        QList<FLOAT_POINT> m_vShapeList;
+        QList<INT_POINT> m_vShapeList;
 };
 
 #endif // DXFREADER_H

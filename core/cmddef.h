@@ -36,7 +36,16 @@
 #include <QDebug>
 #include "serial.h"
 
+
 class QSysData;
+
+struct ERRO_LOG
+{
+    unsigned char cCmd;
+    unsigned short iAddr;
+    unsigned short iValLen;
+    int iTimer;
+};
 
 class DevMaster
 {
@@ -48,6 +57,7 @@ public:
         RECEIVE_STATUS,
         INVALID_CMD,
     };
+
     DevMaster(int nAddr_ = 1, QSerial* pSerial_ = NULL);
 
 public:
@@ -58,6 +68,7 @@ public:
     void PresetSingleRegister(unsigned short wAddr_, unsigned short wVal_); //6
     void ForceMultipleCoils(unsigned short wAddr_, unsigned short wQty_, unsigned char* pData_, unsigned char byteCnt_ = 0); //15
     void PresetMultipleRegisters(unsigned short wAddr_, unsigned short wQty_, unsigned char* pData_, unsigned char byteCnt_ = 0);//16
+    void LogCommucateErro(const QSerial::CmdSend* pCmd_);
 private:
     CheckStatus CheckReadCoil(); //1
     CheckStatus CheckReadRegisters(); //3

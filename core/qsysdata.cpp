@@ -121,8 +121,8 @@ QSysData::QSysData()
 void QSysData::InitParamData()
 {
      CParseConfig _cfg;
-     _cfg.OpenConfigFile("PR.info");
-     _cfg.StartLoadConfig(&m_cGlbData);
+     if(_cfg.OpenConfigFile("PR.info"))
+        _cfg.StartLoadConfig(&m_cGlbData);
 }
 
 int QSysData::GetParamAddrNo(int nAddr_)
@@ -204,6 +204,9 @@ void QSysData::OnReadRegisters(unsigned short addr_, unsigned short qty_,
     }
 }
 
+
+
+
 //===========================file operater===================
 void QSysData::LoadFile(const QString& path_, const QString& name_)
 {
@@ -274,7 +277,7 @@ void QSysData::LoadFromXtfFile(const QString& path)
         {
             _fX = _pData.m_fDataX[_i];
             _fY = _pData.m_fDataY[_i * 12 + _j];
-            m_vDrillData[_nPos++] = FLOAT_POINT(_fX, _fY);
+            m_vDrillData[_nPos++] = INT_POINT(_fX, _fY);
             //Cmd06WriteKeepReg(_nAddr + _j, _fX);
             //Cmd06WriteKeepReg(_nAddr + _j + 1, _fY);
         }
@@ -335,11 +338,11 @@ void QSysData::SortDxfData()
 
 }
 
- void QSysData::SortOneRow(FLOAT_POINT* p_,  int nSize_)
+ void QSysData::SortOneRow(INT_POINT* p_,  int nSize_)
  {
-        float _fMin;
+        int _fMin;
         int _nPos;
-        FLOAT_POINT _fT;
+        INT_POINT _fT;
         for(int _i = 0; _i < nSize_  - 1; ++_i)
         {
                _nPos = _i;

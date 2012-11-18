@@ -71,7 +71,6 @@ QMainFrame::QMainFrame(QWidget *parent) :
     m_pModbus = new DevMaster(1, _pCom);
     _pCom->SetModbus(m_pModbus);
     m_pSysData->SetModbus(m_pModbus);
-    OnTimerUpdate();  //初始化时更新一次
     startTimer(1000);  //开启定时器，1s一次
 }
 
@@ -121,12 +120,12 @@ void QMainFrame::CreateMainMenu()
         connect(m_pScdMenuBtn[_i], SIGNAL(ClickedEvent(int)), this, SLOT(OnSndMenuBtn(int)));
     }
 
-    m_pDateYMD = new QTipLabel(this, QItem::TITLE_LABEL);
-    m_pDateYMD->InitShow("2010-06-25", 0, 0, 225,60, LABE_FONT_SIZE );
-    m_pTitle = new QTipLabel(this,QItem::TITLE_LABEL);
-    m_pTitle->InitShow("自动加工", 225, 0, 574,60, LABE_FONT_SIZE );
+    m_pPageInfo = new QTipLabel(this, QItem::TITLE_LABEL);
+    m_pPageInfo->InitShow("自动加工", 0, 0, 250,60, LABE_FONT_SIZE );
+    m_pWarning = new QTipLabel(this,QItem::TITLE_LABEL);
+    m_pWarning->InitShow("", 250, 0, 549,60, LABE_FONT_SIZE );
     m_pDateHMS = new QTipLabel(this,QItem::TITLE_LABEL);
-    m_pDateHMS->InitShow("12:18:28", 799, 0, 225,60, LABE_FONT_SIZE );
+    m_pDateHMS->InitShow("12:18:28", 774, 0, 250,60, LABE_FONT_SIZE );
 }
 
 
@@ -206,11 +205,11 @@ void QMainFrame::OnSndMenuBtn(int nId_)
   void QMainFrame::timerEvent(QTimerEvent *event_)
   {   
       QDateTime _tTm = QDateTime::currentDateTime();
-      QString _str = _tTm.toString("yyyy-MM-dd w hh:mm:ss");
-      m_pDateYMD->setText(_str.section("w", 0, 0));
-      m_pDateHMS->setText(_str.section("w", 1, 1));
+      QString _str = _tTm.toString("yyyy-MM-dd hh:mm:ss");
+      m_pDateHMS->setText(_str);
       //Frame更新
-      OnTimerUpdate();
+      m_pCurMenuPage->OnUpDate(0);
+      ShowErroInfo();
 
 #if 0
     static int _s_n = 0;
@@ -251,16 +250,48 @@ void QMainFrame::OnSndMenuBtn(int nId_)
 #endif
   }
 
-  unsigned short g_wSend[5] = {1,2,3,4,5};
-  unsigned short g_wRecive[5] = {1,2,3,4,5};
-  //主界面定时更新函数
-  void QMainFrame::OnTimerUpdate()
-  {
-       m_pCurMenuPage->OnUpDate(0);
-  }
 
 
   void QMainFrame::SetTiltleLabel(const QString& str_)
   {
-      m_pTitle->setText(str_);
+      m_pPageInfo->setText(str_);
+  }
+
+
+  void QMainFrame::LogCommucateErro(const ERRO_LOG& Erro_)
+  {
+      m_pErroList.push_back(Erro_);
+  }
+
+  void QMainFrame::ShowErroInfo()
+  {
+    static int _n_ShowIndex = 0;
+    int _nSize = m_pErroList.size();
+    if (_nSize <= 0)
+    {   m_pWarning->setText(""); return;}
+
+    if (_n_ShowIndex >= _nSize)
+        _n_ShowIndex = 0;
+
+    ERRO_LOG& _Erro = m_pErroList[_n_ShowIndex];
+    QString _str;
+
+    _Erro.iTimer--;
+    switch(_Erro.cCmd)
+    {
+    case 1://读取线圈状态(读取点 16位以内)
+    case 3://读取保持寄存器(一个或多个)
+    case 5://强制单个线圈
+    case 6://设置单个寄存器
+    case 15://设置多个线圈
+    case 16://设置多个寄存器
+      _str = QString("通信出错：命令%1 地址%2").arg(int(_Erro.cCmd)).arg(int(_Erro.iAddr));
+      break;
+    default:
+        break;
+    }
+    if (_Erro.iTimer <= 0)
+        m_pErroList.remove(_n_ShowIndex);
+    _n_ShowIndex++;
+    m_pWarning->setText(_str);
   }

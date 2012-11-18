@@ -1,5 +1,6 @@
 #include "cmddef.h"
 #include "qsysdata.h"
+#include "./../ui/mainframe.h"
 
 //字地址 0 - 255 (只取低8位)
 //位地址 0 - 255 (只取低8位)
@@ -130,12 +131,12 @@ DevMaster::CheckStatus DevMaster::CheckReadCoil()
             _crcOld = MakeShort(_pRecBuf[_nLen - 2],_pRecBuf[_nLen -1]);
             if (_crcData == _crcOld)
             {
+                 m_pSerial->StopTimer();
+                  //deal the data here
                 const QSerial::CmdSend* _pCurCmd = m_pSerial->GetCurSend();
                 unsigned short _addr = MakeShort(_pCurCmd->szTxBuffer[2],_pCurCmd->szTxBuffer[3]);
                 unsigned short _qty =  MakeShort(_pCurCmd->szTxBuffer[4],_pCurCmd->szTxBuffer[5]);
                 m_pSysData->OnReadCoil(_addr,_qty,&_pRecBuf[3],_pRecBuf[2]);
-                //deal the data here
-                m_pSerial->StopTimer();
                 qDebug() << "Cmd1 CheckReadCoil ok";
                 return CHECK_OK;//接受OK
             }
@@ -484,4 +485,15 @@ void DevMaster::PresetMultipleRegisters(unsigned short wAddr_, unsigned short wQ
  void DevMaster::BegineSend(QSerial::CmdSend* pCmd_)
  {
      m_pSerial->AddCmdSend(pCmd_);
+ }
+
+
+ void DevMaster::LogCommucateErro(const QSerial::CmdSend* pCmd_)
+ {
+     ERRO_LOG _Erro;
+    _Erro.cCmd = pCmd_->szTxBuffer[1];
+    _Erro.iAddr = MakeShort(pCmd_->szTxBuffer[2],pCmd_->szTxBuffer[3]);
+    _Erro.iValLen = MakeShort(pCmd_->szTxBuffer[4],pCmd_->szTxBuffer[5]);
+    _Erro.iTimer = 5;
+    GetMainFrame()->LogCommucateErro(_Erro);
  }

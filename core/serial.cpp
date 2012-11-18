@@ -125,6 +125,7 @@ void QSerial::timerEvent(QTimerEvent *event_)
             }
             else
             {  //超时
+                m_pMaster->LogCommucateErro(m_pCurCmd);
                 DeleteCmdSend();
             }
         }

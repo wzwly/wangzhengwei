@@ -10,7 +10,7 @@ class  QTipLabel;
 class  QSysData;
 
 class DevMaster;
-
+struct ERRO_LOG;
 
 class QMainFrame : public QMainWindow
 {
@@ -27,8 +27,8 @@ private:
 
     QPushBtn*  m_pPageMenu[MAIN_MENU_COUNT];
     QPushBtn*  m_pScdMenuBtn[SECOND_MENU_COUNT];//二级菜单
-    QTipLabel* m_pDateYMD;
-    QTipLabel* m_pTitle;
+    QTipLabel* m_pPageInfo;
+    QTipLabel* m_pWarning;
     QTipLabel* m_pDateHMS;
 
     QBasePage* m_pMenuPage[MAIN_MENU_COUNT];
@@ -46,15 +46,16 @@ private:
     QSysData* m_pSysData;
     DevMaster* m_pModbus;
 
+    QVector<ERRO_LOG>  m_pErroList;
+
 protected:
     void CreateMainMenu();
     void CreatePage();
     void ChangeSndMenuText(int nIndex_);
     void timerEvent(QTimerEvent *event_); //定时器响应函数
-    void OnTimerUpdate();				  //主界面定时更新函数
     virtual void keyPressEvent ( QKeyEvent* e_);
     virtual void keyReleaseEvent ( QKeyEvent* e_);
-
+    void ShowErroInfo();
 
  public:
     //void OnChangeLang(LANG eLang_);
@@ -62,6 +63,7 @@ protected:
     void SetTiltleLabel(const QString& str_);
     LANG GetLangType() { return m_eLang;}
     void ReShowMenuBtn();
+    void LogCommucateErro(const ERRO_LOG& Erro_);
 };
 
 
