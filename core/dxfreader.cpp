@@ -173,7 +173,7 @@ bool QDxfReader::DealCircles()//圆弧处理
                         _r = m_cNodeVal.strCurLine.toFloat(&_bDigit);
                 if(_bDigit)
                 {
-                        INT_POINT _p(_x,_y);
+                        INT_POINT _p(Round(_x * 100.0), Round(_y * 10.0));
                         m_vShapeList.push_back(_p);
                 }
         }

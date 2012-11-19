@@ -249,9 +249,12 @@ void QSysData::LoadFromDxfFile(const QString& path)
         _dlg.exec();
         return;
     }
-    ReSetData();
-    for (int _i = 0; _i < _dxf.m_vShapeList.size(); ++_i)
-            m_vDrillData.push_back(_dxf.m_vShapeList.at(_i));
+    int _nSize = _dxf.m_vShapeList.size();
+    m_vDrillData.clear();
+    m_vDrillData.resize(_nSize);
+
+    for (int _i = 0; _i < _nSize; ++_i)
+       m_vDrillData[_i] = _dxf.m_vShapeList.at(_i);
 
 }
 
@@ -266,36 +269,31 @@ void QSysData::LoadFromXtfFile(const QString& path)
          _dlg.exec();
          return;
     }
-    ReSetData();
+
+    m_vDrillData.clear();
     m_vDrillData.resize(120);
     int _nPos = 0;
-    int _nAddr = HOLE_POS::ADDR_ROW0;
-    float _fX, _fY;
+    int _iX, _iY;
     for(int _i = 0; _i < 12; ++_i)
     {
         for (int _j = 0; _j < 10; ++_j)
         {
-            _fX = _pData.m_fDataX[_i];
-            _fY = _pData.m_fDataY[_i * 12 + _j];
-            m_vDrillData[_nPos++] = INT_POINT(_fX, _fY);
-            //Cmd06WriteKeepReg(_nAddr + _j, _fX);
-            //Cmd06WriteKeepReg(_nAddr + _j + 1, _fY);
-        }
-         _nAddr += HOLE_POS::HOLE_ROW_MAX;
-         //Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW0_HOLE_QTY + _i, 10);
+            _iX = _pData.m_iDataX[_i];
+            _iY = _pData.m_iDataY[_i * 12 + _j];
+            m_vDrillData[_nPos++] = INT_POINT(_iX, _iY);
+        }          
     }
-    //Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW_QTY, 12);
 }
 
 
 void QSysData::SortDxfData()
 {
-     /*float  _fTemp,_fGap = m_cGlbData.fRowGap;
+     float  _fTemp,_fGap ;
      int _aRow[HOLE_POS::ROW_MAX] = {0};
      int _nClone = 0, _k = 0;
-     FLOAT_POINT _fSortData[HOLE_POS::ROW_MAX][HOLE_POS::HOLE_ROW_MAX];
+     INT_POINT _fSortData[HOLE_POS::ROW_MAX][HOLE_POS::HOLE_ROW_MAX];
 
-     FLOAT_POINT _fP;
+     INT_POINT _fP;
      for (int _i = 0; _i < m_vDrillData.size(); ++_i)
      {
             _fP = m_vDrillData[_i];
@@ -318,7 +316,6 @@ void QSysData::SortDxfData()
             }
      }
 
-     Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW_QTY, _nClone);
      int _nAddr = HOLE_POS::ADDR_ROW0;
      for (int _i = 0; _i <_nClone; ++_i)
      {
@@ -328,13 +325,12 @@ void QSysData::SortDxfData()
 
                  for (int _j = 0; _j < _aRow[_i]; ++_j)
                  {
-                     Cmd06WriteKeepReg(_nAddr + _j, _fSortData[_i][_j].x);
-                     Cmd06WriteKeepReg(_nAddr + _j + 1,  _fSortData[_i][_j].y);
+                     //Cmd06WriteKeepReg(_nAddr + _j, _fSortData[_i][_j].x);
+                     //(_nAddr + _j + 1,  _fSortData[_i][_j].y);
                  }
             }
             _nAddr += HOLE_POS::HOLE_ROW_MAX;
-           Cmd06WriteKeepReg(CTL_PARAM_ADDR::ROW0_HOLE_QTY + _i,  _aRow[_i]);
-     }*/
+      }
 
 }
 

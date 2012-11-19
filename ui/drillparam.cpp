@@ -10,10 +10,10 @@ QDrillParamPage::QDrillParamPage(QWidget* parent_)
  :QBasePage( parent_)
 {
     for (int _i = 0; _i < 120; ++_i)
-            m_cData.m_fDataY[_i] = _i * 10 % 300 + 1;
+            m_cData.m_iDataY[_i] = _i * 10 % 300 + 1;
 
     for (int _i = 0; _i < 12; ++_i)
-            m_cData.m_fDataX[_i] = _i *20 + 1;
+            m_cData.m_iDataX[_i] = _i *20 + 1;
     CreatePageInfo();
     m_nPagePos = 0;
 }
@@ -49,15 +49,14 @@ void QDrillParamPage::OnDataEdit(int nId_)
 
     QNuberInput _SoftKey(this);
 
-
     if (_nIndex == 0)
     {
-            _SoftKey.SetRange(-1000, 2000, m_cData.m_fDataX[_nPos]);
+            _SoftKey.SetRange(-1000, 2000, m_cData.GetXVal(_nPos));
     }
     else
     {
             _nPos = _nPos * 10 + _nIndex - 1;
-            _SoftKey.SetRange(-1000, 2000, m_cData.m_fDataY[_nPos]);
+            _SoftKey.SetRange(-1000, 2000, m_cData.GetYVal(_nPos));
     }
 
     if (!_SoftKey.exec())
@@ -68,14 +67,14 @@ void QDrillParamPage::OnDataEdit(int nId_)
     double _data = _SoftKey.GetDbData();
     if (_nIndex == 0)
     {
-            m_cData.m_fDataX[_nPos] = _data;
+            m_cData.m_iDataX[_nPos] = _data * 100.0;
     }
     else
     {
-            m_cData.m_fDataY[_nPos] = _data;
+            m_cData.m_iDataY[_nPos] = _data * 100.0;
     }
 
-    m_aParamArray[nId_].pData->setText(QString::number(_data,'f', 3));
+    m_aParamArray[nId_].pData->setText(QString::number(_data,'f', 2));
 }
 
 void QDrillParamPage::OnSndBtnClick(int nId_)
@@ -85,7 +84,7 @@ void QDrillParamPage::OnSndBtnClick(int nId_)
             if (m_nPagePos > 0)
             {
                     m_nPagePos--;
-                    OnShowPage(m_nPagePos);
+                    OnShowPage();
             }
     }
     else if (nId_ == 1)
@@ -93,7 +92,7 @@ void QDrillParamPage::OnSndBtnClick(int nId_)
             if (m_nPagePos < 3)
             {
                     m_nPagePos++;
-                    OnShowPage(m_nPagePos);
+                    OnShowPage();
             }
     }
     else if (nId_ == 2)
@@ -109,32 +108,31 @@ void QDrillParamPage::OnSndBtnClick(int nId_)
                     return;
                 }
                 QString _stPath = QString("./Flash/%1.xtf").arg(_str);
-
                 QConfigSet::WriteToFile(_stPath, &m_cData, m_cData.nSize, 0);
           }
     }
 
 }
 
-void QDrillParamPage::OnShowPage(int nPos_)
+void QDrillParamPage::OnShowPage()
 {
     int _nIndex = 0;
 
     int _nPos = 0;
     for (int _i = 0; _i < 3; _i++)
     {
+         _nPos = m_nPagePos * 3 + _i;
          for (int _j = 0; _j < 11; _j++)
-         {
-               _nPos = m_nPagePos * 3 + _i;
+         {           
               if (_j == 0)
               {
                  m_aParamArray[_nIndex].pName->setText(QString("第%1排:X%2").arg(_nPos + 1).arg(_nPos + 1));
-                 m_aParamArray[_nIndex].pData->setText(QString::number(m_cData.m_fDataX[_nPos], 'f', 3));
+                 m_aParamArray[_nIndex].pData->setText(QString::number(m_cData.GetXVal(_nPos), 'f', 2));
               }
               else
               {
                  m_aParamArray[_nIndex].pName->setText(QString("Y%1-%2").arg(_nPos + 1).arg(_j));
-                 m_aParamArray[_nIndex].pData->setText(QString::number(m_cData.m_fDataY[_nPos * 10 + _j - 1], 'f', 3));
+                 m_aParamArray[_nIndex].pData->setText(QString::number(m_cData.GetYVal(_nPos * 10 + _j - 1), 'f', 2));
               }
               _nIndex++;
         }
@@ -146,7 +144,7 @@ void QDrillParamPage::OnShowPage(int nPos_)
 
 void QDrillParamPage::showEvent ( QShowEvent * event )
 {
-    OnShowPage(m_nPagePos);
+    OnShowPage();
     QBasePage::showEvent (event );
 }
 

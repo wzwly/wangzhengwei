@@ -21,11 +21,13 @@ public:
      struct _SaveData
      {
          int nSize;
-         float m_fDataY[120];
-         float m_fDataX[12];
+         int m_iDataY[120]; //默认两位小数 放大了100倍
+         int m_iDataX[12];
          unsigned int iCrc;
          _SaveData(){nSize = sizeof(_SaveData); iCrc = 0x3535fefe;};
          bool IsValid() {return iCrc == 0x3535fefe;}
+         float GetXVal(int nPos_) {return float(m_iDataX[nPos_]) / 100.0;}
+         float GetYVal(int nPos_) {return float(m_iDataY[nPos_]) / 100.0;}
      };
 
     QDrillParamPage(QWidget* parent_);
@@ -40,7 +42,7 @@ public:
 
 private:
     void CreatePageInfo();
-    void OnShowPage(int nPos_);
+    void OnShowPage();
 protected:
     virtual void showEvent ( QShowEvent * event );
 
