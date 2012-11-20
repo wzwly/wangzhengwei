@@ -15,6 +15,9 @@ class QAutoPage : public QBasePage
 public:
     QAutoPage(QWidget* parent_);
 
+    enum {
+        AXIS_ADDR = 200,
+    };
 public slots:
     void OnViewBtnClick(int nId_);
     void OnStepBtnClick(int nId_);
@@ -49,7 +52,6 @@ private:
 
     double m_dDeltH;
     double m_dDeltW;
-   // GlbConfig* m_pGlbCfg;
 
     float m_fStep;
     int  m_nAxisSel;

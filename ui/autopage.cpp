@@ -25,7 +25,6 @@ QAutoPage::QAutoPage(QWidget* parent_)
     m_pPaint = m_pDrawArea->GetPainter();
     m_pDrawArea->GetWidthHeight(m_nWidth,m_nHeight);
     CreatePageInfo();
-    //m_pGlbCfg = m_pSysData->GetCfgData();
     m_fZoom = 1.0;
     m_fStep = 1.0;
     m_nAxisSel = 0;
@@ -33,8 +32,6 @@ QAutoPage::QAutoPage(QWidget* parent_)
 
 void QAutoPage::DrawRuler()
 {
-    //m_pDrawArea->DrawRightRuler(m_pGlbCfg->fXoffsetView,m_pGlbCfg->fViewWidth + m_pGlbCfg->fXoffsetView,"mm");
-    //m_pDrawArea->DrawBottomRuler(m_pGlbCfg->fYoffsetView,m_pGlbCfg->fViewHeight + m_pGlbCfg->fYoffsetView, "mm");
     m_pDrawArea->DrawRightRuler(0,1000,"mm");
     m_pDrawArea->DrawBottomRuler(0,1500, "mm");
 }
@@ -229,22 +226,9 @@ void QAutoPage::DrawSimulate()
 
 void QAutoPage::OnUpDate(int nFlag_)
 {
-
     for(int _i = 0; _i < AXIS_NUM; ++_i)
-    {
-        //Cmd03ReadKeepReg(CTL_PARAM_ADDR::AXIS_X_POS,6,(unsigned char*)m_pGlbCfg->fAxisPos);
-        //m_pXYZCoor[_i]->setText(QString::number(m_pGlbCfg->fAxisPos[_i], 'f', 2));
-        //qDebug() <<"update!";
-
-        //Cmd06WriteKeepReg(1, 0x55);
-        const  char * _p = "1234567890\n00";
-        //CmdWriteKeepReg(1, 11, (const unsigned char*)_p);
-        //for(int _i = 0; _i < 100)
-        static int _iCont = 0;
-        _iCont++;
-        if (_iCont > 100)
-            _iCont = 0;
-        //CmdWriteKeepReg(_iCont, 4, (const unsigned char*)&_iCont);
+    {     
+        m_pXYZCoor[_i]->setText(m_pSysData->GetValText(AXIS_ADDR + _i));
     }
 }
 

@@ -97,6 +97,7 @@ struct ConfigData
     vector<DataMap*> m_pArrayData;
     vector<AlarmCmd*> m_pAlarmInfo;
     QMap<int ,int> m_mapAddrToIndex;
+    QMap<int, int> m_mapIndexToVector;
 };
 
 

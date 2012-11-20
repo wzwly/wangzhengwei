@@ -45,14 +45,19 @@ QSysData::QSysData()
 //================param parse operate=================
  QString QSysData::GetValText(const DataMap* pMap_)
  {
+    QString _str;
+    if (pMap_ == NULL)
+        return _str;
     int _nVal = ParamData(pMap_->iNo);
     double _fVal = double(_nVal) / pMap_->dMult;
-    QString _str = QString("%1").arg(_fVal,0, 'f', pMap_->iFraction);
+    _str = QString("%1").arg(_fVal,0, 'f', pMap_->iFraction);
     return _str;
  }
 
  double QSysData::GetVal(const DataMap* pMap_)
  {
+     if (pMap_ == NULL)
+         return 0.0;
      int _nVal = ParamData(pMap_->iNo);
      double _fVal = double(_nVal) / pMap_->dMult;
      return _fVal;
@@ -60,12 +65,16 @@ QSysData::QSysData()
 
  void QSysData::SetVal(const DataMap* pMap_, double fVal_)
  {
+     if (pMap_ == NULL)
+         return ;
      int _nVal =  Round(fVal_ * pMap_->dMult);
      ParamData(pMap_->iNo) = _nVal;
  }
 
  bool QSysData::CheckValid(const DataMap* pMap_,double dVal_)
  {
+     if (pMap_ == NULL)
+         return false;
      int _nVal =  Round(dVal_ * pMap_->dMult);
      DataRangeMap* _pMin = pMap_->pMin;
      if (_pMin)
@@ -95,6 +104,13 @@ QSysData::QSysData()
 
  void QSysData::GetMaxMinRange(const DataMap*pMap_, double& dMin_, double& dMax_)
  {
+     if (pMap_ == NULL)
+      {
+         dMin_ = -9999.0;
+         dMax_ = 9999.0;
+         return;
+      }
+
      DataRangeMap* _pMin = pMap_->pMin;
      if (_pMin)
      {
@@ -132,9 +148,25 @@ int QSysData::GetParamAddrNo(int nAddr_)
         return _nRet;
 }
 
+ DataMap* QSysData::GetDataMapByPos(int nPos_)
+ {
+     int _nRet = -1;
+     _nRet = m_cGlbData.m_mapIndexToVector.value(nPos_, _nRet);
+     if (_nRet >= 0)
+     {
+        return m_cGlbData.m_pArrayData[_nRet];
+     }
+     else
+         return NULL;
+
+ }
+
 //====================modbus operate==========================
 void QSysData::SendToModelBus(const DataMap* pMap_)
 {
+   if (pMap_ == NULL)
+       return;
+
    if (pMap_->iAddr < 0)
         return;
 

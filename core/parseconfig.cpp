@@ -132,7 +132,7 @@ void CParseConfig::CloseFile()
                         GetGroupInfo();
                         break;
                      default:
-                        assert(false);
+                        //assert(false);
                           break;
             }
         }
@@ -208,9 +208,12 @@ CParseConfig::Token CParseConfig::GetLineToken()
     double _dVal;
     if (GetInt(_nNo) && GetDouble(_dVal))
     {
-        int _addr = 555, _frac = 0;
+        int _addr = -1, _frac = 0;
         double _dMul = 1.0;
-        int _i = 0;
+
+        if (_nNo > 0)
+            _nNo--;
+
         string  _strName, _strUnit, _strText;
         string::size_type  _tPos;
         _tPos = m_strCurLine.find("ADDR");//
@@ -308,8 +311,11 @@ CParseConfig::Token CParseConfig::GetLineToken()
 
         m_pConfigData->m_pArrayData.push_back(new DataMap(_nNo, _addr, _nGrp,  _frac,
                _dMul, _pMin, _pMax,_strName, _strUnit, _strText));
+        static int _s_VectPos = 0;
 
         m_pConfigData->m_mapAddrToIndex.insert(_addr, _nNo);
+        m_pConfigData->m_mapIndexToVector.insert(_nNo, _s_VectPos);
+        _s_VectPos++;
         if (!m_pConfigData->bIsLoaded)
         {
             SetVal(_nNo, _dVal, _dMul);
@@ -408,6 +414,7 @@ bool CParseConfig::GetInt(int& nRet_)
     return true;
 }
 
+#include <QTextCodec>
 
 bool CParseConfig::GetText(string& str_)
 {
@@ -435,7 +442,6 @@ bool CParseConfig::GetText(string& str_)
     _cArray[_i] = '\0';
     str_.append(_cArray);
     return true;
-
 }
 
 

@@ -57,11 +57,14 @@ public:
     //参数操作
     int& ParamData(int i_) {return m_iParamRO0[i_];}
     QString GetValText(const DataMap* pMap_);
+    QString GetValText(int nPos_){return GetValText(GetDataMapByPos(nPos_));}
     double GetVal(const DataMap* pMap_);
+    double GetVal(int nPos_){return GetVal(GetDataMapByPos(nPos_));}
     void SetVal(const DataMap* pMap_, double fVal_);    
     bool CheckValid(const DataMap* pMap_,double dVal_);
     void GetMaxMinRange(const DataMap*pMap_, double& dMin_, double& dMax_);
     int GetParamAddrNo(int nAddr_);
+    DataMap* GetDataMapByPos(int nPos_);
     //modbus operater
     void SetModbus(DevMaster* pModbus_){m_pModbus = pModbus_;}
     void SendToModelBus(const DataMap* pMap_);
