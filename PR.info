@@ -1,4 +1,4 @@
-﻿//注释行
+//注释行
 // ‘//’注释符号
 //
 //整体格式
@@ -18,44 +18,50 @@
 //!=命令  TEXT = "报警提示"
 //
 
-//GROUP 1-4的ADDR范围1 - 200
+//地址1-100
 DATABEGIN
-GROUP 1   
-#1=1.12  ADDR = 1  NAME="X速度" FRAC = 2 MUL = 1.0  MIN = 1.0 MAX = 3600 UNIT = "mm/s"  TEXT = "X速度"
-#2=2.12  ADDR = 2 NAME="Y速度"  FRAC = 2 MUL = 1.0  UNIT = "m/min" TEXT = "Y速度"
+GROUP 1
+#1=10.0 ADDR = 1  NAME="钻孔深度" FRAC = 2 MUL = 1.0  UNIT = "mm" TEXT = "Z轴钻孔深度"
+#2=5.0  ADDR = 2 NAME="Z安全高度"  FRAC = 2 MUL = 1.0  UNIT = "mm" TEXT = "Z轴安全高度"
+#3=0 ADDR = 3  NAME="加工完成后动作" FRAC = 0  TEXT = "机床完成加工后的动作"
+#4=0.0  ADDR = 4 NAME="X轴固定点"  FRAC = 2 MUL = 1.0  UNIT = "mm" TEXT = "回固定点X轴坐标"
+#5=0.0  ADDR = 5 NAME="Y轴固定点"  FRAC = 2 MUL = 1.0  UNIT = "mm" TEXT = "回固定点Y轴坐标"
+#6=0.0  ADDR = 6 NAME="Z轴固定点"  FRAC = 2 MUL = 1.0  UNIT = "mm" TEXT = "回固定点Z轴坐标"
 DATAEND
 
+//地址101-200
 DATABEGIN
 GROUP 2
-#51=51.123  ADDR = 51  NAME="X中心" FRAC = 3 MUL = 1.0  UNIT = "mm" TEXT = "X原点"
-#52=52.123  ADDR = 52 NAME="Y中心" FRAC = 3  MUL = 1.0  UNIT = "mm" TEXT = "Y原点"
+#101=30  ADDR = 101  NAME="XY轴速度" FRAC = 2 MUL = 60.0  UNIT = "mm/min" TEXT = "XY轴运行速度"
+#102= 20 ADDR = 102  NAME="Z轴速度" FRAC = 2 MUL = 60.0  UNIT = "mm/min" TEXT = "Z轴运行速度"
 DATAEND
 
+//地址201-300
 DATABEGIN
 GROUP 3
-#101=101.1  ADDR = 101 NAME="循环时间" FRAC = 1 MUL = 1.0  UNIT = "ms" TEXT = "循环时间间隔"
-#102=102.7  ADDR = 102 NAME="等待时间" FRAC = 1  MUL = 1.0  UNIT = "ms" TEXT = "等待时间间隔"
+#201=2000  ADDR = 201 NAME="X轴正限位" FRAC = 2  UNIT = "mm" TEXT = "X轴正向限位"
+#202=2000  ADDR = 202 NAME="Y轴正限位" FRAC = 2  UNIT = "mm" TEXT = "Y轴正向限位"
+#203=0  ADDR = 203 NAME="Z轴正限位" FRAC = 2  UNIT = "mm" TEXT = "Z轴正向限位"
+#204=0  ADDR = 204 NAME="X轴负限位" FRAC = 2  UNIT = "mm" TEXT = "X轴负向限位"
+#205=0  ADDR = 205 NAME="Y轴负限位" FRAC = 2  UNIT = "mm" TEXT = "Y轴负向限位"
+#206=-600  ADDR = 206 NAME="Z轴负限位" FRAC = 2  UNIT = "mm" TEXT = "Z轴负向限位"
 DATAEND
 
+//301-400
 DATABEGIN
 GROUP 4
-#151=151.12  ADDR = 151  NAME="工件计数" FRAC = 0 MUL = 1.0  UNIT = "" TEXT = "加工工件计数"
-#152=152.12  ADDR = 152 NAME="报警次数" FRAC = 0  MUL = 1.0  UNIT = "mm" TEXT = "报警次数"
+#301=301  ADDR = 301  NAME="报警计数" FRAC = 0  TEXT = "本次开机报警计数"
 DATAEND
 
-//ADDR范围201 - 250
+//地址401-500
 DATABEGIN
 GROUP 5
-//201-206对应XYZABU的当前坐标
-#201=1  ADDR = 201  FRAC = 2  MUL = 1.0  UNIT = "mm" 
-#202=2  ADDR = 202  FRAC = 2  MUL = 1.0  UNIT = "mm" 
-#203=3  ADDR = 203  FRAC = 2  MUL = 1.0  UNIT = "mm" 
-#204=4  ADDR = 204  FRAC = 2  MUL = 1.0  UNIT = "mm" 
-#205=5  ADDR = 205  FRAC = 2  MUL = 1.0  UNIT = "mm" 
-#206=6  ADDR = 206  FRAC = 2  MUL = 1.0  UNIT = "mm" 
-DATAEND
+#401=0.0  ADDR = 401  NAME="X轴坐标" FRAC = 2  MUL = 1.0  UNIT = "mm"
+#402=0.0  ADDR = 402  NAME="Y轴坐标" FRAC = 2  MUL = 1.0  UNIT = "mm"
+#403=0.0  ADDR = 403  NAME="Z轴坐标" FRAC = 2  MUL = 1.0  UNIT = "mm"
 
-
+#410=0 ADDR = 410  NAME="钻孔个数" FRAC = 0
+#411=0 ADDR = 411  NAME= "报警命令" FRAC = 0
 DATABEGIN
 !=1  TEXT= "系统错误"
 DATAEND

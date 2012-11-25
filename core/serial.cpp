@@ -68,7 +68,7 @@ void QSerial::InitModbus()
     _opt.c_iflag = 0;
     _opt.c_oflag = 0;
     _opt.c_lflag = 0;
-    _opt.c_cflag	= B115200 | CS8 | CLOCAL | CREAD;
+    _opt.c_cflag	= B9600 | CS8 | CLOCAL | CREAD;
     if (Tcsetattr(m_nFdModbus, TCSANOW, &_opt))
     {
         perror("tcsetattr   error");

@@ -38,7 +38,6 @@ private:
     int  m_iParamRO2[PAGE_PARAM_COUNT]; //用于输出
     int  m_iParamRO3[PAGE_PARAM_COUNT]; //用于输出
     int  m_iParamRI[PAGE_PARAM_COUNT]; //用于输入
-    int  m_iParamRBtn[PAGE_PARAM_COUNT]; //用于按键发送
     int __n_Save_End__;
 
     ConfigData m_cGlbData;

@@ -71,7 +71,7 @@ enum LANG
 };
 
 
-#define COLOR_F  30
+#define COLOR_F  230
 
 
 #define DISABLE_BK_COLOR  QColor(212, 207, 178, COLOR_F)
@@ -88,7 +88,7 @@ enum LANG
 extern QList<QObject*> g_pListObject;
 
 #define  AXIS_NUM  6
-#define  PAGE_PARAM_COUNT  50
+#define  PAGE_PARAM_COUNT  100
 #define  MAX_LINE_READ  256
 #define  MAX_FILE_NAME_SIZE  128
 

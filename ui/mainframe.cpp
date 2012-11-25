@@ -230,12 +230,12 @@ void QMainFrame::OnSndMenuBtn(int nId_)
         break;
     case 3:
         m_pModbus->PresetSingleRegister(0x10, 0x27ae);
-        _s_n = 4;
+        _s_n = 5;
         break;
     case 4:
        {
             unsigned char _out[5] = {0x33, 0xd7, 0xc8, 0xb9, 0xaa};
-            m_pModbus->ForceMultipleCoils(0x10, 16, _out);
+            m_pModbus->ForceMultipleCoils(0x10, 8, _out);
             _s_n = 5;
        }
         break;
