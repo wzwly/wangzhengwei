@@ -60,7 +60,8 @@ protected:
  public:
     //void OnChangeLang(LANG eLang_);
     void SetSndBtnUnActive(bool bActive_ = true){m_bSndBtnActive = bActive_;} //设置二级菜单，包括主菜单的激活状态
-    void SetTiltleLabel(const QString& str_);
+    void SetInfoItem(const QString& str_);
+    void SetWarnningItem(const QString& str_);
     LANG GetLangType() { return m_eLang;}
     void ReShowMenuBtn();
     void LogCommucateErro(const ERRO_LOG& Erro_);

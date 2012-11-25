@@ -358,7 +358,7 @@ CParseConfig::Token CParseConfig::GetLineToken()
                     if (_bFind)
                         break;
             }
-            else if (isdigit(_ch) || _ch == '.')
+            else if (isdigit(_ch) || _ch == '.' || _ch == '-')
             {
                  _cArray[_i++] = _ch;
                 _bFind = true;
@@ -394,7 +394,7 @@ bool CParseConfig::GetInt(int& nRet_)
                 if (_bFind)
                     break;
         }
-        else if (isdigit(_ch))
+        else if (isdigit(_ch) || _ch == '-')
         {
              _cArray[_i++] = _ch;
             _bFind = true;

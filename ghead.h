@@ -21,7 +21,8 @@ using namespace std;
 #define SECOND_MENU_COUNT    6
 
 //部分函数
-inline int Round(float f_) { return int (f_ + 0.5);}
+inline int Round(float f_) { if(f_ > 0){ return int (f_ + 0.5);}
+else {return int (f_ - 0.5);}}
 
 //液晶屏尺寸变化时，修改这两个宏
 #define LCD_W  800.0

@@ -109,7 +109,7 @@ void QFilePage::ShowFile(int nIndex_)
                 m_aFimeArray[_i].pFileSize->setText(QString("%1K").arg(_Info.nSize));
                 m_aFimeArray[_i].pFilePath->setText(QString("%1").arg(_Info.nPath == 0 ? "系统" : "U盘"));
         }
-        m_pMainFrame->SetTiltleLabel(QString("文件总数:%1").arg(m_lFileList.size()));
+        m_pMainFrame->SetInfoItem(QString("文件总数:%1").arg(m_lFileList.size()));
         m_aFimeArray[m_nSelFile].SetNormal();
         m_nSelFile = 0;
         m_aFimeArray[m_nSelFile].SetActive();

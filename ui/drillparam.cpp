@@ -137,7 +137,7 @@ void QDrillParamPage::OnShowPage()
               _nIndex++;
         }
     }
-    m_pMainFrame->SetTiltleLabel(QString("钻孔参数第%1页").arg(m_nPagePos + 1));
+    m_pMainFrame->SetInfoItem(QString("钻孔参数第%1页").arg(m_nPagePos + 1));
 
 }
 

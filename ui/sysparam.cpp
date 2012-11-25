@@ -117,7 +117,7 @@ void QSysParamPage::Show()
         m_aParamArray[_j].pName->setText("");
         m_aParamArray[_j].pData->setText("");
         m_aParamArray[_j].pUnit->setText("");
-         m_aParamArray[_j].pDataMap = NULL;
+        m_aParamArray[_j].pDataMap = NULL;
     }
 }
 

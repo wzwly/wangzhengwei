@@ -41,8 +41,8 @@ static const char** g_zsSndMenu1[MAIN_MENU_COUNT] = {g_szPageBtn01, g_szPageBtn1
 
 #define LABE_FONT_SIZE  18
 
- QList<QObject*> g_pListObject;
- static QMainFrame* g_pMainFrame = NULL;
+QList<QObject*> g_pListObject;
+static QMainFrame* g_pMainFrame = NULL;
 
 QMainFrame* GetMainFrame() {return g_pMainFrame;}
 
@@ -88,22 +88,22 @@ QMainFrame::~QMainFrame()
 void QMainFrame::keyReleaseEvent (QKeyEvent * e_)
 {
     if (e_->key() == Qt::Key_Escape)
-           close();
+        close();
     else if (m_bHasPressed ||    (e_->key() == Qt::Key_Up || e_->key() == Qt::Key_Down
-                   || e_->key() == Qt::Key_Left || e_->key() == Qt::Key_Right))
+                                  || e_->key() == Qt::Key_Left || e_->key() == Qt::Key_Right))
 
-     //m_pCurMenuPage->keyRelease(e_);
-     m_bHasPressed = false;
+        //m_pCurMenuPage->keyRelease(e_);
+        m_bHasPressed = false;
 }
 
- void QMainFrame::keyPressEvent ( QKeyEvent * e_)
- {
-        //m_pCurMenuPage->keyPress(e_);
-        m_bHasPressed = true;
- }
+void QMainFrame::keyPressEvent ( QKeyEvent * e_)
+{
+    //m_pCurMenuPage->keyPress(e_);
+    m_bHasPressed = true;
+}
 
 void QMainFrame::CreateMainMenu()
- {
+{
 
     //左侧创建
     for (int _i = 0; _i < MAIN_MENU_COUNT; ++_i)
@@ -112,7 +112,7 @@ void QMainFrame::CreateMainMenu()
         m_pPageMenu[_i]->InitShow(g_szMainMenu[_i],BTN_MENU_X, 60 + _i * BTN_MENU_H, BTN_MENU_W, BTN_MENU_H, MENU_FONT_SIZE);
         connect(m_pPageMenu[_i], SIGNAL(ClickedEvent(int)), this, SLOT(OnMainMenuShow(int)));
     }
-   //创建底部
+    //创建底部
     for (int _i = 0; _i < SECOND_MENU_COUNT; ++_i)
     {
         m_pScdMenuBtn[_i] = new QPushBtn(this, QItem::MENU_BTN, _i);
@@ -149,12 +149,12 @@ void QMainFrame::CreatePage()
 
 void QMainFrame::OnMainMenuShow(int nId_)//响应 m_pMainMenu
 {
-     if (m_nCurMainMenu == nId_ || !m_bSndBtnActive)
+    if (m_nCurMainMenu == nId_ || !m_bSndBtnActive)
         return;
-     m_pPageMenu[m_nCurMainMenu]->SetStatus(NORMAL_WIND);
-     m_nCurMainMenu = nId_;
-     m_pPageMenu[m_nCurMainMenu]->SetStatus(ACTIVE_WIND);
-     ChangeSndMenuText(nId_);
+    m_pPageMenu[m_nCurMainMenu]->SetStatus(NORMAL_WIND);
+    m_nCurMainMenu = nId_;
+    m_pPageMenu[m_nCurMainMenu]->SetStatus(ACTIVE_WIND);
+    ChangeSndMenuText(nId_);
 }
 
 
@@ -167,49 +167,48 @@ void QMainFrame::OnSndMenuBtn(int nId_)
         return;
     }
 
-      m_pScdMenuBtn[m_nCurSndMenu]->SetStatus(NORMAL_WIND);
-      m_nCurSndMenu = nId_;
-      m_pScdMenuBtn[m_nCurSndMenu]->SetStatus(ACTIVE_WIND);
-      m_pCurMenuPage->OnSndBtnClick(nId_); //传给下三级菜单窗口处理
+    m_pScdMenuBtn[m_nCurSndMenu]->SetStatus(NORMAL_WIND);
+    m_nCurSndMenu = nId_;
+    m_pScdMenuBtn[m_nCurSndMenu]->SetStatus(ACTIVE_WIND);
+    m_pCurMenuPage->OnSndBtnClick(nId_); //传给下三级菜单窗口处理
 }
 
 
- void QMainFrame::ChangeSndMenuText(int nIndex_)
- {
-     m_pScdMenuBtn[m_nCurSndMenu]->SetStatus(NORMAL_WIND);
-     m_nCurSndMenu  = m_pCurMenuPage->GetSndMenuPos();
-     m_pScdMenuBtn[m_nCurSndMenu]->SetStatus(ACTIVE_WIND);
-       qDebug() << "sel" <<m_nCurSndMenu << nIndex_;
-     m_pCurMenuPage->hide();
-     m_pCurMenuPage = m_pMenuPage[nIndex_];
-     m_pCurMenuPage->show();
+void QMainFrame::ChangeSndMenuText(int nIndex_)
+{
+    m_pScdMenuBtn[m_nCurSndMenu]->SetStatus(NORMAL_WIND);
+    m_nCurSndMenu  = m_pCurMenuPage->GetSndMenuPos();
+    m_pScdMenuBtn[m_nCurSndMenu]->SetStatus(ACTIVE_WIND);
+    m_pCurMenuPage->hide();
+    m_pCurMenuPage = m_pMenuPage[nIndex_];
+    m_pCurMenuPage->show();
 
-     ReShowMenuBtn();
-  }
+    ReShowMenuBtn();
+}
 
-  void QMainFrame::ReShowMenuBtn()
-  {
-      if(m_pCurMenuPage->GetSndBtnShow() == 0)
-      {
-          for (int _i = 0; _i < SECOND_MENU_COUNT; ++_i)
+void QMainFrame::ReShowMenuBtn()
+{
+    if(m_pCurMenuPage->GetSndBtnShow() == 0)
+    {
+        for (int _i = 0; _i < SECOND_MENU_COUNT; ++_i)
             m_pScdMenuBtn[_i]->setText(g_zsSndMenu[m_nCurMainMenu][_i]);
-      }
-      else
-      {
-          for (int _i = 0; _i < SECOND_MENU_COUNT; ++_i)
+    }
+    else
+    {
+        for (int _i = 0; _i < SECOND_MENU_COUNT; ++_i)
             m_pScdMenuBtn[_i]->setText(g_zsSndMenu1[m_nCurMainMenu][_i]);
-      }
-  }
+    }
+}
 
-  //定时器响应函数
-  void QMainFrame::timerEvent(QTimerEvent *event_)
-  {   
-      QDateTime _tTm = QDateTime::currentDateTime();
-      QString _str = _tTm.toString("yyyy-MM-dd hh:mm:ss");
-      m_pDateHMS->setText(_str);
-      //Frame更新
-      m_pCurMenuPage->OnUpDate(0);
-      ShowErroInfo();
+//定时器响应函数
+void QMainFrame::timerEvent(QTimerEvent *event_)
+{
+    QDateTime _tTm = QDateTime::currentDateTime();
+    QString _str = _tTm.toString("yyyy-MM-dd hh:mm:ss");
+    m_pDateHMS->setText(_str);
+    //Frame更新
+    m_pCurMenuPage->OnUpDate(0);
+    ShowErroInfo();
 
 #if 0
     static int _s_n = 0;
@@ -233,38 +232,42 @@ void QMainFrame::OnSndMenuBtn(int nId_)
         _s_n = 5;
         break;
     case 4:
-       {
-            unsigned char _out[5] = {0x33, 0xd7, 0xc8, 0xb9, 0xaa};
-            m_pModbus->ForceMultipleCoils(0x10, 8, _out);
-            _s_n = 5;
-       }
+    {
+        unsigned char _out[5] = {0x33, 0xd7, 0xc8, 0xb9, 0xaa};
+        m_pModbus->ForceMultipleCoils(0x10, 8, _out);
+        _s_n = 5;
+    }
         break;
     case 5:
-        {
-            unsigned short _outReg[5] = {0xee33, 0xccd7, 0xddc8, 0xffb9, 0x45aa};
-            m_pModbus->PresetMultipleRegisters(0x10, 5, (unsigned char*)_outReg);
-            _s_n = 0;
-        }
+    {
+        unsigned short _outReg[5] = {0xee33, 0xccd7, 0xddc8, 0xffb9, 0x45aa};
+        m_pModbus->PresetMultipleRegisters(0x10, 5, (unsigned char*)_outReg);
+        _s_n = 0;
+    }
         break;
     }
 #endif
-  }
+}
 
 
 
-  void QMainFrame::SetTiltleLabel(const QString& str_)
-  {
-      m_pPageInfo->setText(str_);
-  }
+void QMainFrame::SetInfoItem(const QString& str_)
+{
+    m_pPageInfo->setText(str_);
+}
 
+void QMainFrame::SetWarnningItem(const QString& str_)
+{
+    m_pWarning->setText(str_);
+}
 
-  void QMainFrame::LogCommucateErro(const ERRO_LOG& Erro_)
-  {
-      m_pErroList.push_back(Erro_);
-  }
+void QMainFrame::LogCommucateErro(const ERRO_LOG& Erro_)
+{
+    m_pErroList.push_back(Erro_);
+}
 
-  void QMainFrame::ShowErroInfo()
-  {
+void QMainFrame::ShowErroInfo()
+{
     static int _n_ShowIndex = 0;
     int _nSize = m_pErroList.size();
     if (_nSize <= 0)
@@ -285,8 +288,8 @@ void QMainFrame::OnSndMenuBtn(int nId_)
     case 6://设置单个寄存器
     case 15://设置多个线圈
     case 16://设置多个寄存器
-      _str = QString("通信出错：命令%1 地址%2").arg(int(_Erro.cCmd)).arg(int(_Erro.iAddr));
-      break;
+        _str = QString("通信出错：命令%1 地址%2").arg(int(_Erro.cCmd)).arg(int(_Erro.iAddr));
+        break;
     default:
         break;
     }
@@ -294,4 +297,4 @@ void QMainFrame::OnSndMenuBtn(int nId_)
         m_pErroList.remove(_n_ShowIndex);
     _n_ShowIndex++;
     m_pWarning->setText(_str);
-  }
+}

@@ -80,10 +80,10 @@ void QAutoPage::showEvent ( QShowEvent * event )
    // }
     if (m_pSysData->IsLoadFile())
     {
-        m_pMainFrame->SetTiltleLabel(QString("文件:%1").arg(m_pSysData->GetFileName()));
+        m_pMainFrame->SetInfoItem(QString("文件:%1").arg(m_pSysData->GetFileName()));
     }
     else
-        m_pMainFrame->SetTiltleLabel(QString("自动加工"));
+        m_pMainFrame->SetInfoItem(QString("自动加工"));
 
     QBasePage::showEvent (event );
 }
