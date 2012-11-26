@@ -61,21 +61,21 @@ public:
              piDataY = new int[iRow * 10];
              if (_pOldX != NULL)
              {
-                 memset(piDataX, 0, sizeof(int) * _iOldRow);
+                 memset(piDataX, 0, sizeof(int) * iRow);
                  memcpy(piDataX, _pOldX, sizeof(int) * _iOldRow);
                  delete[]  _pOldX;
              }
              else
-                 memset(piDataX, 0, sizeof(int) * _iOldRow);
+                 memset(piDataX, 0, sizeof(int) * iRow);
 
              if (_pOldY != NULL)
              {
-                 memset(piDataY, 0, sizeof(int) * _iOldRow * 10);
+                 memset(piDataY, 0, sizeof(int) * iRow * 10);
                  memcpy(piDataY, _pOldY, sizeof(int) * _iOldRow * 10);
                  delete[]  _pOldY;
              }
              else
-                 memset(piDataY, 0, sizeof(int) * _iOldRow * 10);
+                 memset(piDataY, 0, sizeof(int) * iRow * 10);
              assert(piDataY);
              assert(piDataX);
          }
