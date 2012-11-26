@@ -130,7 +130,7 @@ void QFilePage::showEvent ( QShowEvent * event )
 
 void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
 {
-    if (0 == nId_)
+    if (4 == nId_)
     {
        if (m_nShowIndex > 0)
         {
@@ -138,7 +138,7 @@ void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
             ShowFile(m_nShowIndex);
         }
     }
-    else if (1 == nId_)
+    else if (5 == nId_)
     {
         if (m_nShowIndex + m_nMaxShow < m_lFileList.size())
         {
@@ -147,11 +147,11 @@ void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
          }
 
     }
-    else if (2 == nId_)
+    else if (0 == nId_)
     {
         LoadFile();
     }
-    else if (3 == nId_) //拷贝
+    else if (2 == nId_) //拷贝
     {
         _FileInfo _Info = m_lFileList.at(m_nSelFile + m_nShowIndex);
         QDir _dir(g_szPath[_Info.nPath]);
@@ -185,7 +185,7 @@ void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
        ReadFile(g_szPath[1], 1);
        ShowFile(0);
     }
-    else if (4 == nId_) //删除
+    else if (3 == nId_) //删除
     {
             _FileInfo _Info = m_lFileList.at(m_nShowIndex + m_nSelFile);
             QDir _dir(g_szPath[_Info.nPath]);

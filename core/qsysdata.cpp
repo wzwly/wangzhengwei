@@ -8,6 +8,11 @@
 #include "./../ui/addrdef.h"
 #include "./../ghead.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 QSysData* QSysData::Instance()
 {
     static QSysData* _s_pSysData = NULL;
@@ -292,8 +297,19 @@ void QSysData::LoadFromDxfFile(const QString& path)
 
 void QSysData::LoadFromXtfFile(const QString& path)
 {
-    QDrillParamPage::_SaveData _pData;
-    QConfigSet::ReadFromFile(path, &_pData, _pData.nSize, 0);
+    QDrillParamPage::DrillData _pData;
+    int _fd = open(path.toStdString().data(), O_CREAT | O_RDWR);
+    if (_fd < 0)
+    {
+
+        return;
+    }
+    read(_fd, &_pData,sizeof(QDrillParamPage::DrillData));
+    _pData.NewData();
+    read(_fd, _pData.piDataX,_pData.iSizeX);
+    read(_fd, _pData.piDataY,_pData.iSizeY);
+    read(_fd, &_pData.iCrc,sizeof(int));
+    ::close(_fd);
     if (!_pData.IsValid())
     {
          QString _str = QString("载入文件【%1】失败！").arg(m_strFileName);
@@ -310,8 +326,8 @@ void QSysData::LoadFromXtfFile(const QString& path)
     {
         for (int _j = 0; _j < 10; ++_j)
         {
-            _iX = _pData.m_iDataX[_i];
-            _iY = _pData.m_iDataY[_i * 12 + _j];
+            _iX = _pData.piDataX[_i];
+            _iY = _pData.piDataY[_i * 12 + _j];
             m_vDrillData[_nPos++] = INT_POINT(_iX, _iY);
         }          
     }

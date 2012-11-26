@@ -266,15 +266,29 @@ bool QNuberInput::IsValidData(QString& strOld_)
 {
 
         double _dData =  GetDbData();
-        if (_dData < m_dMin || _dData > m_dMax)
+        if (_dData > m_dMax)
         {
                 m_pEdit->setText(strOld_);
                 return false;
         }
+        else if (m_dMin < 0 && _dData < m_dMin)
+        {
+            m_pEdit->setText(strOld_);
+            return false;
+        }
         return true;
 }
 
+double QNuberInput::GetDbData()
+{
+    double _dData = m_pEdit->text().toDouble();
+    if (_dData > m_dMax)
+        _dData = m_dMax;
+    else if (_dData < m_dMin)
+        _dData = m_dMin;
 
+    return  _dData;
+}
 
 void QNuberInput::SetRange(double dMin_, double dMax_, float fVal_)
 {

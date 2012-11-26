@@ -96,8 +96,7 @@ public slots:
 
 public:
         QString GetText() {return m_pEdit->text();}
-        double GetDbData(){return m_pEdit->text().toDouble();}
-        float GetFloatData(){return m_pEdit->text().toFloat();}
+        double GetDbData();//{return m_pEdit->text().toDouble();}
         void SetRange(double dMin_, double dMax_, double dVal_);
         void SetRange(double dMin_, double dMax_, float fVal_);
         void SetRange(double dMin_, double dMax_, int nVal_);

@@ -5,17 +5,20 @@
 #include "./../label/configset.h"
 #include "mainframe.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+
 
 QDrillParamPage::QDrillParamPage(QWidget* parent_)
  :QBasePage( parent_)
 {
-    for (int _i = 0; _i < 120; ++_i)
-            m_cData.m_iDataY[_i] = _i * 10 % 300 + 1;
-
-    for (int _i = 0; _i < 12; ++_i)
-            m_cData.m_iDataX[_i] = _i *20 + 1;
     CreatePageInfo();
     m_nPagePos = 0;
+    m_sTatus = INVALID;
+    m_cData.NewData();
 }
 
 #define LIST_LABEL_H   56
@@ -51,12 +54,13 @@ void QDrillParamPage::OnDataEdit(int nId_)
 
     if (_nIndex == 0)
     {
-            _SoftKey.SetRange(-1000, 2000, m_cData.GetXVal(_nPos));
+        _nPos = m_nPagePos * 3 + _nPos;
+        _SoftKey.SetRange(-1000, 2000, m_cData.GetXVal(_nPos));
     }
     else
     {
-            _nPos = _nPos * 10 + _nIndex - 1;
-            _SoftKey.SetRange(-1000, 2000, m_cData.GetYVal(_nPos));
+         _nPos = m_nPagePos * 30 + _nPos * 10 + _nIndex - 1;
+         _SoftKey.SetRange(-1000, 2000, m_cData.GetYVal(_nPos));
     }
 
     if (!_SoftKey.exec())
@@ -67,11 +71,11 @@ void QDrillParamPage::OnDataEdit(int nId_)
     double _data = _SoftKey.GetDbData();
     if (_nIndex == 0)
     {
-            m_cData.m_iDataX[_nPos] = _data * 100.0;
+            m_cData.SetXVal(_data,_nPos);
     }
     else
     {
-            m_cData.m_iDataY[_nPos] = _data * 100.0;
+            m_cData.SetYVal(_data,_nPos);
     }
 
     m_aParamArray[nId_].pData->setText(QString::number(_data,'f', 2));
@@ -79,7 +83,7 @@ void QDrillParamPage::OnDataEdit(int nId_)
 
 void QDrillParamPage::OnSndBtnClick(int nId_)
 {
-    if (nId_ == 0)
+    if (nId_ == 4)
     {
             if (m_nPagePos > 0)
             {
@@ -87,19 +91,46 @@ void QDrillParamPage::OnSndBtnClick(int nId_)
                     OnShowPage();
             }
     }
-    else if (nId_ == 1)
+    else if (nId_ == 5)
     {
-            if (m_nPagePos < 3)
+            int _nPage = m_cData.iRow / 3 - 1;
+            if (m_nPagePos < _nPage)
             {
                     m_nPagePos++;
                     OnShowPage();
             }
     }
-    else if (nId_ == 2)
+    else if(0 == nId_) //new
     {
-          QStrInputDlg _dlg(this,QStrInputDlg::FILE_NAME_DLG);
-          if (_dlg.exec())
+        if (ChangeNewStatus(NEW))
+        {
+            m_cData.NewData();
+            m_nPagePos = 0;
+            OnShowPage();
+        }
+    }
+    else if(1 == nId_) //edit
+    {
+        if (m_pSysData->IsLoadFile() && m_pSysData->IsSelDefFile())
+        {
+             if (ChangeNewStatus(INEDIT))
+             {
+                LoadFile(m_pSysData->GetFileFullPath());
+                OnShowPage();
+             }
+        }
+    }
+    else if (nId_ == 2) //save
+    {
+          if (m_sTatus == INEDIT)
           {
+                SaveFile(m_pSysData->GetFileFullPath());
+          }
+          else
+          {
+            QStrInputDlg _dlg(this,QStrInputDlg::FILE_NAME_DLG);
+            if (_dlg.exec())
+            {
                 QString _str = _dlg.GetInputText();
                 if (_str.length() >= 10)
                 {
@@ -108,10 +139,33 @@ void QDrillParamPage::OnSndBtnClick(int nId_)
                     return;
                 }
                 QString _stPath = QString("./Flash/%1.xtf").arg(_str);
-                QConfigSet::WriteToFile(_stPath, &m_cData, m_cData.nSize, 0);
+                //QConfigSet::WriteToFile(_stPath, &m_cData, m_cData.iSize, 0);
+                SaveFile(_stPath);
+            }
           }
     }
+    else if (nId_ == 3)
+    {
+        if (m_sTatus == INEDIT)
+            return;
 
+        QNuberInput _SoftKey(this);
+       _SoftKey.SetRange(3, 100, m_cData.iRow);
+
+       if (!_SoftKey.exec())
+        {
+                return;
+        }
+        int _nRow = _SoftKey.GetDbData();
+
+        if (m_cData.iRow != _nRow)
+        {
+            _nRow = _nRow / 3;
+            _nRow *=3;
+            m_nPagePos = 0;
+            m_cData.ReSetRow(_nRow);
+        }
+    }
 }
 
 void QDrillParamPage::OnShowPage()
@@ -126,7 +180,7 @@ void QDrillParamPage::OnShowPage()
          {           
               if (_j == 0)
               {
-                 m_aParamArray[_nIndex].pName->setText(QString("第%1排:X%2").arg(_nPos + 1).arg(_nPos + 1));
+                 m_aParamArray[_nIndex].pName->setText(QString("第%1排:X").arg(_nPos + 1));
                  m_aParamArray[_nIndex].pData->setText(QString::number(m_cData.GetXVal(_nPos), 'f', 2));
               }
               else
@@ -148,3 +202,63 @@ void QDrillParamPage::showEvent ( QShowEvent * event )
     QBasePage::showEvent (event );
 }
 
+
+bool QDrillParamPage::ChangeNewStatus(Status s_)
+{
+    bool _bRet = false;
+    switch (m_sTatus)
+    {
+        case INEDIT:
+            if (s_ == EDIT_SAVED || s_ == INVALID)
+            {
+                m_sTatus = INVALID;
+                _bRet = true;
+            }
+            break;
+        case NEW:
+            if (s_ == NEW_SAVED || s_ == INVALID)
+            {
+                 m_sTatus = INVALID;
+                _bRet = true;
+            }
+            break;
+        case INVALID:
+            m_sTatus = s_;
+            _bRet = true;
+            break;
+        default:
+        break;
+    }
+    return _bRet;
+}
+
+void QDrillParamPage::SaveFile(const QString& path_)
+{
+    int _fd = open(path_.toStdString().data(), O_CREAT | O_RDWR, S_IWUSR | S_IRUSR);
+    if (_fd < 0)
+    {
+
+        return;
+    }
+    write(_fd, &m_cData,sizeof(DrillData));
+    write(_fd, m_cData.piDataX,m_cData.iSizeX);
+    write(_fd, m_cData.piDataY,m_cData.iSizeY);
+    write(_fd, &m_cData.iCrc,sizeof(int));
+    ::close(_fd);
+}
+
+void QDrillParamPage::LoadFile(const QString& path_)
+{
+    int _fd = open(path_.toStdString().data(), O_RDWR);
+    if (_fd < 0)
+    {
+
+        return;
+    }
+    read(_fd, &m_cData,sizeof(DrillData));
+    m_cData.NewData();
+    read(_fd, m_cData.piDataX,m_cData.iSizeX);
+    read(_fd, m_cData.piDataY,m_cData.iSizeY);
+    read(_fd, &m_cData.iCrc,sizeof(int));
+    ::close(_fd);
+}
