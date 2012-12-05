@@ -101,13 +101,33 @@ struct ConfigData
 };
 
 
+class CParseBase
+{
+public:
+    CParseBase();
+    ~CParseBase();
+public:
+    bool OpenConfigFile(const char* szPath_);
+    void CloseFile();
+protected:
+    bool GetDouble(double& dRet_); //move
+    bool GetInt(int& nRet_); //move
+    bool GetText(string& str_);//move
+    bool LoadLine(); //读取一行。注释行跳过
+protected:
+    string m_strCurLine;
+    long m_nFileSize;
+    int m_nLinePos;
+    QFile* m_pFile;
+};
+
 //过程如下：
 //1.读取一个有效行
 //2.跳过空行
 //3.段开始，压栈，进入段
 //4.段结束，弹栈，进入段
 //5.数据，解释数据，数据插入队列
-class CParseConfig
+class CParseConfig : public CParseBase
 {
 public:
     enum Token
@@ -122,37 +142,21 @@ public:
         TOKEN_NUM,
     };
     CParseConfig();
-    ~ CParseConfig();
-    bool OpenConfigFile(const char* szPath_);
-    void CloseFile();
+    ~ CParseConfig();    
     bool StartLoadConfig(ConfigData* pData_);
-
 private:
-    bool LoadLine(); //读取一行。注释行跳过
     bool ReadToken(const string& strToken_);  //读取对应标记
     Token GetLineToken();
-
     void EnterDataBegin();
     void LeaveDataEnd();
     void GetParam();
     void GetGroupInfo();
     void GetBaseAddr();
     void GetAlarmInfo();
-
-    bool GetDouble(double& dRet_);
-    bool GetInt(int& nRet_);
-    bool GetText(string& str_);
-
     void SetVal(int nNo_, double dVal_, double dMult_);
-
 private:
     int m_nGroup;
     stack<int> m_stkSeg;
-
-    string m_strCurLine;
-    long m_nFileSize;
-    int m_nLinePos;
-    QFile* m_pFile;
     ConfigData* m_pConfigData;
 };
 

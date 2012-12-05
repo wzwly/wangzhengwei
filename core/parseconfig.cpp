@@ -1,20 +1,18 @@
 #include "parseconfig.h"
 
-CParseConfig::CParseConfig()
+CParseBase::CParseBase()
 {
     m_pFile = NULL;
     m_nFileSize = 0;
-    m_pConfigData = NULL;
-    m_nGroup = -1;
+    m_nLinePos = 0;
 }
 
- CParseConfig::~CParseConfig()
- {
-          CloseFile();
- }
+CParseBase::~CParseBase()
+{
+    CloseFile();
+}
 
-
-bool CParseConfig::OpenConfigFile(const char* szPath_)
+bool CParseBase::OpenConfigFile(const char* szPath_)
 {
     if (m_pFile != NULL)
        CloseFile();
@@ -35,7 +33,7 @@ bool CParseConfig::OpenConfigFile(const char* szPath_)
     }
 }
 
-void CParseConfig::CloseFile()
+void CParseBase::CloseFile()
 {
     if (m_pFile)
     {
@@ -46,66 +44,182 @@ void CParseConfig::CloseFile()
     m_nFileSize = 0;
 }
 
+bool CParseBase::LoadLine()
+{
+       char _aRead[MAX_LINE_READ + 1];
 
- bool CParseConfig::LoadLine()
- {
-        char _aRead[MAX_LINE_READ + 1];
+       m_strCurLine.clear();
+       int _i = 0;
+       bool  _bHasChar = false;
+       bool _bGetLine = false;
+       while (1)
+       {
+                _aRead[0] = '\0';
+                int _nRet = m_pFile->readLine(_aRead, MAX_LINE_READ);
+                if (_nRet == 1) //空白行
+                    continue;
+                else if (_nRet > 1)//非空白
+                {
+                       _bHasChar = false;
+                       for (_i = 0; _i < _nRet - 1; ++_i)  //去掉注释
+                       {
+                               if (isspace(_aRead[_i]))
+                                   continue;
+                               else if (_aRead[_i] == '\/' && _aRead[_i + 1] == '\/')
+                               {
+                                       if (_bHasChar)
+                                       {
+                                               _aRead[_i] = '\0';
+                                               _bGetLine = true;
+                                               break;
+                                       }
+                                       else //注释行
+                                       {
+                                           m_strCurLine.clear();
+                                           break;
+                                       }
+                               }
+                               else
+                                   _bHasChar = true;
+                       }
+                       if (_i == (_nRet - 1))
+                       {
+                                _bGetLine = true;
+                                break;
+                       }
 
-        m_strCurLine.clear();
-        int _i = 0;
-        bool  _bHasChar = false;
-        bool _bGetLine = false;
-        while (1)
-        {
-                 _aRead[0] = '\0';
-                 int _nRet = m_pFile->readLine(_aRead, MAX_LINE_READ);
-                 if (_nRet == 1) //空白行
-                     continue;
-                 else if (_nRet > 1)//非空白
-                 {
-                        _bHasChar = false;
-                        for (_i = 0; _i < _nRet - 1; ++_i)  //去掉注释
-                        {
-                                if (isspace(_aRead[_i]))
-                                    continue;
-                                else if (_aRead[_i] == '\/' && _aRead[_i + 1] == '\/')
-                                {
-                                        if (_bHasChar)
-                                        {
-                                                _aRead[_i] = '\0';
-                                                _bGetLine = true;
-                                                break;
-                                        }
-                                        else //注释行
-                                        {
-                                            m_strCurLine.clear();
-                                            break;
-                                        }
-                                }
-                                else
-                                    _bHasChar = true;
-                        }
-                        if (_i == (_nRet - 1))
-                        {
-                                 _bGetLine = true;
-                                 break;
-                        }
+                }
+                else
+                    break;
 
-                 }
-                 else   
-                     break;
-
-                 if (_bGetLine)
-                     break;
-        }
-        m_strCurLine. append(_aRead);  
-        return  !m_strCurLine.empty();
- }
-
+                if (_bGetLine)
+                    break;
+       }
+       m_strCurLine. append(_aRead);
+       return  !m_strCurLine.empty();
+}
 
 
- bool CParseConfig::StartLoadConfig(ConfigData* pData_)
- {
+bool CParseBase::GetDouble(double& dRet_)
+{
+       char _ch;
+       bool _bFind = false;
+       char _cArray[32];
+       int _i = 0;
+       while(_i < 31 && m_nLinePos < m_strCurLine.size())
+       {
+           _ch = m_strCurLine.at(m_nLinePos++);
+
+           if (_ch == ' ' || _ch ==  '\t')
+           {
+                   if (_bFind)
+                       break;
+           }
+           else if (isdigit(_ch) || _ch == '.' || _ch == '-')
+           {
+                _cArray[_i++] = _ch;
+               _bFind = true;
+           }
+           else
+           {
+               if (_bFind)
+                  break;
+               else if (_ch != '=')
+                   return false;
+           }
+       }
+
+       if (_i <= 0)
+           return false;
+       _cArray[_i] = '\0';
+       dRet_ =  atof(_cArray);
+       return true;
+}
+
+bool CParseBase::GetInt(int& nRet_)
+{
+   char _ch;
+   bool _bFind = false;
+   char _cArray[32];
+   int _i = 0;
+   while(_i < 31  && m_nLinePos < m_strCurLine.size())
+   {
+       _ch = m_strCurLine.at(m_nLinePos++);
+
+       if (_ch == ' ' || _ch ==  '\t')
+       {
+               if (_bFind)
+                   break;
+       }
+       else if (isdigit(_ch) || _ch == '-')
+       {
+            _cArray[_i++] = _ch;
+           _bFind = true;
+       }
+       else
+       {
+           if (_bFind)
+               break;
+           else if (_ch != '=')
+               return false;
+       }
+   }
+   if (_i <= 0)
+       return false;
+   _cArray[_i] = '\0';
+   nRet_ =  atoi(_cArray);
+   return true;
+}
+
+#include <QTextCodec>
+
+bool CParseBase::GetText(string& str_)
+{
+   char _ch;
+   bool _bFind = false;
+   char _cArray[64];
+   int _i = 0;
+   while(_i < 63 && m_nLinePos < m_strCurLine.size())
+   {
+       _ch = m_strCurLine.at(m_nLinePos++);
+
+       if (_ch == '\n' || _ch == '\r')
+           return false;
+       if (_bFind) // find out the first '\"'
+       {
+           if (_ch == '\"')
+               break;
+           _cArray[_i++] = _ch;
+       }
+       else if (_ch == '\"')
+           _bFind = true;
+   }
+   if (_i <= 0)
+       return false;
+   _cArray[_i] = '\0';
+   str_.append(_cArray);
+   return true;
+}
+
+
+//========================
+//=======================
+
+CParseConfig::CParseConfig()
+{
+    m_pFile = NULL;
+    m_nFileSize = 0;
+    m_pConfigData = NULL;
+    m_nGroup = -1;
+}
+
+CParseConfig::~CParseConfig()
+{
+         CloseFile();
+}
+
+bool CParseConfig::StartLoadConfig(ConfigData* pData_)
+{
         assert(pData_);
         m_pConfigData = pData_;
 
@@ -304,7 +418,6 @@ CParseConfig::Token CParseConfig::GetLineToken()
           m_nLinePos =  _tPos + 4;
           GetText(_strText);
         }
-
         int _nGrp = 0;
         if (m_nGroup > 0)
              _nGrp = m_nGroup;   
@@ -341,108 +454,6 @@ CParseConfig::Token CParseConfig::GetLineToken()
                 m_pConfigData->m_pAlarmInfo.push_back(new AlarmCmd(_nCmd, _str));
           }
  }
-
-
- bool CParseConfig::GetDouble(double& dRet_)
- {
-        char _ch;
-        bool _bFind = false;
-        char _cArray[32];
-        int _i = 0;
-        while(_i < 31 && m_nLinePos < m_strCurLine.size())
-        {
-            _ch = m_strCurLine.at(m_nLinePos++);
-
-            if (_ch == ' ' || _ch ==  '\t')
-            {
-                    if (_bFind)
-                        break;
-            }
-            else if (isdigit(_ch) || _ch == '.' || _ch == '-')
-            {
-                 _cArray[_i++] = _ch;
-                _bFind = true;
-            }
-            else
-            {
-                if (_bFind)
-                   break;
-                else if (_ch != '=')
-                    return false;
-            }
-        }
-
-        if (_i <= 0)
-            return false;
-        _cArray[_i] = '\0';
-        dRet_ =  atof(_cArray);
-        return true;
- }
-
-bool CParseConfig::GetInt(int& nRet_)
-{
-    char _ch;
-    bool _bFind = false;
-    char _cArray[32];
-    int _i = 0;
-    while(_i < 31  && m_nLinePos < m_strCurLine.size())
-    {
-        _ch = m_strCurLine.at(m_nLinePos++);
-
-        if (_ch == ' ' || _ch ==  '\t')
-        {
-                if (_bFind)
-                    break;
-        }
-        else if (isdigit(_ch) || _ch == '-')
-        {
-             _cArray[_i++] = _ch;
-            _bFind = true;
-        }
-        else
-        {
-            if (_bFind)
-                break;
-            else if (_ch != '=')
-                return false;
-        }
-    }
-    if (_i <= 0)
-        return false;
-    _cArray[_i] = '\0';
-    nRet_ =  atoi(_cArray);
-    return true;
-}
-
-#include <QTextCodec>
-
-bool CParseConfig::GetText(string& str_)
-{
-    char _ch;
-    bool _bFind = false;
-    char _cArray[64];
-    int _i = 0;
-    while(_i < 63 && m_nLinePos < m_strCurLine.size())
-    {
-        _ch = m_strCurLine.at(m_nLinePos++);
-
-        if (_ch == '\n' || _ch == '\r')
-            return false;
-        if (_bFind) // find out the first '\"'
-        {
-            if (_ch == '\"')
-                break;
-            _cArray[_i++] = _ch;
-        }
-        else if (_ch == '\"')
-            _bFind = true;
-    }
-    if (_i <= 0)
-        return false;
-    _cArray[_i] = '\0';
-    str_.append(_cArray);
-    return true;
-}
 
 
 void CParseConfig::SetVal(int nNo_, double dVal_, double dMult_)
