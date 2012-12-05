@@ -48,7 +48,8 @@ HEADERS += ghead.h \
     core/parseconfig.h \
     core/serial.h \
     core/typedef.h \
-    label/listbox.h
+    label/listbox.h \
+    label/label.h
 DEFINES += 
 OTHER_FILES += 备注.txt \
     PR.info

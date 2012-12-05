@@ -2,7 +2,8 @@
 #define FILEPAGE_H
 
 #include "basepage.h"
-#include <QTableView>
+
+class QListBox;
 class QTipLabel;
 class QPushBtn;
 
@@ -11,16 +12,6 @@ class QPushBtn;
 class QFilePage : public QBasePage
 {
     Q_OBJECT
-    struct _FileItem
-    {
-            QTipLabel* pIndex; //序号
-            QPushBtn* pFileName; //文件名
-            QTipLabel* pFileSize; //
-            QTipLabel* pFilePath; //
-
-            void SetActive();
-            void SetNormal();
-    };
     struct _FileInfo
     {
             QString szName;
@@ -29,26 +20,18 @@ class QFilePage : public QBasePage
     };
 public:
     QFilePage(QWidget* parent_);
-
-public slots:
-    void OnListClick(int nId_);
-    signals:
-
 public:
     virtual void OnSndBtnClick(int nIndex_);//响应mainframe 二级菜单点击
     virtual void OnUpDate(int nFlag_){};
-
 protected:
         virtual void showEvent ( QShowEvent * event );
 private:
-        void CreatePageInfo();
         void ReadFile(const char* szDir_, int nPos_);
-        void ShowFile(int nIndex_);
+        void ShowFile();
         void LoadFile();
 
 private:
-        QTableView* m_pFileList;
-        _FileItem m_aFimeArray[FINE_ITEM_NUM];
+        QListBox* m_pFileList;
         QList<_FileInfo> m_lFileList;
         int m_nSelFile;
         int m_nMaxShow;

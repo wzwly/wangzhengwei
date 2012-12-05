@@ -1,8 +1,7 @@
 #include "filepage.h"
-#include "./../label/item.h"
-#include "./../label/button.h"
-#include "./../label/dlg.h"
+#include "./../label/label.h"
 #include "mainframe.h"
+
 #include <QDir>
 #include <QHeaderView>
 #include <QStandardItemModel>
@@ -21,67 +20,17 @@ QFilePage::QFilePage(QWidget* parent_)
 {
     m_nSelFile = 0;
 
-    m_pFileList = new QTableView(this);
-    m_pFileList->setFixedSize(854, 618);
+    m_pFileList = new QListBox(this);
+    m_pFileList->SetWindPos(0, 0,853, 618);
+    QStringList _listHead;
+    _listHead << "编号"<<"文件名"<<"路径"<<"文件大小";
+    m_pFileList->SetColumnHeadName( _listHead);
 
-    QStandardItemModel* _pModel = new QStandardItemModel(this);
-    _pModel->setHorizontalHeaderItem(0, new QStandardItem(QObject::tr("Name")));
-    _pModel->setHorizontalHeaderItem(1, new QStandardItem(QObject::tr("NO.")));
-    _pModel->setHorizontalHeaderItem(2, new QStandardItem(QObject::tr("Sex")));
-     _pModel->setHorizontalHeaderItem(3, new QStandardItem(QObject::tr("Age")));
-     _pModel->setHorizontalHeaderItem(4, new QStandardItem(QObject::tr("College")));
-
-     _pModel->setItem(0, 0, new QStandardItem("张三"));
-      _pModel->setItem(0, 1, new QStandardItem("20120202"));
-       _pModel->setItem(0, 2, new QStandardItem("男"));
-       _pModel->setItem(0, 3, new QStandardItem("18"));
-        _pModel->setItem(0, 4, new QStandardItem("土木学院"));
-    m_pFileList->setModel(_pModel);
-
-    CreatePageInfo();
-}
-
-void QFilePage::_FileItem::SetActive()
-{
-        pIndex->SetStatus(ACTIVE_WIND);
-        pFileName->SetStatus(ACTIVE_WIND);
-        pFileSize->SetStatus(ACTIVE_WIND);
-        pFilePath->SetStatus(ACTIVE_WIND);
-}
-
-
-void QFilePage::_FileItem::SetNormal()
-{
-        pIndex->SetStatus(NORMAL_WIND);
-        pFileName->SetStatus(NORMAL_WIND);
-        pFileSize->SetStatus(NORMAL_WIND);
-        pFilePath->SetStatus(NORMAL_WIND);
-}
-
-void QFilePage::CreatePageInfo()
-{
-    return;
-    QTipLabel* _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
-    _pTemp->InitShow("编号", 0, 0, FILE_ITEM_W0, FILE_ITEM_H0, FILE_FONT_SIZE);
-     _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
-    _pTemp->InitShow("文件名", 100, 0, FILE_ITEM_W1, FILE_ITEM_H0, FILE_FONT_SIZE);
-    _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
-    _pTemp->InitShow("文件大小", 554, 0, FILE_ITEM_W2, FILE_ITEM_H0, FILE_FONT_SIZE);
-    _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
-    _pTemp->InitShow("路径", 704, 0, FILE_ITEM_W3, FILE_ITEM_H0, FILE_FONT_SIZE);
-
-    for (int _i = 0; _i < FINE_ITEM_NUM; ++_i)
-    {
-            m_aFimeArray[_i].pIndex = new QTipLabel(this, QItem::LABEL_LIST);
-            m_aFimeArray[_i].pIndex->InitShow(0, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W0, FILE_ITEM_H, FILE_FONT_SIZE);
-            m_aFimeArray[_i].pFileName = new QPushBtn(this, QItem::LABEL_LIST,_i,Qt::AlignLeft);
-            m_aFimeArray[_i].pFileName->InitShow(100, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W1, FILE_ITEM_H, FILE_FONT_SIZE);
-            m_aFimeArray[_i].pFileSize = new QTipLabel(this, QItem::LABEL_LIST);
-            m_aFimeArray[_i].pFileSize->InitShow(554, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W2, FILE_ITEM_H, FILE_FONT_SIZE);
-            m_aFimeArray[_i].pFilePath = new QTipLabel(this, QItem::LABEL_LIST);
-            m_aFimeArray[_i].pFilePath->InitShow(704, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W3, FILE_ITEM_H, FILE_FONT_SIZE);
-            connect(m_aFimeArray[_i].pFileName, SIGNAL(ClickedEvent(int)), this, SLOT(OnListClick(int)));
-    }
+    m_pFileList->SetColumnWidth(0, 135);
+    m_pFileList->SetColumnWidth(1, 300);
+    m_pFileList->SetColumnWidth(2, 200);
+    m_pFileList->SetColumnWidth(3, 200);
+    m_pFileList->SetColumnHeight(18);
 }
 
 
@@ -106,34 +55,22 @@ void QFilePage::ReadFile(const char* szDir_, int nPos_)
      }
 }
 
-void QFilePage::ShowFile(int nIndex_)
+void QFilePage::ShowFile()
 {
+     m_pFileList->ClearAllRow();
+     int _nSize = m_lFileList.size();
+     _FileInfo _Info;
 
-        for (int _i = 0; _i < FINE_ITEM_NUM; ++_i)
-        {
-                m_aFimeArray[_i].pIndex->setText("");
-                m_aFimeArray[_i].pFileName->setText("");
-                m_aFimeArray[_i].pFileSize->setText("");
-                m_aFimeArray[_i].pFilePath->setText("");
-        }
+    for (int _i = 0; _i <  _nSize; ++_i)
+    {
+      _Info = m_lFileList.at(_i);
+      QStringList _listFile;
+      _listFile << QString("%1").arg(_i + 1) << QString("%1").arg(_Info.szName)
+                   <<QString("%1K").arg(_Info.nSize) << QString("%1").arg(_Info.nPath == 0 ? "系统" : "U盘");
+      m_pFileList->InsertRowText(_listFile);
+    }
+    m_pMainFrame->SetInfoItem(QString("文件总数:%1").arg(m_lFileList.size()));
 
-        int _nLeft = m_lFileList.size() - nIndex_;
-        m_nMaxShow = _nLeft >= FINE_ITEM_NUM ? FINE_ITEM_NUM : _nLeft;
-
-        m_nShowIndex = nIndex_;
-        _FileInfo _Info;
-        for (int _i = 0; _i < m_nMaxShow; ++_i)
-        {
-                _Info = m_lFileList.at(_i + nIndex_);
-                m_aFimeArray[_i].pIndex->setText(QString("%1").arg(_i + 1 + nIndex_));
-                m_aFimeArray[_i].pFileName->setText(QString("%1").arg(_Info.szName));
-                m_aFimeArray[_i].pFileSize->setText(QString("%1K").arg(_Info.nSize));
-                m_aFimeArray[_i].pFilePath->setText(QString("%1").arg(_Info.nPath == 0 ? "系统" : "U盘"));
-        }
-        m_pMainFrame->SetInfoItem(QString("文件总数:%1").arg(m_lFileList.size()));
-        m_aFimeArray[m_nSelFile].SetNormal();
-        m_nSelFile = 0;
-        m_aFimeArray[m_nSelFile].SetActive();
 }
 
 
@@ -145,7 +82,7 @@ void QFilePage::showEvent ( QShowEvent * event )
         m_lFileList.erase(m_lFileList.begin(), m_lFileList.end());
         ReadFile(g_szPath[0], 0);
         ReadFile(g_szPath[1], 1);
-        //ShowFile(0);
+        ShowFile();
         QBasePage::showEvent (event );
 }
 
@@ -153,19 +90,11 @@ void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
 {
     if (4 == nId_)
     {
-       if (m_nShowIndex > 0)
-        {
-            m_nShowIndex -= FINE_ITEM_NUM;
-            ShowFile(m_nShowIndex);
-        }
+
     }
     else if (5 == nId_)
     {
-        if (m_nShowIndex + m_nMaxShow < m_lFileList.size())
-        {
-           m_nShowIndex += m_nMaxShow;
-           ShowFile(m_nShowIndex);
-         }
+
 
     }
     else if (0 == nId_)
@@ -204,7 +133,7 @@ void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
        m_lFileList.erase(m_lFileList.begin(), m_lFileList.end());
        ReadFile(g_szPath[0], 0);
        ReadFile(g_szPath[1], 1);
-       ShowFile(0);
+       ShowFile();
     }
     else if (3 == nId_) //删除
     {
@@ -224,7 +153,7 @@ void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
             if (_dir.remove(_Info.szName))
             {
                   m_lFileList.removeAt(m_nSelFile);
-                  ShowFile(m_nShowIndex);
+                  ShowFile();
             }
     }
 }
@@ -241,13 +170,4 @@ void QFilePage::LoadFile()
     m_pSysData->LoadFile(_str, _Info.szName);
 }
 
-
-void QFilePage::OnListClick(int nId_)
-{
-    if (m_nSelFile == nId_ || nId_ >= m_nMaxShow)
-        return;
-    m_aFimeArray[m_nSelFile].SetNormal();
-    m_nSelFile = nId_;
-    m_aFimeArray[m_nSelFile].SetActive();
-}
 

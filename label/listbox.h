@@ -16,6 +16,7 @@ public:
 private:
     int m_nItemCount;
 public:
+    int GetListCount() {return m_nItemCount;}
     void SetWindPos(int x_, int y_, int w_, int h_) {move(x_, y_); setFixedSize(w_, h_);}
     void SetColumnCount(int n_) {setColumnCount(n_);}
     void SetColumnHeadName(const QStringList& strNameList_) {setHeaderLabels(strNameList_);}
