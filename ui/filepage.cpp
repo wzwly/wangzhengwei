@@ -4,6 +4,8 @@
 #include "./../label/dlg.h"
 #include "mainframe.h"
 #include <QDir>
+#include <QHeaderView>
+#include <QStandardItemModel>
 
 #define FILE_ITEM_H0 60
 #define FILE_ITEM_H  62
@@ -18,6 +20,24 @@ QFilePage::QFilePage(QWidget* parent_)
         :QBasePage( parent_)
 {
     m_nSelFile = 0;
+
+    m_pFileList = new QTableView(this);
+    m_pFileList->setFixedSize(854, 618);
+
+    QStandardItemModel* _pModel = new QStandardItemModel(this);
+    _pModel->setHorizontalHeaderItem(0, new QStandardItem(QObject::tr("Name")));
+    _pModel->setHorizontalHeaderItem(1, new QStandardItem(QObject::tr("NO.")));
+    _pModel->setHorizontalHeaderItem(2, new QStandardItem(QObject::tr("Sex")));
+     _pModel->setHorizontalHeaderItem(3, new QStandardItem(QObject::tr("Age")));
+     _pModel->setHorizontalHeaderItem(4, new QStandardItem(QObject::tr("College")));
+
+     _pModel->setItem(0, 0, new QStandardItem("张三"));
+      _pModel->setItem(0, 1, new QStandardItem("20120202"));
+       _pModel->setItem(0, 2, new QStandardItem("男"));
+       _pModel->setItem(0, 3, new QStandardItem("18"));
+        _pModel->setItem(0, 4, new QStandardItem("土木学院"));
+    m_pFileList->setModel(_pModel);
+
     CreatePageInfo();
 }
 
@@ -40,6 +60,7 @@ void QFilePage::_FileItem::SetNormal()
 
 void QFilePage::CreatePageInfo()
 {
+    return;
     QTipLabel* _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
     _pTemp->InitShow("编号", 0, 0, FILE_ITEM_W0, FILE_ITEM_H0, FILE_FONT_SIZE);
      _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
@@ -124,7 +145,7 @@ void QFilePage::showEvent ( QShowEvent * event )
         m_lFileList.erase(m_lFileList.begin(), m_lFileList.end());
         ReadFile(g_szPath[0], 0);
         ReadFile(g_szPath[1], 1);
-        ShowFile(0);
+        //ShowFile(0);
         QBasePage::showEvent (event );
 }
 

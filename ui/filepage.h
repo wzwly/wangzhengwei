@@ -2,6 +2,7 @@
 #define FILEPAGE_H
 
 #include "basepage.h"
+#include <QTableView>
 class QTipLabel;
 class QPushBtn;
 
@@ -46,6 +47,7 @@ private:
         void LoadFile();
 
 private:
+        QTableView* m_pFileList;
         _FileItem m_aFimeArray[FINE_ITEM_NUM];
         QList<_FileInfo> m_lFileList;
         int m_nSelFile;

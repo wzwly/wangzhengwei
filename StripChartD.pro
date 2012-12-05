@@ -23,7 +23,8 @@ SOURCES += main.cpp \
     core/drawthread.cpp \
     core/cmddef.cpp \
     core/parseconfig.cpp \
-    core/serial.cpp
+    core/serial.cpp \
+    label/listbox.cpp
 
 HEADERS += ghead.h \
     label/item.h \
@@ -46,7 +47,8 @@ HEADERS += ghead.h \
     core/drawthread.h \
     core/parseconfig.h \
     core/serial.h \
-    core/typedef.h
+    core/typedef.h \
+    label/listbox.h
 DEFINES += 
 OTHER_FILES += 备注.txt \
     PR.info

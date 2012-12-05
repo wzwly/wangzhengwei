@@ -57,8 +57,8 @@ void QSerial::InitModbus()
 {
     if ((m_nFdModbus = Open(szModbusCom, O_RDWR | O_NONBLOCK)) < 0)
     {
-        assert(false);
-        perror(szModbusCom);
+        //assert(false);
+        //perror(szModbusCom);
         return ;
     }
     struct termios _opt;
@@ -71,9 +71,9 @@ void QSerial::InitModbus()
     _opt.c_cflag	= B9600 | CS8 | CLOCAL | CREAD;
     if (Tcsetattr(m_nFdModbus, TCSANOW, &_opt))
     {
-        perror("tcsetattr   error");
-        assert(false);
-        exit(1);
+       // perror("tcsetattr   error");
+        //assert(false);
+        //exit(1);
     }
     //注册响应
     QSocketNotifier* notify = new QSocketNotifier(m_nFdModbus, QSocketNotifier::Read, this);
