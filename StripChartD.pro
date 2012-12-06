@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     core/serial.cpp \
     label/listbox.cpp \
     core/xtfreader.cpp \
-    ui/editview.cpp
+    ui/editview.cpp \
+    label/codeedit.cpp
 HEADERS += ghead.h \
     label/item.h \
     label/button.h \
@@ -52,7 +53,8 @@ HEADERS += ghead.h \
     label/listbox.h \
     label/label.h \
     core/xtfreader.h \
-    ui/editview.h
+    ui/editview.h \
+    label/codeedit.h
 DEFINES += 
 OTHER_FILES += 备注.txt \
     PR.info
