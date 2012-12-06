@@ -6,6 +6,7 @@
 class QListBox;
 class QTipLabel;
 class QPushBtn;
+class QCodeEdit;
 
 #define FINE_ITEM_NUM 9
 
@@ -33,6 +34,7 @@ private:
 private:
         QListBox* m_pFileList;
         QList<_FileInfo> m_lFileList;
+        QCodeEdit* m_pCodeEdit;
         int m_nSelFile;
         int m_nMaxShow;
         int m_nShowIndex;

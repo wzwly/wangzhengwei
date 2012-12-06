@@ -25,8 +25,8 @@ SOURCES += main.cpp \
     core/parseconfig.cpp \
     core/serial.cpp \
     label/listbox.cpp \
-    core/xtfreader.cpp \
-    ui/editview.cpp \
+    #core/xtfreader.cpp \
+   # ui/editview.cpp \
     label/codeedit.cpp
 HEADERS += ghead.h \
     label/item.h \
@@ -52,8 +52,8 @@ HEADERS += ghead.h \
     core/typedef.h \
     label/listbox.h \
     label/label.h \
-    core/xtfreader.h \
-    ui/editview.h \
+    #core/xtfreader.h \
+    #ui/editview.h \
     label/codeedit.h
 DEFINES += 
 OTHER_FILES += 备注.txt \

@@ -31,6 +31,10 @@ QFilePage::QFilePage(QWidget* parent_)
     m_pFileList->SetColumnWidth(2, 200);
     m_pFileList->SetColumnWidth(3, 200);
     m_pFileList->SetColumnHeight(18);
+
+    m_pFileList->hide();
+
+    m_pCodeEdit = new QCodeEdit(this);
 }
 
 

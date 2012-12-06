@@ -8,4 +8,6 @@
 #include "softkey.h"
 #include "item.h"
 
+#include "codeedit.h"
+
 #endif // LABEL_H
