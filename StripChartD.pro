@@ -24,8 +24,8 @@ SOURCES += main.cpp \
     core/cmddef.cpp \
     core/parseconfig.cpp \
     core/serial.cpp \
-    label/listbox.cpp
-
+    label/listbox.cpp \
+    core/xtfreader.cpp
 HEADERS += ghead.h \
     label/item.h \
     label/button.h \
@@ -49,7 +49,8 @@ HEADERS += ghead.h \
     core/serial.h \
     core/typedef.h \
     label/listbox.h \
-    label/label.h
+    label/label.h \
+    core/xtfreader.h
 DEFINES += 
 OTHER_FILES += 备注.txt \
     PR.info

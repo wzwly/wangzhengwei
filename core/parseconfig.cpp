@@ -202,6 +202,85 @@ bool CParseBase::GetText(string& str_)
 }
 
 
+bool  CParseBase::FindFirstDigit(int& nPos_)
+{
+    char _ch;
+    bool _bFind = false;
+    int _nCnt = 0;
+    while(_nCnt < m_strCurLine.size())
+    {
+        _ch = m_strCurLine.at(_nCnt++);
+
+        if (isdigit(_ch))
+        {
+            --_nCnt;
+            _bFind = true;
+            break;
+        }
+        else if (_ch == '-')
+        {
+            _ch = m_strCurLine.at(_nCnt);
+            if (isdigit(_ch))
+            {
+                --_nCnt;
+                _bFind = true;
+                break;
+            }
+        }
+    }
+    nPos_ = _nCnt;
+    return _bFind;
+}
+
+bool CParseBase::MovetoNextDigit()
+{
+    char _ch;
+    bool _bFind = false;
+    while(m_nLinePos < m_strCurLine.size())
+    {
+        _ch = m_strCurLine.at(m_nLinePos++);
+
+        if (isdigit(_ch))
+        {
+            --m_nLinePos;
+            _bFind = true;
+            break;
+        }
+        else if (_ch == '-')
+        {
+            _ch = m_strCurLine.at(m_nLinePos);
+            if (isdigit(_ch))
+            {
+                --m_nLinePos;
+                _bFind = true;
+                break;
+            }
+        }
+
+    }
+    return  _bFind;
+}
+
+string::size_type CParseBase::FindLabel(char ch_)
+{
+    char _chUp , _chDown;
+    if (isupper(ch_))
+    {
+        _chUp = ch_;
+        _chDown = tolower(ch_);
+    }
+    else
+    {
+        _chUp = toupper(ch_);
+        _chDown = ch_;
+    }
+    string::size_type  _tPos;
+    _tPos = m_strCurLine.find(_chUp);
+    if (_tPos == string::npos)
+        _tPos = m_strCurLine.find(_chDown);
+    return _tPos;
+}
+
 //========================
 //=======================
 
@@ -250,7 +329,6 @@ bool CParseConfig::StartLoadConfig(ConfigData* pData_)
                           break;
             }
         }
-
 # if 0
     DataMap* _pMap;
     for (int _i = 0; _i < m_pConfigData->m_pArrayData.size(); ++_i)

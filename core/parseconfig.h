@@ -114,6 +114,9 @@ protected:
     bool GetInt(int& nRet_); //move
     bool GetText(string& str_);//move
     bool LoadLine(); //读取一行。注释行跳过
+    bool FindFirstDigit(int& nPos_);
+    bool MovetoNextDigit();
+    string::size_type FindLabel(char ch_);
 protected:
     string m_strCurLine;
     long m_nFileSize;
