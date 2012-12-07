@@ -274,14 +274,14 @@ void QEditKey::InitWind()
     for (int _i = 0; _i < EDIT_KEY_NUM; ++_i)
     {
         m_pKeyBtn[_i] = new QClickBtn(this, _i);
-        m_pKeyBtn[_i]->setFixedSize(76, 60);
+        m_pKeyBtn[_i]->setFixedSize(76, 55);
         m_pKeyBtn[_i]->move(77 * (_i % 11) + 4, 55 * (_i / 11));
         m_pKeyBtn[_i]->setText(g_szEditKeyVal[_i]);
         connect(m_pKeyBtn[_i],SIGNAL(ClickedEvent(int)), this, SLOT(OnBtnPushed(int)));
     }
     connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)),
           this, SLOT(SaveFocusWidget(QWidget*,QWidget*)));
-
+     m_pKeyBtn[EDIT_KEY_NUM - 1]->setFixedSize(153, 55);
     m_pOldFocalWidget = NULL;
 }
 
