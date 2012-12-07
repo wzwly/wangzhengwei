@@ -56,21 +56,49 @@ public slots:
 
 class QAllKeyView :  public QWidget
 {
+    Q_OBJECT
+public:
+    QAllKeyView(QWidget* parent_ = NULL);
+    ~QAllKeyView();
+
+public slots:
+    void OnBtnPushed(int nIndex_);
+    void SaveFocusWidget(QWidget *pOldFocus_, QWidget *pNewFocus_);
+signals:
+    void SendCharacter(int nKey_);
+protected:
+    bool event(QEvent *e_);
+private:
+    QClickBtn* m_pBtnPush[48];
+    QWidget* m_pOldFocalWidget;
+    bool  m_bUpCaps;
+
+};
+
+class QEditKey : public QWidget
+{
      Q_OBJECT
-   public:
-        QAllKeyView(QWidget* parent_ = NULL);
-       ~QAllKeyView();
+public:
+    QEditKey(QWidget* parent_ = NULL);
+    ~QEditKey();
+    enum {
+        EDIT_KEY_NUM = 21,
+    };
+public slots:
+    void OnBtnPushed(int nIndex_);
+    void SaveFocusWidget(QWidget *pOldFocus_, QWidget *pNewFocus_);
+signals:
+    void SendCharacter(int nKey_);
 
-   public slots:
-       void OnBtnPushed(int nIndex_);
-       void SaveFocusWidget(QWidget *pOldFocus_, QWidget *pNewFocus_);
-       signals:
-       void SendCharacter(int nKey_);
 
- private:
-       QClickBtn* m_pBtnPush[48];
-       QWidget* m_pOldFocalWidget;
-       bool  m_bUpCaps;
+private:
+    void InitWind();
+
+protected:
+    bool event(QEvent *e_);
+private:
+    QClickBtn* m_pKeyBtn[EDIT_KEY_NUM];
+    QWidget* m_pOldFocalWidget;
 
 };
 #endif // SOFTKEY_H

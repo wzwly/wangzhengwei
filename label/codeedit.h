@@ -2,7 +2,11 @@
 #define CODEEDIT_H
 
 #include <QWidget>
+#include <QTextEdit>
 #include "button.h"
+
+
+class QEditKey;
 
 class QCodeEdit : public QWidget
 {
@@ -10,13 +14,19 @@ class QCodeEdit : public QWidget
 public:
     QCodeEdit(QWidget * parent);
 
-    enum {
-        EDIT_KEY_NUM = 20,
-    };
-private:
+    //
+    void SetEdittext(const QString& str_);
+    inline QString GetCodeText() const;
+public slots:
+    void OnKeyPushed(int nKey_);
+
+protected:
+    virtual void showEvent ( QShowEvent * event );
+    virtual void hideEvent ( QHideEvent * event );
     void InitWind();
 private:
-    QClickBtn* m_pKeyBtn[EDIT_KEY_NUM];
+    QEditKey* m_pKeyBd;
+    QTextEdit* m_pTextEdit;
 };
 
 #endif // CODEEDIT_H

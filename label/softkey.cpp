@@ -230,3 +230,81 @@ void QAllKeyView::SaveFocusWidget(QWidget * pOldFocus_, QWidget* pNewFocus_)
     }
 }
 
+bool QAllKeyView::event(QEvent *e_)
+{
+    if (e_->type() == QEvent::WindowActivate)
+    {
+        if (m_pOldFocalWidget)
+            m_pOldFocalWidget->activateWindow();
+    }
+    return QWidget::event(e_);
+}
+
+////=================
+static const char* g_szEditKeyVal[21] =
+{ "0", "1", "2", "3", "4", ".", "-", "←", "↑","→", "Back\nSpace",
+  "5", "6", "7", "8", "9", "X", "Y", "Space", "↓", "Enter"
+};
+
+static const int g_cEditKeyVal[21] = {
+Qt::Key_0, Qt::Key_1, Qt::Key_2, Qt::Key_3,Qt::Key_4,Qt::Key_Period,Qt::Key_Minus,Qt::Key_Left,Qt::Key_Up,Qt::Key_Right,Qt::Key_Backspace,
+Qt::Key_5,Qt::Key_6,Qt::Key_7,Qt::Key_8,Qt::Key_9,Qt::Key_X,Qt::Key_Y, Qt::Key_Space,Qt::Key_Down,Qt::Key_Return};
+
+//============
+
+QEditKey::QEditKey(QWidget* parent_)
+    :QWidget(parent_, Qt::Tool | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint)
+{
+    setFixedSize(854, 110);	//set size
+    setAutoFillBackground(true);
+    QPalette _pal = this->palette();	//set back ground
+    _pal.setColor(QPalette::Background, COLOR_BACK);
+    this->setPalette(_pal);
+    InitWind();
+}
+
+QEditKey::~QEditKey()
+{
+
+}
+
+
+void QEditKey::InitWind()
+{
+    for (int _i = 0; _i < EDIT_KEY_NUM; ++_i)
+    {
+        m_pKeyBtn[_i] = new QClickBtn(this, _i);
+        m_pKeyBtn[_i]->setFixedSize(76, 60);
+        m_pKeyBtn[_i]->move(77 * (_i % 11) + 4, 55 * (_i / 11));
+        m_pKeyBtn[_i]->setText(g_szEditKeyVal[_i]);
+        connect(m_pKeyBtn[_i],SIGNAL(ClickedEvent(int)), this, SLOT(OnBtnPushed(int)));
+    }
+    connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)),
+          this, SLOT(SaveFocusWidget(QWidget*,QWidget*)));
+
+    m_pOldFocalWidget = NULL;
+}
+
+void QEditKey::OnBtnPushed(int nIndex_)
+{
+    int _nKey = g_cEditKeyVal[nIndex_];
+     emit SendCharacter(_nKey);
+}
+
+void QEditKey::SaveFocusWidget(QWidget * pOldFocus_, QWidget* pNewFocus_)
+{
+    if (pNewFocus_ != NULL && !isAncestorOf(pNewFocus_))
+    {
+         m_pOldFocalWidget = pNewFocus_;
+    }
+}
+
+bool QEditKey::event(QEvent *e_)
+{
+    if (e_->type() == QEvent::WindowActivate)
+    {
+        if (m_pOldFocalWidget)
+            m_pOldFocalWidget->activateWindow();
+    }
+    return QWidget::event(e_);
+}
