@@ -55,6 +55,7 @@ public:
         while(m_nItemCount > 0)
             DeleteRow(0);
     }
+    int GetCurSel() ;
 };
 
 

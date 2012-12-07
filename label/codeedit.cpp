@@ -36,6 +36,12 @@ void QCodeEdit::InitWind()
     m_pTextEdit = new QTextEdit(this);
     m_pTextEdit->setFixedSize(854, 517);
 
+    QPalette _pal = m_pTextEdit->palette();	//set back ground
+    _pal.setColor(QPalette::Base, QColor(220,220, 220));
+    _pal.setColor(QPalette::Window, QColor(220,220, 220));
+
+    m_pTextEdit->setPalette(_pal);
+
     m_pKeyBd = new QEditKey(this);
     m_pKeyBd->move(0, 590);
     connect(m_pKeyBd,SIGNAL(SendCharacter(int)), this, SLOT(OnKeyPushed(int)));
@@ -44,6 +50,8 @@ void QCodeEdit::InitWind()
 
  void QCodeEdit::OnKeyPushed(int nKey_)
  {
+     if (!m_bIsEditStatus)
+         return;
     QKeyEvent _keyPress(QEvent::KeyPress,  nKey_, Qt::NoModifier, QString(QChar(nKey_)));
     QCoreApplication::sendEvent(m_pTextEdit, &_keyPress);
  }

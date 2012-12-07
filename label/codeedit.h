@@ -17,6 +17,8 @@ public:
     //
     void SetEdittext(const QString& str_);
     inline QString GetCodeText() const;
+    void EnterEditStatus() {m_bIsEditStatus = true;}
+    void LeaveEditStatus() {m_bIsEditStatus = false;}
 public slots:
     void OnKeyPushed(int nKey_);
 
@@ -27,6 +29,7 @@ protected:
 private:
     QEditKey* m_pKeyBd;
     QTextEdit* m_pTextEdit;
+    bool m_bIsEditStatus;
 };
 
 #endif // CODEEDIT_H
