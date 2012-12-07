@@ -18,8 +18,7 @@
 QFilePage::QFilePage(QWidget* parent_)
         :QBasePage( parent_)
 {
-    m_nSelFile = 0;
-
+    m_nFileStatus = 0;
     m_pFileList = new QListBox(this);
     m_pFileList->SetWindPos(0, 0,853, 618);
     QStringList _listHead;
@@ -51,7 +50,7 @@ void QFilePage::ReadFile(const char* szDir_, int nPos_)
      for (int _i = 0; _i < _list.size(); ++_i)
      {
          _fileInfo = _list.at(_i);
-                 _Info.nSize = _fileInfo.size()/ 1024 + 1;
+                 _Info.nSize = _fileInfo.size();
                  _Info.szName = _fileInfo.fileName();
                  _Info.nPath = nPos_;
                  m_lFileList.push_back(_Info);
@@ -69,7 +68,7 @@ void QFilePage::ShowFile()
       _Info = m_lFileList.at(_i);
       QStringList _listFile;
       _listFile << QString("%1").arg(_i + 1) << QString("%1").arg(_Info.szName)
-                   <<QString("%1K").arg(_Info.nSize) << QString("%1").arg(_Info.nPath == SYS_PATH ? "系统" : "U盘");
+                   <<QString("%1k").arg(_Info.nSize / 1024 + 1) << QString("%1").arg(_Info.nPath == SYS_PATH ? "系统" : "U盘");
       m_pFileList->InsertRowText(_listFile);
     }
     m_pMainFrame->SetInfoItem(QString("文件总数:%1").arg(m_lFileList.size()));
@@ -116,13 +115,19 @@ void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
     else if (2 == nId_) //
     {
         if (0 == m_nSndBtnShow)
-           ;//
+             EditFile();//
         else
             DeleteFile();
     }
     else if (3 == nId_) //
     {
-
+        if (0 == m_nSndBtnShow)
+            NewFile();
+    }
+    else if (4 == nId_)
+    {
+        if (0 == m_nSndBtnShow)
+            SaveFile();
     }
     else if (5 == nId_)
     {
@@ -196,9 +201,11 @@ void QFilePage::LoadFile()
 
  void QFilePage::DeleteFile()
  {
-     _FileInfo _Info;
-     if (!GetCurSelFile(_Info))
+     int _nSel = m_pFileList->GetCurSel();
+     if (_nSel < 0)
          return;
+
+     _FileInfo _Info = m_lFileList.at(_nSel);
       QDir _dir(g_szPath[_Info.nPath]);
       if (_dir.exists(_Info.szName))
       {
@@ -212,8 +219,110 @@ void QFilePage::LoadFile()
 
       if (_dir.remove(_Info.szName))
       {
-          m_lFileList.removeAt(m_nSelFile);
+          m_lFileList.removeAt(_nSel);
           ShowFile();
       }
 }
 
+ void QFilePage::EditFile()
+ {
+     _FileInfo _Info;
+     if (!GetCurSelFile(_Info))
+         return;
+
+
+      QDir _dir(g_szPath[_Info.nPath]);
+      if (SYS_PATH == _Info.nPath && _dir.exists(_Info.szName))
+      {
+            m_FileInEdit = _Info;
+
+            QString _FilePath = QString("%1%2").arg(g_szPath[_Info.nPath]).arg(_Info.szName);
+            QFile _file(_FilePath);
+            _file.open(QIODevice::ReadWrite | QIODevice::Text);
+             char* _pbuffer = new char[_Info.nSize + 1];
+            QDataStream _out(&_file);
+            _out.readRawData(_pbuffer,_Info.nSize);
+            _pbuffer[_Info.nSize] = 0;
+            QString _strContent(_pbuffer);
+            m_pCodeEdit->SetEdittext(_strContent);
+            _file.close();
+            delete [] _pbuffer;
+      }
+      else
+          return;
+
+     ShowEditView(true);
+     m_nFileStatus = EDIT_FILE_STATE;
+ }
+
+ void QFilePage::NewFile()
+ {
+     m_pCodeEdit->SetEdittext("");
+     ShowEditView(true);
+     m_nFileStatus = NEW_FILE_STATE;
+ }
+
+ void QFilePage::SaveFile()
+ {
+    _FileInfo _Info;
+    if (m_nFileStatus == EDIT_FILE_STATE)
+    {
+        _Info = m_FileInEdit;
+    }
+    else if (m_nFileStatus = NEW_FILE_STATE)
+    {
+         _Info.nPath = SYS_PATH;
+
+         QStrInputDlg _dlg(this,QStrInputDlg::FILE_NAME_DLG);
+         if (!_dlg.exec())
+             return;
+
+         _Info.szName = _dlg.GetInputText();
+         if (_Info.szName.length() >= 15)
+         {
+                 QOkDlg _dlg("文件名长度超过15,请重新输入！", this);
+                 _dlg.exec();
+                 return;
+         }
+
+         _Info.szName += ".xtf";
+         QDir _dir(g_szPath[_Info.nPath]);
+         if (_dir.exists(_Info.szName))
+         {
+             QOkDlg _dlg("该文件名已经存在！请从新输入.", this);
+             _dlg.exec();
+             return;
+         }
+    }
+    else
+        return;
+
+    QString _FilePath = QString("%1%2").arg(g_szPath[_Info.nPath]).arg(_Info.szName);
+    QFile _file(_FilePath);
+    _file.open(QIODevice::ReadWrite | QIODevice::Text);
+    QDataStream _out(&_file);
+    QString _strContent =  m_pCodeEdit->GetCodeText();
+    std::string	_stdStr = _strContent.toStdString();
+    _out.writeRawData(_stdStr.data(), _strContent.size());
+    _file.close();
+    ShowEditView(false);
+    m_nFileStatus = NORMAL_FILE_STATUS;
+    ReListFile();
+ }
+
+
+ void QFilePage::ShowEditView(bool bShow_)
+ {
+    if (bShow_)
+    {
+        m_pFileList->hide();
+        m_pCodeEdit->show();
+        m_pCodeEdit->EnterEditStatus();
+    }
+    else
+    {
+        m_pFileList->show();
+        m_pCodeEdit->hide();
+        m_pCodeEdit->LeaveEditStatus();
+    }
+ }

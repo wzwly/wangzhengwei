@@ -4,7 +4,7 @@
 #include "./ui/mainframe.h"
 
 #include "./core/parseconfig.h"
-//#include "./core/xtfreader.h"
+#include "./core/xtfreader.h"
 
 int main(int argc, char *argv[])
 {

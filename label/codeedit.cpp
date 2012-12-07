@@ -62,9 +62,5 @@ void QCodeEdit::InitWind()
      m_pTextEdit->setPlainText(str_);
  }
 
- inline QString QCodeEdit::GetCodeText() const
- {
-     m_pTextEdit->toPlainText ();
- }
 
 

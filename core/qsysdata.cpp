@@ -1,11 +1,11 @@
 #include "qsysdata.h"
 #include "dxfreader.h"
 #include "cmddef.h"
+#include "xtfreader.h"
 
 #include "./../ui/drillparam.h"
-#include "./../label/configset.h"
-#include "./../label/dlg.h"
 #include "./../ui/addrdef.h"
+#include "./../label/label.h"
 #include "./../ghead.h"
 
 #include <sys/types.h>
@@ -297,40 +297,9 @@ void QSysData::LoadFromDxfFile(const QString& path)
 
 void QSysData::LoadFromXtfFile(const QString& path)
 {
-    QDrillParamPage::DrillData _pData;
-    int _fd = open(path.toStdString().data(), O_CREAT | O_RDWR);
-    if (_fd < 0)
-    {
-
-        return;
-    }
-    read(_fd, &_pData,sizeof(QDrillParamPage::DrillData));
-    _pData.NewData();
-    read(_fd, _pData.piDataX,_pData.iSizeX);
-    read(_fd, _pData.piDataY,_pData.iSizeY);
-    read(_fd, &_pData.iCrc,sizeof(int));
-    ::close(_fd);
-    if (!_pData.IsValid())
-    {
-         QString _str = QString("载入文件【%1】失败！").arg(m_strFileName);
-         QOkDlg _dlg(_str);
-         _dlg.exec();
-         return;
-    }
-
-    m_vDrillData.clear();
-    m_vDrillData.resize(120);
-    int _nPos = 0;
-    int _iX, _iY;
-    for(int _i = 0; _i < 12; ++_i)
-    {
-        for (int _j = 0; _j < 10; ++_j)
-        {
-            _iX = _pData.piDataX[_i];
-            _iY = _pData.piDataY[_i * 12 + _j];
-            m_vDrillData[_nPos++] = INT_POINT(_iX, _iY);
-        }          
-    }
+    CXtfReader _xtf;
+    if( _xtf.OpenConfigFile(path))
+        _xtf.StartParseFile(1);
 }
 
 

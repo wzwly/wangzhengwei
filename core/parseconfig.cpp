@@ -12,7 +12,7 @@ CParseBase::~CParseBase()
     CloseFile();
 }
 
-bool CParseBase::OpenConfigFile(const char* szPath_)
+bool CParseBase::OpenConfigFile(const QString& szPath_)
 {
     if (m_pFile != NULL)
        CloseFile();

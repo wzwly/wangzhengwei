@@ -22,7 +22,12 @@ class QFilePage : public QBasePage
     enum {
         SYS_PATH = 0,
         USB_PATH,
+
+        NORMAL_FILE_STATUS,
+        EDIT_FILE_STATE,
+        NEW_FILE_STATE,
     };
+
 public:
     QFilePage(QWidget* parent_);
 public:
@@ -41,13 +46,17 @@ private:
 
     void ReListFile();
     bool GetCurSelFile(_FileInfo& info_);
+    void EditFile();
+    void NewFile();
+    void SaveFile();
+    void ShowEditView(bool bShow_);
 private:
     QListBox* m_pFileList;
     QList<_FileInfo> m_lFileList;
     QCodeEdit* m_pCodeEdit;
-    int m_nSelFile;
-    int m_nMaxShow;
-    int m_nShowIndex;
+
+    _FileInfo m_FileInEdit;
+    int m_nFileStatus; 
 };
 
 

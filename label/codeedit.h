@@ -16,7 +16,7 @@ public:
 
     //
     void SetEdittext(const QString& str_);
-    inline QString GetCodeText() const;
+    inline QString GetCodeText();
     void EnterEditStatus() {m_bIsEditStatus = true;}
     void LeaveEditStatus() {m_bIsEditStatus = false;}
 public slots:
@@ -31,5 +31,11 @@ private:
     QTextEdit* m_pTextEdit;
     bool m_bIsEditStatus;
 };
+
+inline QString QCodeEdit::GetCodeText()
+{
+    return m_pTextEdit->toPlainText ();
+}
+
 
 #endif // CODEEDIT_H

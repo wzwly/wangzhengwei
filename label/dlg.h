@@ -66,7 +66,7 @@ private:
 private:
      void InitialData(STR_DLG_TYPE eDlg_);
 public:
-     const QString& GetInputText(){return m_pInputText->text();}
+     QString GetInputText(){return m_pInputText->text();}
 
 //=======================================
 //=======================================

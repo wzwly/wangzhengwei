@@ -107,7 +107,7 @@ public:
     CParseBase();
     ~CParseBase();
 public:
-    bool OpenConfigFile(const char* szPath_);
+    bool OpenConfigFile(const QString& szPath_);
     void CloseFile();
 protected:
     bool GetDouble(double& dRet_); //move
