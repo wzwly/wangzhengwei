@@ -258,8 +258,8 @@ void QSysData::LoadFile(const QString& path_, const QString& name_)
     _str1.copy(m_szName, _str1.size());
     m_szName[_str1.size()] = '\0';
 
-    QString _fix = path_.right(3);
-    if (_fix == "xtf")
+    QString _fix = path_.right(4);
+    if (_fix == FILE_SUFFIX)
         LoadFromXtfFile(path_);
     else
         LoadFromDxfFile(path_);
