@@ -49,7 +49,7 @@ public:
     void ReSetLoad();
     bool IsLoadFile(const QString& path_){return path_ == m_strFilePath;}
     bool IsLoadFile(){return !m_strFilePath.isEmpty();}
-    bool IsSelDefFile(){ QString _fix = m_strFilePath.right(3); return _fix == "xtf";}
+    bool IsSelDefFile(){ QString _fix = m_strFilePath.right(4); return _fix == FILE_SUFFIX;}
     const QString& GetFileName() {return m_strFileName;}
     const QString& GetFileFullPath() {return m_strFilePath;}
 

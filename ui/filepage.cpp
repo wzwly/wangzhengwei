@@ -17,8 +17,8 @@
 
 QFilePage::QFilePage(QWidget* parent_)
         :QBasePage( parent_)
-{
-    m_nFileStatus = 0;
+{    
+    m_nFileStatus = NORMAL_FILE_STATUS;
     m_pFileList = new QListBox(this);
     m_pFileList->SetWindPos(0, 0,853, 618);
     QStringList _listHead;
@@ -103,36 +103,50 @@ void QFilePage::OnSndBtnClick(int nId_)//响应mainframe 二级菜单点击
         if (0 == m_nSndBtnShow)
             LoadFile();
         else
-            CpyFile(USB_PATH);
+            EditFile();//
     }
     if (1 == nId_)
     {
          if (0 == m_nSndBtnShow)
             UnloadFile();//
          else
-            CpyFile(SYS_PATH);
+            NewFile();
+
     }
     else if (2 == nId_) //
     {
         if (0 == m_nSndBtnShow)
-             EditFile();//
-        else
-            DeleteFile();
+            CpyFile(USB_PATH);
     }
     else if (3 == nId_) //
     {
-        if (0 == m_nSndBtnShow)
-            NewFile();
+        if (0 == m_nSndBtnShow)             
+            CpyFile(SYS_PATH);
     }
     else if (4 == nId_)
     {
         if (0 == m_nSndBtnShow)
+            DeleteFile();
+        else
             SaveFile();
     }
     else if (5 == nId_)
     {
-        m_nSndBtnShow =  m_nSndBtnShow ? 0 : 1;
-        m_pMainFrame->ReShowMenuBtn();
+
+        if (1 == m_nSndBtnShow && m_nFileStatus != NORMAL_FILE_STATUS)
+        {
+            QString _str = QString("确定放弃编辑返回？");
+            QOkDlg _dlg(_str, this);
+            if(_dlg.exec())
+            {     
+                 ShowEditView(false);
+            }   
+        }
+        else
+        {
+            m_nSndBtnShow =  m_nSndBtnShow ? 0 : 1;
+            m_pMainFrame->ReShowMenuBtn();
+        }
     }
 
 }
@@ -232,7 +246,7 @@ void QFilePage::LoadFile()
 
 
       QDir _dir(g_szPath[_Info.nPath]);
-      if (SYS_PATH == _Info.nPath && _dir.exists(_Info.szName))
+      if (SYS_PATH == _Info.nPath &&_Info.szName.right(4) == FILE_SUFFIX && _dir.exists(_Info.szName))
       {
             m_FileInEdit = _Info;
 
@@ -264,12 +278,15 @@ void QFilePage::LoadFile()
 
  void QFilePage::SaveFile()
  {
+     if (m_nFileStatus == NORMAL_FILE_STATUS)
+         return;
+
     _FileInfo _Info;
     if (m_nFileStatus == EDIT_FILE_STATE)
     {
         _Info = m_FileInEdit;
     }
-    else if (m_nFileStatus = NEW_FILE_STATE)
+    else if (m_nFileStatus == NEW_FILE_STATE)
     {
          _Info.nPath = SYS_PATH;
 
@@ -285,7 +302,7 @@ void QFilePage::LoadFile()
                  return;
          }
 
-         _Info.szName += ".xtf";
+         _Info.szName += FILE_SUFFIX;
          QDir _dir(g_szPath[_Info.nPath]);
          if (_dir.exists(_Info.szName))
          {
@@ -305,8 +322,7 @@ void QFilePage::LoadFile()
     std::string	_stdStr = _strContent.toStdString();
     _out.writeRawData(_stdStr.data(), _strContent.size());
     _file.close();
-    ShowEditView(false);
-    m_nFileStatus = NORMAL_FILE_STATUS;
+    ShowEditView(false);  
     ReListFile();
  }
 
@@ -317,10 +333,11 @@ void QFilePage::LoadFile()
     {
         m_pFileList->hide();
         m_pCodeEdit->show();
-        m_pCodeEdit->EnterEditStatus();
+        m_pCodeEdit->EnterEditStatus();      
     }
     else
-    {
+    {     
+        m_nFileStatus = NORMAL_FILE_STATUS;       
         m_pFileList->show();
         m_pCodeEdit->hide();
         m_pCodeEdit->LeaveEditStatus();

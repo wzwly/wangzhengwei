@@ -17,7 +17,7 @@
 #include <QDebug>
 
 using namespace std;
-#define MAIN_MENU_COUNT      5
+#define MAIN_MENU_COUNT      4
 #define SECOND_MENU_COUNT    6
 
 //部分函数
@@ -85,6 +85,8 @@ enum LANG
 #define ARRAY_SIZE(a)  (sizeof(a) / sizeof(a[0])) //数组个数
 
 #define g_fDataMult  100.0
+
+#define FILE_SUFFIX ".xtf"
 
 //保存全局的类指针，方便统一释放
 extern QList<QObject*> g_pListObject;

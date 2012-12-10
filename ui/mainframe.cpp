@@ -1,8 +1,7 @@
 #include "mainframe.h"
 #include <QtGui>
 #include "./../ghead.h"
-#include "./../label/item.h"
-#include "./../label/button.h"
+#include "./../label/label.h"
 #include "./../core/qsysdata.h"
 #include "./../core/cmddef.h"
 #include "./../core/serial.h"
@@ -15,24 +14,22 @@
 #include "syspage.h"
 
 
-static const char* g_szMainMenu[MAIN_MENU_COUNT] = {"自动页面", "程序文件","钻孔参数", "系统参数", "系统监视"};
-static const int g_nSndMenuQyt[MAIN_MENU_COUNT] = {3, 5, 4, 5, 4};  //二级菜单显示个数
+static const char* g_szMainMenu[MAIN_MENU_COUNT] = {"自动页面", "程序文件", "系统参数", "系统监视"};
+static const int g_nSndMenuQyt[MAIN_MENU_COUNT] = {3, 5, 4, 5};  //二级菜单显示个数
 
 static const char* g_szPageBtn0[SECOND_MENU_COUNT] = {"启动","暂停", "停止", "回原点", "仿真", "手动"};
-static const char* g_szPageBtn1[SECOND_MENU_COUNT] = {"加载", "卸载", "编辑", "新建文件", "保存","文件管理"};
-static const char* g_szPageBtn2[SECOND_MENU_COUNT] = {"新建文件", "编辑文件", "保存文件", "设定排数", "上页","下页"};
-static const char* g_szPageBtn3[SECOND_MENU_COUNT] = {"系统参数", "速度参数", "限位参数", "视图参数","上页","下页"};
-static const char* g_szPageBtn4[SECOND_MENU_COUNT] = {"","", "", "", "", "触屏校准"};
+static const char* g_szPageBtn1[SECOND_MENU_COUNT] = {"加载", "卸载", "拷贝到U盘", "拷贝到系统", "删除","编辑"};
+static const char* g_szPageBtn2[SECOND_MENU_COUNT] = {"系统参数", "速度参数", "限位参数", "视图参数","上页","下页"};
+static const char* g_szPageBtn3[SECOND_MENU_COUNT] = {"","", "", "", "", "触屏校准"};
 
 static const char* g_szPageBtn01[SECOND_MENU_COUNT] = {"步进","连续", "全部回原点", "单轴回原点", "设定原点", "自动"};
-static const char* g_szPageBtn11[SECOND_MENU_COUNT] = {"拷贝到U盘","拷贝到系统","删除", "", "", "返回"};
+static const char* g_szPageBtn11[SECOND_MENU_COUNT] = {"编辑","新建","", "", "保存", "返回"};
 static const char* g_szPageBtn21[SECOND_MENU_COUNT] = {"","","", "", "", ""};
-static const char* g_szPageBtn31[SECOND_MENU_COUNT] = {"","","", "", "", ""};
-static const char* g_szPageBtn41[SECOND_MENU_COUNT] = {"","", "", "", "", ""};
+static const char* g_szPageBtn31[SECOND_MENU_COUNT] = {"","", "", "", "", ""};
 
 //typedef  const char* (*DEF_PARRAY_MENU_SND)[SECOND_MENU_COUNT];
-static const char** g_zsSndMenu[MAIN_MENU_COUNT] = {g_szPageBtn0, g_szPageBtn1, g_szPageBtn2, g_szPageBtn3, g_szPageBtn4};
-static const char** g_zsSndMenu1[MAIN_MENU_COUNT] = {g_szPageBtn01, g_szPageBtn11, g_szPageBtn21, g_szPageBtn31, g_szPageBtn41};
+static const char** g_zsSndMenu[MAIN_MENU_COUNT] = {g_szPageBtn0, g_szPageBtn1, g_szPageBtn2, g_szPageBtn3};
+static const char** g_zsSndMenu1[MAIN_MENU_COUNT] = {g_szPageBtn01, g_szPageBtn11, g_szPageBtn21, g_szPageBtn31};
 
 #define BTN_MENU_H  90
 #define BTN_MENU_W  170
@@ -132,11 +129,10 @@ void QMainFrame::CreatePage()
 {
     m_pMenuPage[0] = new QAutoPage(this);
     m_pMenuPage[1] = new QFilePage(this);
-    m_pMenuPage[2] = new QDrillParamPage(this);
-    m_pMenuPage[3] = new QSysParamPage(this);
-    m_pMenuPage[4] = new QSysPage(this);
-
-    for (int _i = 0; _i < 5; ++_i)
+   // m_pMenuPage[2] = new QDrillParamPage(this);
+    m_pMenuPage[2] = new QSysParamPage(this);
+    m_pMenuPage[3] = new QSysPage(this);
+    for (int _i = 0; _i < MAIN_MENU_COUNT; ++_i)
     {
         m_pMenuPage[_i]->SetModbus(m_pModbus);
         m_pMenuPage[_i]->SetSysData(m_pSysData);

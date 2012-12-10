@@ -138,7 +138,7 @@ void QDrillParamPage::OnSndBtnClick(int nId_)
                     _dlg.exec();
                     return;
                 }
-                QString _stPath = QString("./Flash/%1.xtf").arg(_str);
+                QString _stPath = QString("./Flash/%1%2").arg(_str).arg(FILE_SUFFIX);
                 //QConfigSet::WriteToFile(_stPath, &m_cData, m_cData.iSize, 0);
                 SaveFile(_stPath);
             }
