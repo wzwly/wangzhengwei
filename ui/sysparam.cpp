@@ -1,8 +1,7 @@
 #include "sysparam.h"
-#include "./../label/item.h"
-#include "./../label/button.h"
+
+#include "./../label/label.h"
 #include "./../ghead.h"
-#include "./../label/dlg.h"
 #include "./../core/cmddef.h"
 #include "addrdef.h"
 
@@ -24,39 +23,21 @@
 QSysParamPage::QSysParamPage(QWidget* parent_)
     :QBasePage( parent_)
 {
-    m_nShowIndex = 0;
-    CreatePageInfo();
-}
+    m_nShowColumn = 0;
+    m_pFileList = new QListBox(this);
+    m_pFileList->SetWindPos(0, 0,853, 618);
+    QStringList _listHead;
+    _listHead << "编号"<<"参数名"<<"参数值"<<"单位";
+    m_pFileList->SetColumnHeadName( _listHead);
 
-void QSysParamPage::CreatePageInfo()
-{
-    QTipLabel* _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
-    _pTemp->InitShow("编号", 0, 0, FILE_ITEM_W0, FILE_ITEM_H0, FILE_FONT_SIZE);
-    _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
-    _pTemp->InitShow("参数名", 100, 0, FILE_ITEM_W1, FILE_ITEM_H0, FILE_FONT_SIZE);
-    _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
-    _pTemp->InitShow("参数值", 554, 0, FILE_ITEM_W2, FILE_ITEM_H0, FILE_FONT_SIZE);
-    _pTemp = new QTipLabel(this,QItem::LABEL_DLG);
-    _pTemp->InitShow("单位", 704, 0, FILE_ITEM_W3, FILE_ITEM_H0, FILE_FONT_SIZE);
-
-    for (int _i = 0; _i < PARAM_COLOUM; ++_i)
-    {
-        m_aParamArray[_i].pIndex = new QTipLabel(this, QItem::LABEL_LIST);
-        m_aParamArray[_i].pIndex->InitShow(0, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W0, FILE_ITEM_H, FILE_FONT_SIZE);
-        m_aParamArray[_i].pName = new QTipLabel(this, QItem::LABEL_LIST, Qt::AlignLeft);
-        m_aParamArray[_i].pName->InitShow(100, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W1, FILE_ITEM_H, FILE_FONT_SIZE);
-        m_aParamArray[_i].pData = new QPushBtn(this, QItem::LABEL_TIP,_i,Qt::AlignLeft);
-        m_aParamArray[_i].pData->InitShow(554, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W2, FILE_ITEM_H, FILE_FONT_SIZE);
-        m_aParamArray[_i].pData->SetBdWide(5);
-        m_aParamArray[_i].pUnit = new QTipLabel(this, QItem::LABEL_LIST);
-        m_aParamArray[_i].pUnit->InitShow(704, FILE_ITEM_H0 + FILE_ITEM_H * _i, FILE_ITEM_W3, FILE_ITEM_H, FILE_FONT_SIZE);
-        connect(m_aParamArray[_i].pData, SIGNAL(ClickedEvent(int)), this, SLOT(OnListClick(int)));
-    }
-
+    m_pFileList->SetColumnWidth(0, 135);
+    m_pFileList->SetColumnWidth(1, 340);
+    m_pFileList->SetColumnWidth(2, 180);
+    m_pFileList->SetColumnWidth(3, 180);
+    m_pFileList->SetColumnHeight(18);    
     InitParam();
     UpdateView(0);
 }
-
 
 void QSysParamPage::InitParam()
 {    
@@ -82,6 +63,7 @@ void QSysParamPage::InitParam()
             m_vParamData3.push_back(_pMap);
             break;
         case 5:
+            m_vParamData4.push_back(_pMap);
             break;
         case 6:
             break;
@@ -93,99 +75,76 @@ void QSysParamPage::InitParam()
 
 }
 
-void QSysParamPage::Show()
+void QSysParamPage::ReShow()
 {
-    int _nLen = m_pSysParam->size() - m_nShowIndex;
-    int _nMax = (_nLen > PARAM_COLOUM) ? PARAM_COLOUM :_nLen;
-
-
-    int _j = 0;
+    m_pFileList->ClearAllRow();
     DataMap* _pMap = NULL;
-    for (int _i = m_nShowIndex; _i < m_nShowIndex + _nMax; ++_i, ++_j)
+    for (int _i = 0; _i < m_pCurParamList->size(); ++_i)
     {
-        _pMap = m_pSysParam->at(_i);
-        m_aParamArray[_j].pIndex->setText(QString::number(_pMap->iNo));
-        m_aParamArray[_j].pName->setText(_pMap->strName.data());
-        m_aParamArray[_j].pData->setText(m_pSysData->GetValText(_pMap));
-        m_aParamArray[_j].pUnit->setText(_pMap->strUnit.data());
-        m_aParamArray[_j].pDataMap = _pMap;
-    }
-
-    for (; _j < PARAM_COLOUM; ++_j)
-    {
-        m_aParamArray[_j].pIndex->setText("");
-        m_aParamArray[_j].pName->setText("");
-        m_aParamArray[_j].pData->setText("");
-        m_aParamArray[_j].pUnit->setText("");
-        m_aParamArray[_j].pDataMap = NULL;
+        _pMap = m_pCurParamList->at(_i);
+        QStringList _listParam;
+        _listParam << QString::number(_pMap->iNo) << _pMap->strName.data()
+                << m_pSysData->GetValText(_pMap)<<_pMap->strUnit.data();
+        m_pFileList->InsertRowText(_listParam);
     }
 }
 
 void QSysParamPage::UpdateView(int nIndex_)
 {
     if (0 == nIndex_)
-        m_pSysParam = & m_vParamData0;
+        m_pCurParamList = & m_vParamData0;
     else if (1 == nIndex_)
-        m_pSysParam = & m_vParamData1;
+        m_pCurParamList = & m_vParamData1;
     else if (2 == nIndex_)
-        m_pSysParam = & m_vParamData2;
+        m_pCurParamList = & m_vParamData2;
     else if (3 == nIndex_)
-        m_pSysParam = & m_vParamData3;
-    Show();
+        m_pCurParamList = & m_vParamData3;
+    else if (4 == nIndex_)
+        m_pCurParamList = & m_vParamData4;
+    ReShow();
 }
 
-void QSysParamPage::OnListClick(int nId_)
-{
-    DataMap* _pMap = m_aParamArray[nId_].pDataMap;
-
-    if (_pMap == NULL)
-        return;
-
-    QNuberInput _SoftKey(this);
-    double _dMin, _dMax;
-    m_pSysData->GetMaxMinRange(_pMap, _dMin, _dMax);
-    _SoftKey.SetRange(_dMin, _dMax, m_pSysData->GetValText(_pMap));
-    if (!_SoftKey.exec())
-        return;
-
-    double _data = _SoftKey.GetDbData();
-
-    if (!m_pSysData->CheckValid(_pMap,_data))
-    {
-        QPopTip::ShowTextInMainframe(" 参数范围设置错误！", 25);
-        return;
-    }
-
-    m_pSysData->SetVal(_pMap, _data);
-    m_aParamArray[nId_].pData->setText(m_pSysData->GetValText(_pMap));
-
-    m_pSysData->SendToModelBus(_pMap);
-}
 
 void QSysParamPage::OnSndBtnClick(int nIndex_)
 {
-
-    if (nIndex_ <= 3)
+    if (nIndex_ <= 4)
     {
-        m_nShowIndex = 0;
+        if (m_nShowColumn == nIndex_)
+            return;
+        m_nShowColumn = nIndex_;
         UpdateView(nIndex_);
     }
-    else if (nIndex_ == 4)
+    else if (nIndex_ == 5) //edit
     {
-        if(m_nShowIndex > 0)
+        int _nSel = m_pFileList->GetCurSel();
+        if (_nSel < 0)
+            return;
+
+        DataMap* _pMap = m_pCurParamList->at(_nSel);
+        if (_pMap == NULL)
+            return;
+
+        QNuberInput _SoftKey(this);
+        double _dMin, _dMax;
+        m_pSysData->GetMaxMinRange(_pMap, _dMin, _dMax);
+        _SoftKey.SetRange(_dMin, _dMax, m_pSysData->GetValText(_pMap));
+        if (!_SoftKey.exec())
+            return;
+
+        double _data = _SoftKey.GetDbData();
+        if (!m_pSysData->CheckValid(_pMap,_data))
         {
-            m_nShowIndex -= PARAM_COLOUM;
-            Show();
+            QPopTip::ShowTextInMainframe(" 参数范围设置错误！", 25);
+            return;
         }
-    }
-    else if (nIndex_ == 5)
-    {
-         int _nLen = m_pSysParam->size() - m_nShowIndex;
-         if (_nLen > PARAM_COLOUM)
-         {
-             m_nShowIndex += PARAM_COLOUM;
-              Show();
-         }
+
+        m_pSysData->SetVal(_pMap, _data);        
+        QStringList _listParam;
+        _listParam << QString::number(_pMap->iNo) << _pMap->strName.data()
+                << m_pSysData->GetValText(_pMap)<<_pMap->strUnit.data();
+
+        m_pFileList->SetRowText( _nSel, _listParam);
+        m_pSysData->SendToModelBus(_pMap);
     }
 
 }

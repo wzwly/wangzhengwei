@@ -4,8 +4,6 @@
 #include "basepage.h"
 
 class QListBox;
-class QTipLabel;
-class QPushBtn;
 class QCodeEdit;
 
 #define FINE_ITEM_NUM 9
